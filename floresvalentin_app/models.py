@@ -1,3 +1,181 @@
+import uuid
 from django.db import models
+from django.conf import settings
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
-# Create your models here.
+# Modelo para Categorías
+class Category(models.Model):
+    # Usamos un ID normal autoincremental aquí, pero podemos usar UUID
+    name = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=110, unique=True, blank=True, help_text="")
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            from django.utils.text import slugify
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Categoría"
+        verbose_name_plural = "Categorías"
+
+
+# Modelo para Productos
+class Product(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL, # Si se borra la categoría, el producto no se borra, solo queda sin categoría
+        null=True,
+        blank=True,
+        related_name='products' # Para acceder desde una categoría: category.products.all()
+    )
+    name = models.CharField(max_length=200)
+    description = models.TextField(blank=True) # blank=True significa que no es requerido en formularios
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    # Usamos ImageField para mejor manejo de archivos en Django
+    image = models.ImageField(upload_to='products/', blank=True, null=True) # null=True permite valor NULL en DB
+    stock = models.PositiveIntegerField(default=0) # PositiveIntegerField asegura >= 0
+    available = models.BooleanField(default=True) # Campo útil para marcar si se muestra o no
+    created_at = models.DateTimeField(auto_now_add=True) # Se establece al crear
+    updated_at = models.DateTimeField(auto_now=True) # Se actualiza al guardar
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name'] # Ordenar por nombre por defecto
+
+
+# Modelo de Perfil de Usuario (extiende el User de Django)
+class Profile(models.Model):
+    # OneToOneField asegura que cada User tenga solo un Profile
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, # Referencia al modelo User activo
+        on_delete=models.CASCADE, # Si se borra el User, se borra el Profile
+        primary_key=True # Usa el ID del User como PK del Profile
+    )
+    # Los campos first_name y last_name ya están en el modelo User de Django
+    phone = models.CharField(max_length=20, blank=True)
+    country = models.CharField(max_length=50, blank=True)
+    city = models.CharField(max_length=50, blank=True)
+    neighborhood = models.CharField(max_length=100, blank=True)
+    address = models.CharField(max_length=255, blank=True)
+    postal_code = models.CharField(max_length=20, blank=True)
+
+    preferences = models.JSONField(blank=True, null=True, default=list) # Almacena una lista Python
+
+    newsletter = models.BooleanField(default=False)
+
+    # Roles - Usamos choices para limitar las opciones
+    ROLE_CHOICES = (
+        ('user', 'Usuario'),
+        ('admin', 'Administrador'),
+    )
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='user')
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Perfil de {self.user.username}"
+
+# Signal para crear/actualizar Profile automáticamente cuando se crea/actualiza User
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_or_update_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+    # instance.profile.save() # Descomentar si quieres que se guarde el perfil cada vez que se guarda el user
+
+
+# Modelo de Órdenes
+class Order(models.Model):
+    STATUS_CHOICES = (
+        ('pending', 'Pendiente'),
+        ('processing', 'Procesando'),
+        ('shipped', 'Enviado'),
+        ('delivered', 'Entregado'),
+        ('cancelled', 'Cancelado'),
+    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True) # Puede calcularse después
+    # Puedes añadir campos de dirección de envío aquí si no están en el perfil
+    # o si pueden ser diferentes por orden
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Orden {self.id} de {self.user.username}"
+
+    class Meta:
+        ordering = ['-created_at'] # Ordenar por fecha descendente
+
+
+# Modelo de Items de Órdenes
+class OrderItem(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, related_name='order_items', on_delete=models.SET_NULL, null=True) # No borrar item si se borra producto
+    quantity = models.PositiveIntegerField(default=1)
+    price = models.DecimalField(max_digits=10, decimal_places=2) # Precio al momento de la compra
+
+    def __str__(self):
+        return f"{self.quantity} x {self.product.name if self.product else 'Producto eliminado'}"
+
+    def get_cost(self):
+        return self.price * self.quantity
+
+
+# Modelo para Pedidos Especiales
+class SpecialOrder(models.Model):
+    STATUS_CHOICES = (
+        ('pending', 'Pendiente'),
+        ('reviewing', 'En Revisión'),
+        ('approved', 'Aprobado'),
+        ('rejected', 'Rechazado'),
+        ('in_progress', 'En Progreso'),
+        ('completed', 'Completado'),
+    )
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    recipient_name = models.CharField(max_length=150)
+    recipient_phone = models.CharField(max_length=20, blank=True)
+    delivery_address = models.CharField(max_length=255)
+    delivery_city = models.CharField(max_length=50)
+    delivery_postal_code = models.CharField(max_length=20, blank=True)
+    occasion = models.CharField(max_length=100)
+    delivery_date = models.DateField()
+    delivery_time = models.CharField(max_length=50, blank=True, help_text="Ej: Mañana, Tarde, 14:00-16:00")
+    budget = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    message = models.TextField(blank=True)
+    special_instructions = models.TextField(blank=True)
+    # Almacenaremos la descripción de los productos deseados o IDs como JSON
+    products = models.JSONField(blank=True, null=True, help_text="Descripción o lista de productos deseados")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Pedido especial {self.id} para {self.recipient_name} de {self.user.username}"
+
+    class Meta:
+        ordering = ['-created_at']
+
+
+# Modelo para Carrito de Compras Persistente (Opcional)
+# si no necesitas que el carrito persista entre dispositivos o sesiones largas.
+class ShoppingCart(models.Model):
+    # OneToOneField asegura un solo carrito por usuario
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, primary_key=True)
+    # Items almacenados como JSON: { "product_uuid": {"quantity": Q, "price": P}, ... }
+    items = models.JSONField(default=dict, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Carrito de {self.user.username}"

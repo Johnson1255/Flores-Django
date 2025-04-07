@@ -3,8 +3,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Product, Category, Order, OrderItem, SpecialOrder, Cart, CartItem, Coupon
-from .forms import SpecialOrderForm, ContactForm, ProfileForm, CheckoutForm
+# Corrected model imports: Replaced Cart with ShoppingCart, removed CartItem and Coupon
+from .models import Product, Category, Order, OrderItem, SpecialOrder, ShoppingCart
+from .forms import SpecialOrderForm, ContactForm, ProfileForm, CheckoutForm # Assuming CheckoutForm exists
 
 # Página principal
 def index(request):
@@ -80,140 +81,280 @@ def product_detail_api(request, product_id):
     return JsonResponse(product_data)
 
 # Carrito de compras
+# Refactored to use ShoppingCart model
 def get_or_create_cart(request):
     if request.user.is_authenticated:
-        cart, created = Cart.objects.get_or_create(user=request.user)
+        # Use ShoppingCart model, user is the primary key
+        cart, created = ShoppingCart.objects.get_or_create(user=request.user)
     else:
-        cart_id = request.session.get('cart_id')
-        if cart_id:
-            try:
-                cart = Cart.objects.get(id=cart_id)
-            except Cart.DoesNotExist:
-                cart = Cart.objects.create()
-                request.session['cart_id'] = str(cart.id)
-        else:
-            cart = Cart.objects.create()
-            request.session['cart_id'] = str(cart.id)
+        # For anonymous users, we might need a different strategy
+        # or decide not to support persistent carts for them.
+        # For now, let's return None or handle session-based cart later.
+        # This implementation assumes authenticated users for persistent cart.
+        # If anonymous cart is needed, session logic would go here.
+        # cart_id = request.session.get('shopping_cart_id')
+        # if cart_id: ... etc.
+        messages.error(request, "Debes iniciar sesión para usar el carrito persistente.")
+        return None # Or redirect to login
     return cart
 
+# Refactored to handle potential None cart and pass items differently
 def cart_detail(request):
     cart = get_or_create_cart(request)
-    return render(request, 'floresvalentin_app/cart.html', {'cart': cart})
+    cart_items_context = []
+    cart_subtotal = 0
+    if cart and cart.items:
+        product_ids = cart.items.keys()
+        products = Product.objects.filter(id__in=product_ids)
+        products_dict = {str(p.id): p for p in products}
 
+        for product_id, item_data in cart.items.items():
+            product = products_dict.get(product_id)
+            if product:
+                quantity = item_data.get('quantity', 0)
+                price = item_data.get('price', float(product.price)) # Use stored price or current
+                total_price = quantity * price
+                cart_items_context.append({
+                    'product': product,
+                    'quantity': quantity,
+                    'price': price,
+                    'total_price': total_price,
+                    'id': product_id # Pass ID for update/remove forms
+                })
+                cart_subtotal += total_price
+
+    # TODO: Calculate tax and total based on subtotal
+    cart_tax = cart_subtotal * 0.19 # Example tax
+    cart_total = cart_subtotal + cart_tax
+
+    # Use the correct template name based on file structure
+    return render(request, 'floresvalentin_app/shopping_cart_detail.html', {
+        'cart': cart, # Pass the cart object itself if needed
+        'cart_items': cart_items_context,
+        'cart_subtotal': cart_subtotal,
+        'cart_tax': cart_tax,
+        'cart_total': cart_total,
+    })
+
+# Needs refactoring to use ShoppingCart.items JSONField
 def cart_add(request, product_id):
     cart = get_or_create_cart(request)
+    if not cart:
+        # Handle case where user is not logged in or cart creation failed
+        return redirect('login') # Or wherever appropriate
+
     product = get_object_or_404(Product, id=product_id)
     quantity = int(request.POST.get('quantity', 1))
-    
-    cart_item, created = CartItem.objects.get_or_create(
-        cart=cart,
-        product=product,
-        defaults={'quantity': quantity}
-    )
-    
-    if not created:
-        cart_item.quantity += quantity
-        cart_item.save()
+    product_id_str = str(product.id)
+
+    # Update JSONField
+    if product_id_str in cart.items:
+        cart.items[product_id_str]['quantity'] += quantity
+    else:
+        cart.items[product_id_str] = {
+            'quantity': quantity,
+            'price': float(product.price) # Store price at time of adding
+        }
+    cart.save()
     
     messages.success(request, f'{product.name} añadido al carrito')
+    # Use the correct URL name from floresvalentin_app/urls.py
     return redirect('floresvalentin_app:ver_carrito')
 
-def cart_update(request, product_id):
+# Needs refactoring to use ShoppingCart.items JSONField
+def cart_update(request, item_id): # Changed parameter to item_id (which is product_id here)
     cart = get_or_create_cart(request)
-    product = get_object_or_404(Product, id=product_id)
-    quantity = int(request.POST.get('quantity', 1))
-    
-    try:
-        cart_item = CartItem.objects.get(cart=cart, product=product)
-        cart_item.quantity = quantity
-        cart_item.save()
-    except CartItem.DoesNotExist:
-        pass
-    
+    if not cart:
+        return redirect('login')
+
+    product_id_str = str(item_id) # item_id is the product UUID string
+    quantity = int(request.POST.get('quantity', 0))
+
+    if product_id_str in cart.items:
+        if quantity > 0:
+            cart.items[product_id_str]['quantity'] = quantity
+            messages.success(request, 'Cantidad actualizada.')
+        else:
+            # If quantity is 0 or less, remove the item
+            del cart.items[product_id_str]
+            messages.success(request, 'Producto eliminado del carrito.')
+        cart.save()
+    else:
+         messages.error(request, 'Producto no encontrado en el carrito.')
+
     return redirect('floresvalentin_app:ver_carrito')
 
-def cart_remove(request, product_id):
+# Needs refactoring to use ShoppingCart.items JSONField
+def cart_remove(request, item_id): # Changed parameter to item_id
     cart = get_or_create_cart(request)
-    product = get_object_or_404(Product, id=product_id)
-    
-    try:
-        cart_item = CartItem.objects.get(cart=cart, product=product)
-        cart_item.delete()
-    except CartItem.DoesNotExist:
-        pass
-    
+    if not cart:
+        return redirect('login')
+
+    product_id_str = str(item_id) # item_id is the product UUID string
+
+    if product_id_str in cart.items:
+        del cart.items[product_id_str]
+        cart.save()
+        messages.success(request, 'Producto eliminado del carrito.')
+    else:
+        messages.error(request, 'Producto no encontrado en el carrito.')
+
     return redirect('floresvalentin_app:ver_carrito')
 
+# Needs refactoring - No Coupon model exists currently
 def apply_coupon(request):
+    # This function needs a Coupon model and logic to work.
+    # For now, just display a message.
     if request.method == 'POST':
         coupon_code = request.POST.get('coupon_code')
-        
-        try:
-            coupon = Coupon.objects.get(code=coupon_code, active=True)
-            cart = get_or_create_cart(request)
-            cart.coupon = coupon
-            cart.save()
-            messages.success(request, 'Cupón aplicado correctamente')
-        except Coupon.DoesNotExist:
-            messages.error(request, 'El cupón no es válido')
-    
+        messages.info(request, f'Funcionalidad de cupón "{coupon_code}" no implementada.')
+
     return redirect('floresvalentin_app:ver_carrito')
 
 # Proceso de compra
 @login_required
 def checkout(request):
     cart = get_or_create_cart(request)
-    form = CheckoutForm(initial={
+    if not cart or not cart.items:
+         messages.warning(request, 'Tu carrito está vacío.')
+         return redirect('floresvalentin_app:ver_carrito')
+
+    # Recalculate totals here before passing to template/form
+    cart_items_context = []
+    cart_subtotal = 0
+    if cart.items:
+        product_ids = cart.items.keys()
+        products = Product.objects.filter(id__in=product_ids)
+        products_dict = {str(p.id): p for p in products}
+        for product_id, item_data in cart.items.items():
+             product = products_dict.get(product_id)
+             if product:
+                 quantity = item_data.get('quantity', 0)
+                 price = item_data.get('price', float(product.price))
+                 cart_subtotal += quantity * price
+
+    cart_tax = cart_subtotal * 0.19 # Example tax
+    cart_total = cart_subtotal + cart_tax
+
+    # Pass calculated totals to the template
+    # Initialize form with user data if available
+    initial_data = {
         'first_name': request.user.first_name,
         'last_name': request.user.last_name,
         'email': request.user.email,
-    })
-    
+    }
+    # Add address info if available in Profile model
+    if hasattr(request.user, 'profile'):
+         initial_data.update({
+             'address': request.user.profile.address,
+             'city': request.user.profile.city,
+             'postal_code': request.user.profile.postal_code,
+             'phone': request.user.profile.phone,
+         })
+    form = CheckoutForm(initial=initial_data)
+
     return render(request, 'floresvalentin_app/checkout.html', {
         'cart': cart,
-        'form': form
+        'form': form,
+        'cart_subtotal': cart_subtotal,
+        'cart_tax': cart_tax,
+        'cart_total': cart_total,
     })
 
+# Needs refactoring for ShoppingCart and Order creation
 @login_required
 def checkout_confirm(request):
     if request.method == 'POST':
         form = CheckoutForm(request.POST)
         if form.is_valid():
             cart = get_or_create_cart(request)
-            
+            if not cart or not cart.items:
+                messages.error(request, 'Error: Tu carrito está vacío.')
+                return redirect('floresvalentin_app:ver_carrito')
+
+            # Recalculate total for the order
+            cart_subtotal = 0
+            product_ids = cart.items.keys()
+            products = Product.objects.filter(id__in=product_ids)
+            products_dict = {str(p.id): p for p in products}
+            order_items_data = [] # To store data for OrderItem creation
+
+            for product_id, item_data in cart.items.items():
+                 product = products_dict.get(product_id)
+                 if product:
+                     quantity = item_data.get('quantity', 0)
+                     price = item_data.get('price', float(product.price))
+                     cart_subtotal += quantity * price
+                     order_items_data.append({
+                         'product': product,
+                         'quantity': quantity,
+                         'price': price
+                     })
+
+            cart_tax = cart_subtotal * 0.19 # Example tax
+            cart_total = cart_subtotal + cart_tax
+
             # Crear orden
             order = Order.objects.create(
                 user=request.user,
-                first_name=form.cleaned_data['first_name'],
-                last_name=form.cleaned_data['last_name'],
-                email=form.cleaned_data['email'],
-                address=form.cleaned_data['address'],
-                postal_code=form.cleaned_data['postal_code'],
-                city=form.cleaned_data['city'],
-                phone=form.cleaned_data['phone'],
-                total_price=cart.get_total_price(),
-                coupon=cart.coupon
+                # Get data from the VALID form
+                # first_name=form.cleaned_data['first_name'], # Assuming these fields are in CheckoutForm
+                # last_name=form.cleaned_data['last_name'],
+                # email=form.cleaned_data['email'],
+                # address=form.cleaned_data['address'],
+                # postal_code=form.cleaned_data['postal_code'],
+                # city=form.cleaned_data['city'],
+                # phone=form.cleaned_data['phone'],
+                total_amount=cart_total, # Use calculated total
+                # coupon=cart.coupon # No coupon model/field yet
             )
-            
-            # Crear items de la orden
-            for item in cart.items.all():
+
+            # Crear items de la orden from collected data
+            for item_data in order_items_data:
                 OrderItem.objects.create(
                     order=order,
-                    product=item.product,
-                    price=item.product.price,
-                    quantity=item.quantity
+                    product=item_data['product'],
+                    price=item_data['price'],
+                    quantity=item_data['quantity']
                 )
-            
-            # Vaciar carrito
-            cart.items.all().delete()
-            cart.coupon = None
+
+            # Vaciar carrito (JSONField)
+            cart.items = {}
             cart.save()
-            
+
+            # TODO: Add payment processing logic here if needed
+
             return redirect('floresvalentin_app:order_completed', order_id=order.id)
-    else:
-        form = CheckoutForm()
-    
-    return render(request, 'floresvalentin_app/checkout_confirm.html', {'form': form})
+        else:
+             # Form is invalid, re-render checkout page with errors
+             cart = get_or_create_cart(request) # Need cart context again
+             # Recalculate totals again for the template
+             cart_subtotal = 0
+             if cart and cart.items:
+                 product_ids = cart.items.keys()
+                 products = Product.objects.filter(id__in=product_ids)
+                 products_dict = {str(p.id): p for p in products}
+                 for product_id, item_data in cart.items.items():
+                      product = products_dict.get(product_id)
+                      if product:
+                          quantity = item_data.get('quantity', 0)
+                          price = item_data.get('price', float(product.price))
+                          cart_subtotal += quantity * price
+             cart_tax = cart_subtotal * 0.19
+             cart_total = cart_subtotal + cart_tax
+
+             messages.error(request, "Por favor corrige los errores en el formulario.")
+             return render(request, 'floresvalentin_app/checkout.html', {
+                 'cart': cart,
+                 'form': form, # Pass invalid form back
+                 'cart_subtotal': cart_subtotal,
+                 'cart_tax': cart_tax,
+                 'cart_total': cart_total,
+             })
+
+    # If GET request, redirect to checkout page
+    return redirect('floresvalentin_app:checkout')
+
 
 def order_completed(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)

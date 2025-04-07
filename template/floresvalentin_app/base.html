@@ -88,16 +88,16 @@
                     </div>
                 </div>
                 <div class="header-actions">
-                    {# Enlace a Pedido Especial (TODO: requiere definir la URL 'special_order_create') #}
-                    <a href="{% url 'tienda:special_order_create' %}" class="action-button">
+                    {# TODO: requiere definir la URL 'special_order_create' #}
+                    <a href="{% url 'floresvalentin_app:special_order_create' %}" class="action-button">
                         <i class="fas fa-gift"></i>
                         <span>{% trans "Pedido Especial" %}</span>
                     </a>
                     {# Enlace al Carrito (TODO: requiere definir la URL 'ver_carrito') #}
-                    <a href="{% url 'tienda:ver_carrito' %}" class="action-button primary">
+                    <a href="{% url 'floresvalentin_app:ver_carrito' %}" class="action-button primary">
                         <i class="fas fa-shopping-cart"></i>
                         <span>{% trans "Comprar Ahora" %}</span>
-                        {# Contador del carrito (requiere pasar 'cart_item_count' en el contexto) #}
+                        {# TODO: requiere pasar 'cart_item_count' en el contexto #}
                         <span class="cart-counter">{{ cart_item_count|default:0 }}</span>
                     </a>
                 </div>
@@ -108,8 +108,8 @@
     {# --- BARRA DE NAVEGACIÓN STICKY --- #}
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container-fluid">
-            {# Enlace a Inicio (TODO: requiere definir la URL 'index') #}
-            <a class="navbar-brand" href="{% url 'tienda:index' %}">{% trans "Inicio" %}</a>
+            {# TODO: requiere definir la URL 'index' #}
+            <a class="navbar-brand" href="{% url 'floresvalentin_app:index' %}">{% trans "Inicio" %}</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -117,36 +117,36 @@
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         {# Enlace a Catálogo (TODO: requiere definir la URL 'catalogo') #}
-                        <a class="nav-link" href="{% url 'tienda:catalogo' %}">{% trans "Catálogo" %}</a>
+                        <a class="nav-link" href="{% url 'floresvalentin_app:catalogo' %}">{% trans "Catálogo" %}</a>
                     </li>
                     {# --- ENLACES OPCIONALES (si son secciones de index.html o páginas separadas) --- #}
                     {# Opción A: Si son secciones DENTRO de la página de inicio #}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'tienda:index' %}#galeria">{% trans "Galería" %}</a>
+                        <a class="nav-link" href="{% url 'floresvalentin_app:index' %}#galeria">{% trans "Galería" %}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'tienda:index' %}#ubicacion">{% trans "Ubicación" %}</a>
+                        <a class="nav-link" href="{% url 'floresvalentin_app:index' %}#ubicacion">{% trans "Ubicación" %}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'tienda:index' %}#contacto">{% trans "Contacto" %}</a>
+                        <a class="nav-link" href="{% url 'floresvalentin_app:index' %}#contacto">{% trans "Contacto" %}</a>
                     </li>
                     {# Opción B: Si se convierten en páginas separadas, necesitarían sus propias URLs #}
                     {#
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'tienda:gallery' %}">{% trans "Galería" %}</a>
+                        <a class="nav-link" href="{% url 'floresvalentin_app:gallery' %}">{% trans "Galería" %}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'tienda:location' %}">{% trans "Ubicación" %}</a>
+                        <a class="nav-link" href="{% url 'floresvalentin_app:location' %}">{% trans "Ubicación" %}</a>
                     </li>
                      <li class="nav-item">
-                        <a class="nav-link" href="{% url 'tienda:contact' %}">{% trans "Contacto" %}</a>
+                        <a class="nav-link" href="{% url 'floresvalentin_app:contact' %}">{% trans "Contacto" %}</a>
                     </li>
                     #}
                     {# --- Puedes añadir más enlaces aquí (ej. Mi Cuenta si el usuario está logueado) --- #}
                     {% if user.is_authenticated %}
                     <li class="nav-item">
-                        {# Asumiendo que tienes una vista/URL para el perfil del usuario #}
-                        <a class="nav-link" href="{% url 'tienda:profile' %}">{% trans "Mi Cuenta" %}</a>
+                        {# Asumiendo que tenemos una vista/URL para el perfil del usuario #}
+                        <a class="nav-link" href="{% url 'floresvalentin_app:profile' %}">{% trans "Mi Cuenta" %}</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -197,7 +197,6 @@
         <div class="footer-bottom">
             <p>© {% now "Y" %} Flores para San Valentín. {% trans "Todos los derechos reservados." %}</p>
             <div class="footer-links">
-                {# Estos enlaces deberían apuntar a páginas de políticas reales si las tienes #}
                 <a href="#">{% trans "Política de Privacidad" %}</a>
                 <a href="#">{% trans "Términos y Condiciones" %}</a>
                 <a href="#">{% trans "Política de Cookies" %}</a>
@@ -222,7 +221,6 @@
     <script type="module" src="{% static 'js/main.js' %}"></script>
     <script type="module" src="{% static 'js/music.js' %}"></script> {# Si la música es global #}
     <script type="module" src="{% static 'js/theme.js' %}"></script> {# Si el tema es global #}
-    {# <script type="module" src="{% static 'js/map.js' %}"></script> <- Movido: Cargar solo donde se necesite #}
 
     {# --- BLOQUE PARA SCRIPTS EXTRA (JS específicos de página) --- #}
     {% block extra_js %}{% endblock %}

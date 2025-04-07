@@ -6,12 +6,12 @@
                 <div>
                     <h5>{{ item.product.name }}</h5>
                     <p>Precio: ${{ item.price|floatformat:2 }}</p> {# Precio unitario al añadir #}
-                    <form action="{% url 'tienda:actualizar_carrito' item.product.id %}" method="post">
+                    <form action="{% url 'floresvalentin_app:actualizar_carrito' item.product.id %}" method="post">
                         {% csrf_token %}
                         <input type="number" name="quantity" value="{{ item.quantity }}" min="1">
                         <button type="submit">Actualizar</button>
                     </form>
-                    <form action="{% url 'tienda:eliminar_del_carrito' item.product.id %}" method="post">
+                    <form action="{% url 'floresvalentin_app:eliminar_del_carrito' item.product.id %}" method="post">
                         {% csrf_token %}
                         <button type="submit">Eliminar</button>
                     </form>
@@ -23,7 +23,7 @@
          <div class="cart-empty text-center p-4">
              <i class="fas fa-shopping-cart fa-3x mb-3"></i>
              <p>Tu carrito está vacío</p>
-             <a href="{% url 'tienda:catalogo' %}" class="btn btn-primary">Ver catálogo</a>
+             <a href="{% url 'floresvalentin_app:catalogo' %}" class="btn btn-primary">Ver catálogo</a>
          </div>
     {% endif %}
 </div>

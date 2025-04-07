@@ -59,7 +59,7 @@ ROOT_URLCONF = 'flores_django.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [BASE_DIR / 'template'], # Corrected directory name to singular 'template'
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

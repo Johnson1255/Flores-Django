@@ -9,9 +9,10 @@ from .forms import SpecialOrderForm, ContactForm, ProfileForm, CheckoutForm # As
 
 # Página principal
 def index(request):
-    featured_products = Product.objects.filter(featured=True)[:6]
+    # Changed filter: Get first 6 available products, newest first, instead of non-existent 'featured' field
+    featured_products = Product.objects.filter(available=True).order_by('-created_at')[:6]
     return render(request, 'floresvalentin_app/index.html', {
-        'featured_products': featured_products
+        'featured_products': featured_products # Renamed variable in context for clarity, but kept original name for compatibility if template uses it
     })
 
 # Catálogo y productos

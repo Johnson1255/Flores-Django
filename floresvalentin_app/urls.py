@@ -37,6 +37,6 @@ urlpatterns = [
     
     # Otras páginas
     path('contacto/', views.contact, name='contact'),
-    path('galeria/', views.gallery, name='gallery'),
-    path('ubicacion/', views.location, name='location'),
+    # path('galeria/', views.gallery, name='gallery'), # Removed - Assuming gallery is part of index
+    path('ubicacion/', views.location, name='location'), # Assuming location is also part of index or needs its own template
 ]

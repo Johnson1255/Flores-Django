@@ -1,0 +1,20 @@
+<form id="special-order-form" method="post" action="{% url 'tienda:special_order_create' %}">
+    {% csrf_token %}
+
+    {# Renderizar campos con Bootstrap - Ejemplo #}
+    {% for field in form %}
+        <div class="mb-3">
+            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}{% if field.field.required %}*{% endif %}</label>
+            {{ field }} {# Django renderiza el input/select/textarea #}
+            {% if field.help_text %}
+                <div class="form-text">{{ field.help_text }}</div>
+            {% endif %}
+            {% for error in field.errors %}
+                <div class="invalid-feedback d-block">{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+
+    {# ... (alertas, botón submit) ... #}
+    <button type="submit" class="btn btn-primary btn-lg">Enviar Pedido Especial</button>
+</form>

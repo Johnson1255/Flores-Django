@@ -1,0 +1,39 @@
+{% extends 'tienda/base.html' %}
+{% load static i18n %}
+
+{% block title %}{% trans "Inicio - Flores Valentín" %}{% endblock %}
+
+{% block extra_head %}
+    {# Posibles estilos específicos para la página de inicio #}
+    {# <link rel="stylesheet" href="{% static 'css/index_specific.css' %}"> #}
+{% endblock %}
+
+{% block content %}
+    {# --- Aquí pega TODO el contenido que era específico de tu index.html original --- #}
+    {# (El banner, sección catálogo preview, galería, ubicación, video, contacto) #}
+    {# Asegúrate de actualizar las rutas de imágenes con {% static %} y los enlaces internos con {% url %} #}
+
+    <section id="home">
+       <div class="banner-container">
+            <h1 class="banner-title">{% trans "Flores para San Valentín" %}</h1>
+            <img class="banner" src="{% static 'images/banner1.jpg' %}" alt="Flores 1">
+            {# ... más banners ... #}
+        </div>
+    </section>
+
+    {# ... resto de las secciones: catalogo preview, galeria, ubicacion, video, contacto ... #}
+     <section id="ubicacion" class="py-5">
+         {# ... contenido de ubicación ... #}
+         <div class="map-wrapper">
+             <div id="map"></div> {# El div para Leaflet sigue aquí #}
+         </div>
+         {# ... #}
+     </section>
+
+{% endblock %}
+
+{% block extra_js %}
+    {# Carga map.js solo en esta página si el mapa solo está aquí #}
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script> {# Leaflet JS #}
+    <script type="module" src="{% static 'js/map.js' %}"></script>
+{% endblock %}

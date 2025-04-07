@@ -1,0 +1,8 @@
+<select id="category-filter" name="category" class="form-select">
+    <option value="">Todas las categorías</option>
+    {% for category in categories %}
+        <option value="{{ category.slug }}" {% if category.slug == request.GET.category %}selected{% endif %}>
+            {{ category.name }}
+        </option>
+    {% endfor %}
+</select>

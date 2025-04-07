@@ -1,0 +1,230 @@
+{% extends 'floresvalentin_app/base.html' %}
+{% load static i18n %}
+
+{% block title %}{% trans "Iniciar Sesión / Registrarse" %}{% endblock %}
+
+{% block extra_head %}
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    {# Add any other login-specific head elements here #}
+    <style>
+    /* Keep theme toggle button style if not in login.css */
+    .theme-toggle-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: transparent;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--text-color); /* Use CSS variable */
+        z-index: 1050; /* Ensure it's above other elements */
+    }
+    /* Hide base header/footer if desired for login page */
+    /*
+    body > .main-header, body > .sticky-top, body > .main-footer {
+        display: none;
+    }
+    */
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container my-5"> {# Added margin top/bottom #}
+    <div class="login-card">
+        {# Removed back button for now, base nav provides navigation #}
+        {# <a href="{% url 'floresvalentin_app:index' %}" class="back-button"> ... </a> #}
+
+        <div class="login-header">
+            <img src="{% static 'images/logo.svg' %}" alt="{% trans 'Flores San Valentín' %}" class="login-logo">
+            <h1 data-i18n="welcome_flowers">{% trans "Bienvenido a Flores San Valentín" %}</h1>
+            <p class="login-message" data-i18n="login_message">{% trans "Para continuar con tu compra, por favor inicia sesión o crea una cuenta nueva" %}</p>
+        </div>
+
+        {# Display Django form errors #}
+        {% if form.errors %}
+            <div class="alert alert-danger mb-3" role="alert">
+                {% trans "Tu nombre de usuario y contraseña no coinciden. Por favor, inténtalo de nuevo." %}
+            </div>
+        {% endif %}
+
+        {% if next %}
+            {% if user.is_authenticated %}
+            <p class="alert alert-warning">{% trans "Tu cuenta no tiene acceso a esta página. Para proceder, por favor inicia sesión con una cuenta que tenga acceso." %}</p>
+            {% else %}
+            <p class="alert alert-info">{% trans "Por favor, inicia sesión para ver esta página." %}</p>
+            {% endif %}
+        {% endif %}
+
+        <div class="login-tabs">
+            {# JS will handle switching, but Django renders the login form by default #}
+            <button class="tab-button active" data-tab="login" data-i18n="login">{% trans "Iniciar Sesión" %}</button>
+            <button class="tab-button" data-tab="register" data-i18n="register">{% trans "Registrarse" %}</button>
+        </div>
+
+        {# --- Django Login Form --- #}
+        <form class="login-form" method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="{{ form.username.id_for_label }}" data-i18n="username">{{ form.username.label }}</label> {# Use username label #}
+                <div class="input-with-icon">
+                    <i class="fas fa-user"></i> {# Changed icon to user for username #}
+                    {{ form.username }} {# Render username field #}
+                </div>
+                 {% for error in form.username.errors %}<div class="error-message d-block">{{ error }}</div>{% endfor %}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.password.id_for_label }}" data-i18n="password">{{ form.password.label }}</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-lock"></i>
+                    {{ form.password }} {# Render password field #}
+                </div>
+                 {% for error in form.password.errors %}<div class="error-message d-block">{{ error }}</div>{% endfor %}
+            </div>
+
+            <div class="form-options">
+                {# Django auth form doesn't have remember me by default #}
+                {# <label class="remember-me"> ... </label> #}
+                <span class="flex-grow-1"></span> {# Pushes forgot password link to the right #}
+                <a href="{% url 'password_reset' %}" class="forgot-password" data-i18n="forgot_password">{% trans "¿Olvidaste tu contraseña?" %}</a>
+            </div>
+
+            <button type="submit" class="login-button">
+                <span data-i18n="login">{% trans "Iniciar Sesión" %}</span>
+                <i class="fas fa-arrow-right"></i>
+            </button>
+            <input type="hidden" name="next" value="{{ next }}">
+        </form>
+        {# --- End Django Login Form --- #}
+
+        {# --- Registration Form Placeholder --- #}
+        {# This form needs a separate Django view and URL #}
+        {# We keep the HTML structure but maybe link to a registration page #}
+        <form class="register-form" style="display: none;" action="#" method="post"> {# TODO: Add action="{% url 'registration_view_name' %}" #}
+             {# {% csrf_token %} #} {# Add CSRF when it's a real Django form #}
+            <!-- Información Personal -->
+            <div class="form-group">
+                <label for="nombre">Nombre</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="nombre" name="nombre" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="apellidos">Apellidos</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="apellidos" name="apellidos" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="email-registro">Correo Electrónico</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email-registro" name="email" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="telefono">Teléfono</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-phone"></i>
+                    <input type="tel" id="telefono" name="telefono" required>
+                </div>
+            </div>
+            <!-- Dirección -->
+             <div class="form-group">
+                <label for="pais">País</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-globe"></i>
+                    <input type="text" id="pais" name="pais" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="ciudad">Ciudad</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-city"></i>
+                    <input type="text" id="ciudad" name="ciudad" required>
+                </div>
+            </div>
+             <div class="form-group">
+                <label for="barrio">Barrio</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-h-square"></i>
+                    <input type="text" id="barrio" name="barrio" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="direccion">Dirección de Entrega</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-home"></i>
+                    <input type="text" id="direccion" name="direccion" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="codigo-postal">Código Postal</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <input type="text" id="codigo-postal" name="codigo-postal" required>
+                </div>
+            </div>
+            <!-- Contraseña -->
+            <div class="form-group">
+                <label for="password-registro">Contraseña</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password-registro" name="password" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="confirm-password">Confirmar Contraseña</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="confirm-password" name="confirm-password" required>
+                </div>
+            </div>
+            <!-- Preferencias -->
+            <div class="form-group">
+                <label for="ocasiones">Ocasiones de interés (opcional)</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-label"><input type="checkbox" name="ocasiones" value="cumpleanos"> Cumpleaños</label>
+                    <label class="checkbox-label"><input type="checkbox" name="ocasiones" value="aniversarios"> Aniversarios</label>
+                    <label class="checkbox-label"><input type="checkbox" name="ocasiones" value="bodas"> Bodas</label>
+                    <label class="checkbox-label"><input type="checkbox" name="ocasiones" value="condolencias"> Condolencias</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="checkbox-label"><input type="checkbox" name="newsletter" value="true"> Deseo recibir ofertas y novedades</label>
+            </div>
+            <div class="form-group">
+                <label class="checkbox-label required"><input type="checkbox" name="terminos" required> Acepto los términos y condiciones*</label>
+            </div>
+            <button type="submit" class="login-button">
+                <span data-i18n="create_account">{% trans "Crear Cuenta" %}</span>
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        </form>
+        {# --- End Registration Form Placeholder --- #}
+
+        {# Optional: Social Login Buttons #}
+        <div class="social-login">
+            <p data-i18n="or_login_with">{% trans "O inicia sesión con" %}</p>
+            <div class="social-buttons">
+                {# TODO: Implement social auth backend (e.g., django-allauth) #}
+                <button class="social-button google"><i class="fab fa-google"></i> Google</button>
+                <button class="social-button facebook"><i class="fab fa-facebook-f"></i> Facebook</button>
+            </div>
+        </div>
+
+        {# Theme toggle button from original HTML - might be better placed in base.html #}
+        {# <button id="theme-toggle" class="theme-toggle-btn"> <i class="fas fa-moon"></i> </button> #}
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    {# Link the login JS, but it likely needs adaptation for Django forms/CSRF #}
+    <script type="module" src="{% static 'js/login.js' %}"></script>
+    {# Add theme toggle JS if button is kept here #}
+    {# <script type="module" src="{% static 'js/theme.js' %}"></script> #}
+{% endblock %}

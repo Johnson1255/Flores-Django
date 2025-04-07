@@ -1,29 +1,119 @@
-<div id="cartItems" class="cart-items">
-    {% if cart_items %}
-        {% for item in cart_items %}
-            <div class="cart-item"> {# Estructura HTML de cada item #}
-                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
-                <div>
-                    <h5>{{ item.product.name }}</h5>
-                    <p>Precio: ${{ item.price|floatformat:2 }}</p> {# Precio unitario al añadir #}
-                    <form action="{% url 'floresvalentin_app:actualizar_carrito' item.product.id %}" method="post">
-                        {% csrf_token %}
-                        <input type="number" name="quantity" value="{{ item.quantity }}" min="1">
-                        <button type="submit">Actualizar</button>
-                    </form>
-                    <form action="{% url 'floresvalentin_app:eliminar_del_carrito' item.product.id %}" method="post">
-                        {% csrf_token %}
-                        <button type="submit">Eliminar</button>
-                    </form>
-                    <p>Subtotal: ${{ item.total_price|floatformat:2 }}</p>
+{% extends 'floresvalentin_app/base.html' %}
+{% load static %}
+
+{% block title %}Carrito de Compras - Flores Valentín{% endblock %}
+
+{% block extra_head %}
+    {# Load shopping cart specific CSS #}
+    <link rel="stylesheet" href="{% static 'css/shoppingCart.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="shopping-cart-container">
+    <div class="inner-container">
+        <h2 class="text-center mb-4">Mi Carrito de Compras</h2>
+
+        <div class="row g-4">
+            <!-- Columna izquierda: Lista de productos -->
+            <div class="col-lg-8">
+                <!-- Contenedor de items del carrito -->
+                <div id="cartItems" class="cart-items">
+                    {% if cart_items %}
+                        {% for item in cart_items %}
+                            <div class="cart-item" data-item-id="{{ item.id }}"> {# Added data-item-id for JS #}
+                                <img src="{{ item.product.image.url|default:'#' }}" alt="{{ item.product.name }}" class="cart-item-image"> {# Added default #}
+                                <div class="cart-item-details">
+                                    <h5>{{ item.product.name }}</h5>
+                                    <p class="cart-item-price">Precio: ${{ item.price|floatformat:2 }}</p> {# Precio unitario al añadir #}
+                                </div>
+                                <div class="quantity-controls">
+                                     {# Form to update quantity #}
+                                    <form action="{% url 'floresvalentin_app:actualizar_carrito' item.id %}" method="post" class="d-inline-flex align-items-center update-cart-form">
+                                        {% csrf_token %}
+                                        <button type="button" class="btn btn-sm btn-outline-secondary quantity-decrease">-</button>
+                                        <input type="number" name="quantity" value="{{ item.quantity }}" min="1" class="form-control form-control-sm quantity-input mx-1" style="width: 60px;">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary quantity-increase">+</button>
+                                        {# Hidden submit button, triggered by JS #}
+                                        <button type="submit" class="btn btn-sm btn-primary ms-2 update-submit-btn" style="display: none;">Actualizar</button>
+                                    </form>
+                                </div>
+                                <div class="cart-item-subtotal">
+                                     <strong>Subtotal: <span class="item-subtotal-price">${{ item.total_price|floatformat:2 }}</span></strong>
+                                </div>
+                                {# Form to remove item #}
+                                <form action="{% url 'floresvalentin_app:eliminar_del_carrito' item.id %}" method="post" class="d-inline remove-cart-form">
+                                     {% csrf_token %}
+                                     <button type="submit" class="btn btn-danger btn-sm remove-item">
+                                         <i class="fas fa-trash-alt"></i>
+                                     </button>
+                                </form>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                         <div class="cart-empty text-center p-4">
+                             <i class="fas fa-shopping-cart fa-3x mb-3 text-muted"></i>
+                             <p>Tu carrito está vacío.</p>
+                             <a href="{% url 'floresvalentin_app:catalogo' %}" class="btn btn-primary">Ver catálogo</a>
+                         </div>
+                    {% endif %}
                 </div>
             </div>
-        {% endfor %}
-    {% else %}
-         <div class="cart-empty text-center p-4">
-             <i class="fas fa-shopping-cart fa-3x mb-3"></i>
-             <p>Tu carrito está vacío</p>
-             <a href="{% url 'floresvalentin_app:catalogo' %}" class="btn btn-primary">Ver catálogo</a>
-         </div>
-    {% endif %}
+
+            <!-- Columna derecha: Resumen y cupón -->
+            <div class="col-lg-4">
+                <div class="cart-sidebar">
+                    <!-- Resumen del carrito -->
+                    <div class="cart-summary">
+                        <h4>Resumen del pedido</h4>
+                        <div class="summary-item">
+                            <span>Subtotal</span>
+                            <span id="subtotal">${{ cart_subtotal|floatformat:2|default:'0.00' }}</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Envío</span>
+                            {# TODO: Calculate shipping dynamically #}
+                            <span id="shipping">$0.00</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>IVA (19%)</span> {# Assuming 19% tax #}
+                            <span id="tax">${{ cart_tax|floatformat:2|default:'0.00' }}</span>
+                        </div>
+                        <hr>
+                        <div class="summary-item total">
+                            <strong>Total</strong>
+                            <strong id="total">${{ cart_total|floatformat:2|default:'0.00' }}</strong>
+                        </div>
+                        {# TODO: Link to actual checkout view #}
+                        <a href="#" class="btn btn-primary checkout-button w-100">
+                            Proceder al pago
+                        </a>
+                    </div>
+
+                    <!-- Cupón de descuento -->
+                    {# TODO: Implement coupon logic if needed #}
+                    <div class="coupon-card mt-3">
+                        <h5>Cupón de descuento</h5>
+                        <div class="input-group">
+                            <input type="text"
+                                   class="form-control"
+                                   id="couponInput"
+                                   placeholder="Ingresa tu código">
+                            <button class="btn btn-outline-primary"
+                                    type="button"
+                                    id="applyCoupon">
+                                Aplicar
+                            </button>
+                        </div>
+                         <div id="coupon-message" class="mt-2 small"></div> {# For coupon feedback #}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+    {# Load shopping cart specific JavaScript #}
+    <script type="module" src="{% static 'js/shoppingCart.js' %}"></script>
+{% endblock %}

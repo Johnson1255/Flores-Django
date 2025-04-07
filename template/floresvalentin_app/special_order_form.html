@@ -1,20 +1,222 @@
-<form id="special-order-form" method="post" action="{% url 'floresvalentin_app:special_order_create' %}">
-    {% csrf_token %}
+{% extends 'floresvalentin_app/base.html' %}
+{% load static %}
 
-    {# Renderizar campos con Bootstrap - Ejemplo #}
-    {% for field in form %}
-        <div class="mb-3">
-            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}{% if field.field.required %}*{% endif %}</label>
-            {{ field }} {# Django renderiza el input/select/textarea #}
-            {% if field.help_text %}
-                <div class="form-text">{{ field.help_text }}</div>
-            {% endif %}
-            {% for error in field.errors %}
-                <div class="invalid-feedback d-block">{{ error }}</div>
-            {% endfor %}
+{% block title %}Pedido Especial - Flores Valentín{% endblock %}
+
+{% block extra_head %}
+    {# Load special order form specific CSS #}
+    <link rel="stylesheet" href="{% static 'css/special.css' %}">
+{% endblock %}
+
+{% block content %}
+<main class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header"> {# Removed bg-primary text-white as base.html might handle this or special.css #}
+                    <h2 class="mb-0"><i class="fas fa-gift me-2"></i>Pedido Especial</h2>
+                </div>
+                <div class="card-body">
+                    <p class="lead mb-4">Cuéntanos sobre tu ocasión especial y crearemos un arreglo floral único para ti.</p>
+
+                    {# Assuming 'form' is passed from the Django view #}
+                    <form id="special-order-form" method="post" action="{% url 'floresvalentin_app:special_order_create' %}">
+                        {% csrf_token %}
+
+                        {# Check if form object exists before iterating #}
+                        {% if form %}
+                            <h4 class="mb-3">Información del destinatario</h4>
+                            {# Render recipient fields if they exist in the form #}
+                            {% if form.recipient_name %}
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="{{ form.recipient_name.id_for_label }}" class="form-label">{{ form.recipient_name.label }}{% if form.recipient_name.field.required %}*{% endif %}</label>
+                                    {{ form.recipient_name }}
+                                    {% if form.recipient_name.help_text %}<div class="form-text">{{ form.recipient_name.help_text }}</div>{% endif %}
+                                    {% for error in form.recipient_name.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                                </div>
+                                {% if form.recipient_phone %}
+                                <div class="col-md-6">
+                                    <label for="{{ form.recipient_phone.id_for_label }}" class="form-label">{{ form.recipient_phone.label }}{% if form.recipient_phone.field.required %}*{% endif %}</label>
+                                    {{ form.recipient_phone }}
+                                    {% if form.recipient_phone.help_text %}<div class="form-text">{{ form.recipient_phone.help_text }}</div>{% endif %}
+                                    {% for error in form.recipient_phone.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+
+                            {# Render delivery address fields #}
+                            {% if form.delivery_address %}
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <label for="{{ form.delivery_address.id_for_label }}" class="form-label">{{ form.delivery_address.label }}{% if form.delivery_address.field.required %}*{% endif %}</label>
+                                    {{ form.delivery_address }}
+                                    {% if form.delivery_address.help_text %}<div class="form-text">{{ form.delivery_address.help_text }}</div>{% endif %}
+                                    {% for error in form.delivery_address.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                            {% if form.delivery_city or form.delivery_postal_code %}
+                            <div class="row mb-3">
+                                {% if form.delivery_city %}
+                                <div class="col-md-6">
+                                    <label for="{{ form.delivery_city.id_for_label }}" class="form-label">{{ form.delivery_city.label }}{% if form.delivery_city.field.required %}*{% endif %}</label>
+                                    {{ form.delivery_city }}
+                                    {% if form.delivery_city.help_text %}<div class="form-text">{{ form.delivery_city.help_text }}</div>{% endif %}
+                                    {% for error in form.delivery_city.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                                </div>
+                                {% endif %}
+                                {% if form.delivery_postal_code %}
+                                <div class="col-md-6">
+                                    <label for="{{ form.delivery_postal_code.id_for_label }}" class="form-label">{{ form.delivery_postal_code.label }}{% if form.delivery_postal_code.field.required %}*{% endif %}</label>
+                                    {{ form.delivery_postal_code }}
+                                    {% if form.delivery_postal_code.help_text %}<div class="form-text">{{ form.delivery_postal_code.help_text }}</div>{% endif %}
+                                    {% for error in form.delivery_postal_code.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+
+                            <h4 class="mb-3">Detalles del pedido</h4>
+                             {# Render order detail fields #}
+                            {% if form.occasion or form.budget %}
+                            <div class="row mb-3">
+                                {% if form.occasion %}
+                                <div class="col-md-6">
+                                    <label for="{{ form.occasion.id_for_label }}" class="form-label">{{ form.occasion.label }}{% if form.occasion.field.required %}*{% endif %}</label>
+                                    {{ form.occasion }}
+                                    {% if form.occasion.help_text %}<div class="form-text">{{ form.occasion.help_text }}</div>{% endif %}
+                                    {% for error in form.occasion.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                                </div>
+                                {% endif %}
+                                {% if form.budget %}
+                                <div class="col-md-6">
+                                    <label for="{{ form.budget.id_for_label }}" class="form-label">{{ form.budget.label }}{% if form.budget.field.required %}*{% endif %}</label>
+                                    {{ form.budget }}
+                                    {% if form.budget.help_text %}<div class="form-text">{{ form.budget.help_text }}</div>{% endif %}
+                                    {% for error in form.budget.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            {% if form.delivery_date or form.delivery_time %}
+                             <div class="row mb-3">
+                                {% if form.delivery_date %}
+                                <div class="col-md-6">
+                                    <label for="{{ form.delivery_date.id_for_label }}" class="form-label">{{ form.delivery_date.label }}{% if form.delivery_date.field.required %}*{% endif %}</label>
+                                    {{ form.delivery_date }}
+                                    {% if form.delivery_date.help_text %}<div class="form-text">{{ form.delivery_date.help_text }}</div>{% endif %}
+                                    {% for error in form.delivery_date.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                                </div>
+                                {% endif %}
+                                {% if form.delivery_time %}
+                                <div class="col-md-6">
+                                    <label for="{{ form.delivery_time.id_for_label }}" class="form-label">{{ form.delivery_time.label }}{% if form.delivery_time.field.required %}*{% endif %}</label>
+                                    {{ form.delivery_time }}
+                                    {% if form.delivery_time.help_text %}<div class="form-text">{{ form.delivery_time.help_text }}</div>{% endif %}
+                                    {% for error in form.delivery_time.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+
+                            {# Render product inclusion fields - Adapt based on actual form fields #}
+                            <h4 class="mb-3">Productos para incluir</h4>
+                            {% if form.include_flowers %}
+                            <div class="form-check form-switch mb-2">
+                                {{ form.include_flowers }}
+                                <label class="form-check-label fw-bold" for="{{ form.include_flowers.id_for_label }}">{{ form.include_flowers.label }}</label>
+                            </div>
+                            <div id="flowers-options" class="ms-4 mb-3 {% if not form.include_flowers.value %}d-none{% endif %}">
+                                {% if form.flower_types %}
+                                <label class="form-label">{{ form.flower_types.label }}</label>
+                                {{ form.flower_types }} {# Assuming CheckboxSelectMultiple widget #}
+                                {% endif %}
+                                {% if form.flower_colors %}
+                                <label class="form-label mt-3">{{ form.flower_colors.label }}</label>
+                                {{ form.flower_colors }} {# Assuming CheckboxSelectMultiple widget #}
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            {# Repeat similar structure for chocolates, plushies, gifts if they exist in the form #}
+                            {% if form.include_chocolates %}
+                             <div class="form-check form-switch mb-2">
+                                {{ form.include_chocolates }}
+                                <label class="form-check-label fw-bold" for="{{ form.include_chocolates.id_for_label }}">{{ form.include_chocolates.label }}</label>
+                            </div>
+                             <div id="chocolates-options" class="ms-4 mb-3 {% if not form.include_chocolates.value %}d-none{% endif %}">
+                                {% if form.chocolate_types %}
+                                <label class="form-label">{{ form.chocolate_types.label }}</label>
+                                {{ form.chocolate_types }}
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            {% if form.include_plushies %}
+                             <div class="form-check form-switch mb-2">
+                                {{ form.include_plushies }}
+                                <label class="form-check-label fw-bold" for="{{ form.include_plushies.id_for_label }}">{{ form.include_plushies.label }}</label>
+                            </div>
+                             <div id="plushies-options" class="ms-4 mb-3 {% if not form.include_plushies.value %}d-none{% endif %}">
+                                {% if form.plushie_type %}
+                                <label class="form-label">{{ form.plushie_type.label }}</label>
+                                {{ form.plushie_type }} {# Assuming RadioSelect widget #}
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                             {% if form.include_gifts %}
+                             <div class="form-check form-switch mb-2">
+                                {{ form.include_gifts }}
+                                <label class="form-check-label fw-bold" for="{{ form.include_gifts.id_for_label }}">{{ form.include_gifts.label }}</label>
+                            </div>
+                             <div id="gifts-options" class="ms-4 mb-3 {% if not form.include_gifts.value %}d-none{% endif %}">
+                                {% if form.other_gifts %}
+                                <label class="form-label">{{ form.other_gifts.label }}</label>
+                                {{ form.other_gifts }}
+                                {% endif %}
+                            </div>
+                            {% endif %}
+
+                            {# Render message and instructions fields #}
+                            {% if form.message %}
+                            <div class="mb-3">
+                                <label for="{{ form.message.id_for_label }}" class="form-label">{{ form.message.label }}{% if form.message.field.required %}*{% endif %}</label>
+                                {{ form.message }}
+                                {% if form.message.help_text %}<div class="form-text">{{ form.message.help_text }}</div>{% endif %}
+                                {% for error in form.message.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                            </div>
+                            {% endif %}
+                            {% if form.special_instructions %}
+                            <div class="mb-3">
+                                <label for="{{ form.special_instructions.id_for_label }}" class="form-label">{{ form.special_instructions.label }}{% if form.special_instructions.field.required %}*{% endif %}</label>
+                                {{ form.special_instructions }}
+                                {% if form.special_instructions.help_text %}<div class="form-text">{{ form.special_instructions.help_text }}</div>{% endif %}
+                                {% for error in form.special_instructions.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                            </div>
+                            {% endif %}
+
+                        {% else %}
+                            <p>Error: El formulario no está disponible.</p>
+                        {% endif %}
+
+                        <div class="alert alert-info" role="alert">
+                            <i class="fas fa-info-circle me-2"></i> Nos comunicaremos contigo dentro de las próximas 24 horas para confirmar los detalles y el precio final de tu pedido especial.
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i> Enviar Pedido Especial
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-    {% endfor %}
+    </div>
+</main>
+{% endblock %}
 
-    {# ... (alertas, botón submit) ... #}
-    <button type="submit" class="btn btn-primary btn-lg">Enviar Pedido Especial</button>
-</form>
+{% block extra_js %}
+    {# Load special order form specific JavaScript #}
+    <script type="module" src="{% static 'js/special-order.js' %}"></script>
+{% endblock %}

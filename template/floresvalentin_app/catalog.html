@@ -1,8 +1,207 @@
-<select id="category-filter" name="category" class="form-select">
-    <option value="">Todas las categorías</option>
-    {% for category in categories %}
-        <option value="{{ category.slug }}" {% if category.slug == request.GET.category %}selected{% endif %}>
-            {{ category.name }}
-        </option>
-    {% endfor %}
-</select>
+{% extends 'floresvalentin_app/base.html' %}
+{% load static %}
+
+{% block title %}Catálogo - Flores Valentín{% endblock %}
+
+{% block extra_head %}
+    {# Load catalog-specific CSS #}
+    <link rel="stylesheet" href="{% static 'css/catalog.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <header class="pb-3 mb-4 border-bottom">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1>Catálogo de Flores Valentin</h1>
+            <div class="btn-group" role="group" aria-label="Cambiar vista">
+                <button id="view-grid" class="btn btn-outline-primary active" data-bs-toggle="tooltip" title="Vista de cuadrícula">
+                    <i class="fas fa-th"></i>
+                </button>
+                <button id="view-list" class="btn btn-outline-primary" data-bs-toggle="tooltip" title="Vista de lista">
+                    <i class="fas fa-list"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Tabs de categorías -->
+    {# TODO: Populate categories dynamically from view context #}
+    <div id="category-tabs" class="mb-4 category-tabs">
+        <ul class="nav nav-pills flex-nowrap overflow-auto pb-2">
+            {# Example: <li class="nav-item"><a class="nav-link active" data-category="all">Todas</a></li> #}
+        </ul>
+    </div>
+
+    <!-- Filters -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3 mb-md-0">
+            <div class="input-group">
+                <input type="text" id="search-input" class="form-control" placeholder="Buscar flores...">
+                <button class="btn btn-outline-secondary" type="button" id="search-button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3 mb-md-0">
+            {# TODO: Populate categories dynamically from view context #}
+            <select id="category-filter" class="form-select">
+                <option value="">Todas las categorías</option>
+                {# Example:
+                {% for category in categories %}
+                    <option value="{{ category.slug }}" {% if category.slug == request.GET.category %}selected{% endif %}>
+                        {{ category.name }}
+                    </option>
+                {% endfor %}
+                #}
+            </select>
+        </div>
+        <div class="col-md-3 mb-3 mb-md-0">
+            <select id="sort-by" class="form-select">
+                <option value="name-asc">Nombre (A-Z)</option>
+                <option value="name-desc">Nombre (Z-A)</option>
+                <option value="price-asc">Precio (menor a mayor)</option>
+                <option value="price-desc">Precio (mayor a menor)</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button id="filter-reset" class="btn btn-outline-secondary w-100">
+                <i class="fas fa-sync-alt me-1"></i> Reiniciar
+            </button>
+        </div>
+    </div>
+
+    <!-- Results count -->
+    <p id="results-count" class="text-muted">Cargando productos...</p>
+
+    <!-- Product grid/list -->
+    {# TODO: Populate products dynamically from view context #}
+    <div id="flowers-container" class="row">
+        <!-- Los productos se cargarán aquí dinámicamente -->
+        <div class="col-12 text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="mt-2">Cargando productos...</p>
+        </div>
+        {# Example Product Card (Grid View) - Repeat this structure #}
+        {#
+        <div class="col-md-4 mb-4 product-grid-item">
+            <div class="card product-card h-100">
+                <img src="{% static 'images/default-flower.jpg' %}" class="card-img-top" alt="Nombre Flor">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Nombre Flor</h5>
+                    <p class="card-text text-muted small">Categoría</p>
+                    <p class="card-text flex-grow-1">Descripción corta...</p>
+                    <div class="d-flex justify-content-between align-items-center mt-auto">
+                        <span class="fw-bold text-primary">$Precio</span>
+                        <button class="btn btn-sm btn-outline-primary add-to-cart" data-id="product-id">
+                            <i class="fas fa-cart-plus"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary quick-view" data-id="product-id" data-bs-toggle="modal" data-bs-target="#quickViewModal">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        #}
+        {# Example Product Card (List View) - Repeat this structure #}
+        {#
+        <div class="col-12 mb-3 product-list-item" style="display: none;">
+             <div class="card product-card-list">
+                 <div class="row g-0">
+                     <div class="col-md-3">
+                         <img src="{% static 'images/default-flower.jpg' %}" class="img-fluid rounded-start" alt="Nombre Flor">
+                     </div>
+                     <div class="col-md-9">
+                         <div class="card-body">
+                             <h5 class="card-title">Nombre Flor</h5>
+                             <p class="card-text text-muted small">Categoría</p>
+                             <p class="card-text">Descripción más detallada del producto...</p>
+                             <div class="d-flex justify-content-between align-items-center">
+                                 <span class="fw-bold text-primary">$Precio</span>
+                                 <div>
+                                     <button class="btn btn-sm btn-outline-primary add-to-cart" data-id="product-id">
+                                         <i class="fas fa-cart-plus"></i> Añadir
+                                     </button>
+                                     <button class="btn btn-sm btn-outline-secondary quick-view" data-id="product-id" data-bs-toggle="modal" data-bs-target="#quickViewModal">
+                                         <i class="fas fa-eye"></i> Ver
+                                     </button>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+         </div>
+        #}
+    </div>
+
+    <!-- Pagination -->
+    {# TODO: Implement pagination logic in view and template #}
+    <nav aria-label="Navegación de páginas" class="mt-4">
+        <ul id="pagination" class="pagination justify-content-center">
+            {# Example:
+            <li class="page-item disabled"><a class="page-link" href="#">Anterior</a></li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">Siguiente</a></li>
+            #}
+        </ul>
+    </nav>
+</div>
+
+<!-- Quick View Modal -->
+<div class="modal fade" id="quickViewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="quickViewTitle">Vista Rápida</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <img id="quickViewImage" src="{% static 'images/default-flower.jpg' %}" alt="" class="img-fluid rounded">
+                    </div>
+                    <div class="col-md-6">
+                        <h3 id="quickViewName">Nombre Producto</h3>
+                        <p id="quickViewDescription" class="text-muted">Descripción detallada...</p>
+                        <p class="mb-2">
+                            <span class="badge bg-light text-dark" id="quickViewCategory">Categoría</span>
+                        </p>
+                        <h4 id="quickViewPrice" class="text-primary mb-3">$Precio</h4>
+                        <p>
+                            <i class="fas fa-box me-2"></i>
+                            <span id="quickViewStock">Stock</span> unidades disponibles
+                        </p>
+                        <div class="d-grid gap-2">
+                            {# TODO: Ensure data-id is set dynamically #}
+                            <button class="btn btn-primary add-to-cart" data-id="">
+                                <i class="fas fa-shopping-cart me-2"></i>
+                                Añadir al Carrito
+                            </button>
+                            <button class="btn btn-outline-secondary">
+                                <i class="far fa-heart me-2"></i>
+                                Añadir a Favoritos
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    {# Load catalog-specific JavaScript #}
+    <script type="module" src="{% static 'js/catalog.js' %}"></script>
+    {# Initialize Bootstrap tooltips if used #}
+    <script>
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+          return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    </script>
+{% endblock %}

@@ -1,0 +1,751 @@
+:root {
+    --background-color: #fff5f7;
+    --text-color: #333;
+    --navbar-text-color: #575757;
+    --heading-color: #333;
+    --primary-color: #ff4d6d;
+    --primary-hover: #ff3355;
+    --secondary-color: #ffe0e6;
+    --border-color: #ff4d6d;
+    --card-bg: #f9f9f9;
+    --form-bg: #ffe0e6;
+    --header-bg: white;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --footer-bg-start: #ff4d6d;
+    --footer-bg-end: #ff758c;
+    --footer-bg: linear-gradient(to right, var(--footer-bg-start), var(--footer-bg-end));
+    --top-bar-bg: #ff4d6d;
+    --white-color: white;
+    --whatsapp-color: #25D366;
+    --light-text: #666;
+    --banner-shadow: rgba(0, 0, 0, 0.5);
+    --footer-dark-bg: rgba(0, 0, 0, 0.1);
+  }
+  
+  html[data-theme="dark"] {
+    --background-color: #222222;
+    --text-color: #f5f5f5;
+    --navbar-text-color: white;
+    --heading-color: #ffffff;
+    --primary-color: #64b5f6;
+    --primary-hover: #4a90e2;
+    --secondary-color: #333333;
+    --border-color: #444444;
+    --card-bg: #2d2d2d;
+    --form-bg: #333333;
+    --header-bg: #333333;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --footer-bg-start: #333333;
+    --footer-bg-end: #444444;
+    --footer-bg: linear-gradient(to right, var(--footer-bg-start), var(--footer-bg-end));
+    --top-bar-bg: #444444;
+    --white-color: #f5f5f5;
+    --whatsapp-color: #128C7E;
+    --light-text: #cccccc;
+    --banner-shadow: rgba(0, 0, 0, 0.7);
+    --footer-dark-bg: rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Header Styles */
+  .main-header {
+    background: var(--header-bg);
+    box-shadow: 0 2px 5px var(--shadow-color);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  /* Top Bar */
+  .top-bar {
+    background: var(--top-bar-bg);
+    color: var(--white-color);
+    font-size: 0.9rem;
+    padding: 8px 0;
+    position: relative;
+    z-index: 1030;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  /* Base container style - SIN DISPLAY FLEX */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  
+  /* Específicos para los containers que necesitan flex */
+  .top-bar .container,
+  .main-header-content .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .contact-info span {
+    margin-right: 20px;
+  }
+  
+  .contact-info i {
+    margin-right: 5px;
+  }
+  
+  .opening-hours i {
+    margin-right: 5px;
+  }
+  
+  .top-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .social-icons {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .social-icons a {
+    color: var(--white-color);
+    text-decoration: none;
+    transition: opacity 0.3s ease, color 0.3s ease;
+  }
+  
+  .social-icons a:hover {
+    opacity: 0.8;
+  }
+  
+  /* Main Header Content */
+  .main-header-content {
+    padding: 20px 0;
+    background-color: var(--header-bg);
+    transition: background-color 0.3s ease;
+  }
+  
+  .logo-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .logo {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+  }
+  
+  .brand-text h1 {
+    color: var(--primary-color);
+    margin: 0;
+    font-size: 1.8rem;
+    transition: color 0.3s ease;
+  }
+  
+  .brand-text p {
+    color: var(--light-text);
+    margin: 5px 0 0 0;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+  }
+  
+  .header-actions {
+    display: flex;
+    gap: 15px;
+  }
+  
+  .action-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: 2px solid var(--primary-color);
+    border-radius: 25px;
+    background: transparent;
+    color: var(--primary-color);
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+  
+  .action-button:hover {
+    background: var(--primary-color);
+    color: var(--white-color);
+    text-decoration: none;
+  }
+  
+  .action-button.primary {
+    background: var(--primary-color);
+    color: var(--white-color);
+  }
+  
+  .action-button.primary:hover {
+    background: var(--primary-hover);
+    border-color: var(--primary-hover);
+  }
+  
+  /* Menú de navegación */
+  .navbar {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    background-color: var(--primary-color) !important;
+    font-weight: bold;
+    z-index: 1020;
+    transition: background-color 0.3s ease;
+  }
+  
+  .navbar .nav-link {
+    color: var(--navbar-text-color) !important;
+    transition: color 0.3s ease;
+  }
+  
+  /* Banner */
+  .banner-container {
+    position: relative;
+    width: 100%;
+    height: 350px;
+    overflow: hidden;
+    margin-top: 0px;
+    background-color: var(--background-color);
+  }
+  
+  .banner-title {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+    color: var(--white-color);
+    font-family: "Borel", serif;
+    font-size: 3.5rem;
+    text-shadow: 2px 2px 4px var(--banner-shadow);
+    width: 100%;
+    padding: 0 20px;
+    margin: 0;
+    text-align: center;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+  }
+  
+  .banner {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+    animation: fade 1s ease-in-out;
+  }
+  
+  @keyframes fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 968px) {
+    .top-bar .container {
+      flex-direction: column;
+      gap: 10px;
+      text-align: center;
+    }
+    
+    .main-header-content .container {
+      flex-direction: column;
+      gap: 20px;
+      text-align: center;
+    }
+    
+    .logo-container {
+      flex-direction: column;
+    }
+    
+    .header-actions {
+      flex-direction: column;
+      width: 100%;
+    }
+    
+    .action-button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .contact-info span {
+      display: block;
+      margin: 5px 0;
+    }
+    
+    .top-bar-right {
+      flex-direction: column;
+      gap: 10px;
+    }
+  }
+  
+  /* Footer Styles */
+  .main-footer {
+    background: var(--footer-bg);
+    color: var(--white-color);
+    padding: 40px 0 0 0;
+    margin-top: 50px;
+    box-shadow: 0 -4px 8px var(--shadow-color);
+    transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    padding: 0 20px;
+  }
+  
+  .footer-section {
+    margin-bottom: 30px;
+  }
+  
+  .footer-section h3 {
+    color: var(--white-color);
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    position: relative;
+    padding-bottom: 10px;
+    transition: color 0.3s ease;
+  }
+  
+  .footer-section h3::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 50px;
+    height: 2px;
+    background-color: var(--white-color);
+    transition: background-color 0.3s ease;
+  }
+  
+  .footer-section p {
+    line-height: 1.6;
+    margin: 0;
+  }
+  
+  .footer-hours,
+  .footer-contact {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .footer-hours li,
+  .footer-contact li {
+    margin-bottom: 10px;
+  }
+  
+  .footer-contact li i {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+  }
+  
+  .social-links {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+  
+  .social-links a {
+    color: var(--white-color);
+    text-decoration: none;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--white-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+  
+  .social-links a:hover {
+    background: var(--white-color);
+    color: var(--primary-color);
+    transform: translateY(-3px);
+  }
+  
+  .social-links i {
+    font-size: 1.2rem;
+  }
+  
+  .footer-bottom {
+    margin-top: 30px;
+    padding: 20px;
+    background: var(--footer-dark-bg);
+    text-align: center;
+    transition: background-color 0.3s ease;
+  }
+  
+  .footer-links {
+    margin-top: 10px;
+  }
+  
+  .footer-links a {
+    color: var(--white-color);
+    text-decoration: none;
+    margin: 0 10px;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+  }
+  
+  .footer-links a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .footer-content {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+    
+    .footer-section h3::after {
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    
+    .social-links {
+      justify-content: center;
+    }
+    
+    form {
+      width: 90%;
+    }
+  }
+  
+  /* Botón de cambio de tema */
+  #theme-toggle {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 2px 5px var(--shadow-color);
+    transition: all 0.3s ease;
+    z-index: 1000;
+  }
+  
+  #theme-toggle:hover {
+    transform: scale(1.1);
+    background-color: var(--primary-hover);
+  }
+  
+  /* Estilos para los botones de autenticación */
+  .auth-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background-color: var(--primary-color, #ff4b4b);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background-color 0.3s, transform 0.2s;
+    margin-left: 1rem;
+  }
+  
+  .auth-button:hover {
+    background-color: var(--primary-color);
+    transform: translateY(-2px);
+  }
+  
+  .auth-button i {
+    margin-right: 0.5rem;
+  }
+  
+  /* Estilo específico para el botón de cerrar sesión */
+  #logout-button {
+    background-color: var(--primary-color);
+  }
+  
+  #logout-button:hover {
+    background-color: var(--primary-hover);
+  }
+
+  /* Estilos para la página de pedido especial */
+
+/* Estilos generales */
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-family: 'Raleway', sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Estilos para el contenedor principal */
+main.container {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+/* Estilos para las tarjetas */
+.card {
+    background-color: var(--card-bg);
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 8px 16px var(--shadow-color);
+    transform: translateY(-5px);
+}
+
+.card-header {
+    background-color: var(--primary-color) !important;
+    color: var(--white-color) !important;
+    border-bottom: none;
+    padding: 1.25rem;
+    font-family: 'Borel', cursive;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Estilos para formularios */
+.form-label {
+    font-weight: 600;
+    color: var(--heading-color);
+    margin-bottom: 0.5rem;
+}
+
+.form-control, .form-select {
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.75rem;
+    background-color: var(--form-bg);
+    color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    box-shadow: 0 0 0 0.25rem rgba(255, 77, 109, 0.25);
+    border-color: var(--primary-color);
+}
+
+html[data-theme="dark"] .form-control, 
+html[data-theme="dark"] .form-select {
+    background-color: var(--form-bg);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+html[data-theme="dark"] .form-control:focus, 
+html[data-theme="dark"] .form-select:focus {
+    box-shadow: 0 0 0 0.25rem rgba(100, 181, 246, 0.25);
+}
+
+/* Estilos para los grupos de campos */
+h4 {
+    color: var(--heading-color);
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+    font-family: 'Borel', cursive;
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 0.5rem;
+    display: inline-block;
+}
+
+/* Estilos para los checkboxes y radio buttons */
+.form-check-input {
+    border: 1px solid var(--border-color);
+}
+
+.form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+html[data-theme="dark"] .form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.form-check-label {
+    color: var(--text-color);
+}
+
+/* Estilos para los switches */
+.form-switch .form-check-input {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba%28255, 255, 255, 1%29'/%3e%3c/svg%3e");
+}
+
+.form-switch .form-check-input:checked {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba%28255, 255, 255, 1%29'/%3e%3c/svg%3e");
+}
+
+/* Estilos para las opciones indentadas */
+.ms-4 {
+    background-color: rgba(255, 224, 230, 0.3);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem !important;
+}
+
+html[data-theme="dark"] .ms-4 {
+    background-color: rgba(68, 68, 68, 0.3);
+}
+
+/* Estilos para los botones */
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--white-color);
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+    transform: translateY(-2px);
+}
+
+.btn-primary:focus {
+    box-shadow: 0 0 0 0.25rem rgba(255, 77, 109, 0.25);
+}
+
+html[data-theme="dark"] .btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+html[data-theme="dark"] .btn-primary:hover {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+}
+
+html[data-theme="dark"] .btn-primary:focus {
+    box-shadow: 0 0 0 0.25rem rgba(100, 181, 246, 0.25);
+}
+
+/* Estilos para el mensaje de alerta */
+.alert-info {
+    background-color: rgba(100, 181, 246, 0.1);
+    border-color: var(--primary-color);
+    color: var(--text-color);
+    border-radius: 6px;
+    padding: 1rem;
+}
+
+html[data-theme="dark"] .alert-info {
+    background-color: rgba(100, 181, 246, 0.1);
+}
+
+/* Estilos para la etiqueta de caracteres restantes */
+.form-text {
+    color: var(--light-text);
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+/* Animaciones para los elementos del formulario */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.form-control, .form-select, .form-check, .btn {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+/* Estilos para las secciones de opciones */
+#flowers-options, #chocolates-options, #plushies-options, #gifts-options {
+    transition: all 0.3s ease;
+}
+
+/* Estilos para responsividad */
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 2rem;
+    }
+    
+    .form-label {
+        margin-top: 0.5rem;
+    }
+    
+    .btn-primary {
+        padding: 0.5rem 1rem;
+    }
+}
+
+/* Estilos para etiquetas requeridas */
+.form-label:after {
+    content: "*";
+    color: var(--primary-color);
+    margin-left: 0.25rem;
+}
+
+/* Excepciones para etiquetas opcionales */
+label[for="recipient-phone"]:after,
+label[for="delivery-postal-code"]:after,
+label[for="budget"]:after,
+label[for="delivery-time"]:after,
+label[for="message"]:after,
+label[for="special-instructions"]:after {
+    content: "";
+}
+
+/* Estilos para la etiqueta de título */
+.lead {
+    color: var(--heading-color);
+    font-weight: 500;
+    font-size: 1.1rem;
+}
+
+/* Estilos para los label de los productos */
+.fw-bold {
+    font-size: 1.1rem;
+    color: var(--heading-color);
+}
+
+/* Efecto hover para los checkboxes y radio buttons */
+.form-check:hover .form-check-label {
+    color: var(--primary-color);
+    cursor: pointer;
+}
+
+/* Estilo para el texto descriptivo */
+.form-text {
+    font-style: italic;
+}
+
+/* Estilo para el botón de envío */
+.btn-lg {
+    margin-top: 1rem;
+    box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+/* Estilo para indicar campos obligatorios */
+.card-body::before {
+    content: "* Campos obligatorios";
+    display: block;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    font-style: italic;
+}
+  

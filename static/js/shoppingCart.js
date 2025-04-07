@@ -1,17 +1,33 @@
-// Importación de la configuración de Supabase
-import { supabase } from './supabase.js';
+// NO importar supabase
+
+// Helper CSRF
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
 
 class CarritoCompras {
-    // Constructor: Inicializa el carrito y sus componentes principales
     constructor() {
-        this.productos = []; // Array para almacenar los productos del carrito
-        this.supabase = supabase; // Instancia de Supabase para operaciones con la base de datos
-        this.inicializarElementos(); // Inicializa referencias a elementos del DOM
-        this.cargarCarritoDeSupabase(); // Carga inicial del carrito desde Supabase
-        this.vincularEventos(); // Configura los event listeners
+        // No mantenemos `this.productos` como fuente de verdad.
+        // Los datos vienen de la plantilla o se actualizan vía AJAX.
+        this.inicializarElementos();
+        this.vincularEventos();
+        // La carga inicial la hace Django al renderizar la plantilla.
+        // Los totales iniciales también los calcula Django.
+        console.log("Clase CarritoCompras (Django) inicializada.");
     }
 
-    // Inicializa las referencias a elementos del DOM necesarios para el carrito
     inicializarElementos() {
         this.contenedorProductos = document.getElementById('cartItems');
         this.elementoSubtotal = document.getElementById('subtotal');
@@ -19,345 +35,297 @@ class CarritoCompras {
         this.elementoImpuesto = document.getElementById('tax');
         this.elementoTotal = document.getElementById('total');
         this.botonPagar = document.querySelector('.checkout-button');
-        this.inputCupon = document.querySelector('.coupon-card input');
-        this.botonCupon = document.querySelector('.coupon-card button');
+        this.inputCupon = document.querySelector('#couponInput'); // Usar ID
+        this.botonCupon = document.querySelector('#applyCoupon'); // Usar ID
+        this.resumenPedidoContainer = document.querySelector('.cart-summary'); // Para actualizar totales
     }
 
-    // Configura los event listeners para las interacciones del usuario
     vincularEventos() {
-        // Event listener para el botón de pago
-        this.botonPagar?.addEventListener('click', () => this.procesarPago());
-        // Event listener para aplicar cupón de descuento
+        // Botón Pagar ahora debe redirigir a la URL de checkout de Django
+        this.botonPagar?.addEventListener('click', (e) => {
+            e.preventDefault(); // Prevenir comportamiento default si es un botón en form
+            // Asume que tienes una URL 'checkout' en tu app Django
+            const checkoutUrl = this.botonPagar.dataset.checkoutUrl || '/floresvalentin_app/checkout/'; // Obtener URL del botón o usar default
+            const itemCount = this.contenedorProductos?.querySelectorAll('.cart-item').length || 0;
+            if (itemCount === 0) {
+                alert('Su carrito está vacío.');
+                return;
+            }
+            window.location.href = checkoutUrl;
+        });
+
+        // Aplicar cupón (necesita endpoint Django)
         this.botonCupon?.addEventListener('click', () => this.aplicarCupon());
 
-        // Event delegation para los botones de cantidad y eliminar
+        // Delegación de eventos para actualizar/eliminar
         this.contenedorProductos?.addEventListener('click', async (e) => {
             const target = e.target;
             const cartItem = target.closest('.cart-item');
-            
             if (!cartItem) return;
-            
+
             const productId = cartItem.dataset.productId;
+            const actionButton = target.closest('button'); // Encuentra el botón clickeado
 
-            // Manejo de botones de cantidad
-            if (target.classList.contains('quantity-btn')) {
-                const action = target.dataset.action;
-                await this.actualizarCantidad(productId, action);
-            }
+            if (!actionButton) return;
 
-            // Manejo del botón eliminar
-            if (target.classList.contains('remove-item') || target.closest('.remove-item')) {
+            if (actionButton.classList.contains('quantity-btn')) {
+                const action = actionButton.dataset.action; //'increase' o 'decrease'
+                 const quantityInput = cartItem.querySelector('input[type="number"]');
+                 let currentQuantity = parseInt(quantityInput.value);
+                 let newQuantity = currentQuantity;
+
+                 if (action === 'increase') {
+                     newQuantity++;
+                 } else if (action === 'decrease') {
+                     newQuantity = Math.max(1, currentQuantity - 1); // No bajar de 1
+                 }
+
+                 if (newQuantity !== currentQuantity) {
+                    await this.actualizarCantidad(productId, newQuantity, cartItem);
+                 }
+
+            } else if (actionButton.classList.contains('remove-item')) {
                 e.preventDefault();
-                await this.eliminarProducto(productId);
+                 if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+                    await this.eliminarProducto(productId, cartItem);
+                 }
             }
         });
     }
 
-    // Actualiza la cantidad de un producto específico
-    async actualizarCantidad(idProducto, accion) {
-        const producto = this.productos.find(item => item.id === idProducto);
-        if (!producto) return;
+    // Llama a la vista Django para actualizar cantidad
+    async actualizarCantidad(productId, quantity, cartItemElement) {
+        const url = `/floresvalentin_app/carrito/actualizar/${productId}/`; // URL Django
+        this.showLoadingFeedback(cartItemElement);
 
-        if (accion === 'increase') {
-            producto.quantity++;
-        } else if (accion === 'decrease' && producto.quantity > 1) {
-            producto.quantity--;
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ quantity: quantity })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error || `Error ${response.status}`);
+            }
+
+            const data = await response.json(); // Espera { success: true, item_html: "...", summary_html: "..." }
+
+            if (data.success) {
+                // Opción 1: Reemplazar solo el item afectado
+                 const newItemHtml = data.item_html;
+                 if (newItemHtml) {
+                     const tempDiv = document.createElement('div');
+                     tempDiv.innerHTML = newItemHtml;
+                     cartItemElement.replaceWith(tempDiv.firstChild);
+                 } else {
+                     // Fallback si no viene HTML específico: Recargar sección del carrito
+                     this.recargarSeccionCarrito();
+                 }
+                // Opción 2: Reemplazar todo el resumen del pedido
+                this.actualizarResumenPedido(data.summary_html);
+                 // Actualizar contador general
+                 this.actualizarContadorHeader(data.cart_count);
+
+            } else {
+                throw new Error(data.error || 'Error al actualizar cantidad.');
+            }
+
+        } catch (error) {
+            console.error('Error al actualizar cantidad:', error);
+            this.showToast(`Error: ${error.message}`, 'error');
+        } finally {
+            this.hideLoadingFeedback(cartItemElement);
         }
-
-        await this.actualizarCarrito();
-        this.mostrarConfirmacion(`Cantidad actualizada: ${producto.name}`, producto.quantity);
     }
 
-    // Elimina un producto del carrito
-    async eliminarProducto(idProducto) {
+    // Llama a la vista Django para eliminar producto
+    async eliminarProducto(productId, cartItemElement) {
+        const url = `/floresvalentin_app/carrito/eliminar/${productId}/`; // URL Django
+        this.showLoadingFeedback(cartItemElement);
+
         try {
-            const confirmDelete = confirm('¿Estás seguro de que deseas eliminar este producto?');
-            
-            if (confirmDelete) {
-                // Eliminar del array local
-                this.productos = this.productos.filter(item => item.id !== idProducto);
-                
-                // Actualizar en localStorage
-                this.guardarCarritoEnLocal();
-                
-                // Actualizar en Supabase de forma explícita
-                try {
-                    const usuario = await this.supabase.auth.getUser();
-                    if (usuario.data?.user) {
-                        const { error } = await this.supabase
-                            .from('shopping_cart')
-                            .upsert({
-                                user_id: usuario.data.user.id,
-                                items: this.productos,
-                                updated_at: new Date().toISOString()
-                            }, {
-                                onConflict: 'user_id'
-                            });
-                        
-                        if (error) throw error;
-                    }
-                } catch (error) {
-                    console.error('Error al actualizar Supabase:', error);
+            const response = await fetch(url, {
+                method: 'POST', // O DELETE si tu vista lo soporta
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'X-Requested-With': 'XMLHttpRequest'
                 }
-                
-                // Actualizar la UI
-                this.renderizarCarrito();
-                this.calcularTotales();
-                
-                // Eliminar el elemento del DOM si existe
-                const itemElement = this.contenedorProductos.querySelector(`[data-product-id="${idProducto}"]`);
-                if (itemElement) {
-                    itemElement.remove();
-                }
+            });
+
+             if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error || `Error ${response.status}`);
             }
+
+            const data = await response.json(); // Espera { success: true, summary_html: "...", cart_count: X, message: "..." }
+
+            if (data.success) {
+                cartItemElement.remove(); // Eliminar del DOM
+                this.actualizarResumenPedido(data.summary_html);
+                this.actualizarContadorHeader(data.cart_count);
+                 // Verificar si el carrito quedó vacío
+                 if (this.contenedorProductos?.childElementCount === 0) {
+                     this.mostrarMensajeCarritoVacio();
+                 }
+                this.showToast(data.message || 'Producto eliminado.');
+            } else {
+                 throw new Error(data.error || 'Error al eliminar producto.');
+            }
+
         } catch (error) {
             console.error('Error al eliminar producto:', error);
+            this.showToast(`Error: ${error.message}`, 'error');
+        } finally {
+             // No necesitamos ocultar feedback porque el elemento se elimina
         }
     }
 
-    // Actualiza el estado del carrito en todas las capas (local, Supabase y UI)
-    async actualizarCarrito() {
-        this.guardarCarritoEnLocal();
-        await this.sincronizarConSupabase();
-        this.renderizarCarrito();
-        this.calcularTotales();
-    }
+     // Muestra feedback visual de carga en un item
+     showLoadingFeedback(element) {
+         element?.classList.add('loading-item'); // Añade una clase para styling (ej. opacidad)
+         // Podrías añadir un spinner específico si quieres
+     }
 
-    // Sincroniza el estado del carrito con Supabase
-    async sincronizarConSupabase() {
-        try {
-            const usuario = await this.supabase.auth.getUser();
-            if (!usuario.data?.user) return;
+     // Oculta feedback visual de carga
+     hideLoadingFeedback(element) {
+         element?.classList.remove('loading-item');
+     }
 
-            // Actualiza o inserta el carrito en Supabase
-            const { error } = await this.supabase
-                .from('shopping_cart')
-                .upsert({
-                    user_id: usuario.data.user.id,
-                    items: this.productos,
-                    updated_at: new Date().toISOString()
-                }, {
-                    onConflict: 'user_id'
-                });
-
-            if (error) throw error;
-        } catch (error) {
-            console.error('Error al sincronizar con Supabase:', error);
+    // Actualiza el HTML del resumen del pedido
+    actualizarResumenPedido(summaryHtml) {
+        if (this.resumenPedidoContainer && summaryHtml) {
+            this.resumenPedidoContainer.innerHTML = summaryHtml;
+             // Volver a buscar elementos de resumen si es necesario para recalcular
+             this.elementoSubtotal = document.getElementById('subtotal');
+             this.elementoEnvio = document.getElementById('shipping');
+             this.elementoImpuesto = document.getElementById('tax');
+             this.elementoTotal = document.getElementById('total');
+        } else {
+            // Si no viene HTML, intenta recalcular desde los datos actuales (menos preciso)
+             console.warn("No se recibió HTML de resumen, se recalculará localmente (puede ser impreciso).");
+             this.recalcularTotalesLocalmente(); // Fallback
         }
     }
 
-    // Calcula los totales del carrito (subtotal, envío, impuestos y total)
-    calcularTotales() {
-        const subtotal = this.productos.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        const envio = subtotal > 0 ? 15000.00 : 0;
-        const impuesto = subtotal * 0.19; // 19% IVA
-        const total = subtotal + envio + impuesto;
+     // Actualiza el contador del carrito en el header
+     actualizarContadorHeader(count) {
+         if (count !== undefined) {
+            const cartCounters = document.querySelectorAll('.cart-counter');
+            cartCounters.forEach(counter => {
+                counter.textContent = count;
+                counter.style.display = count > 0 ? 'inline-block' : 'none';
+            });
+         }
+     }
 
-        // Actualiza los elementos en la UI con los nuevos totales
-        if (this.elementoSubtotal) this.elementoSubtotal.textContent = `$${subtotal.toFixed(2)}`;
-        if (this.elementoEnvio) this.elementoEnvio.textContent = `$${envio.toFixed(2)}`;
-        if (this.elementoImpuesto) this.elementoImpuesto.textContent = `$${impuesto.toFixed(2)}`;
-        if (this.elementoTotal) this.elementoTotal.textContent = `$${total.toFixed(2)}`;
-    }
-
-    // Renderiza los productos del carrito en la UI
-    renderizarCarrito() {
-        if (!this.contenedorProductos) return;
-
-        // Si el carrito está vacío, mostrar mensaje
-        if (this.productos.length === 0) {
+     // Muestra el mensaje de carrito vacío
+     mostrarMensajeCarritoVacio() {
+         if (this.contenedorProductos) {
             this.contenedorProductos.innerHTML = `
                 <div class="cart-empty text-center p-4">
                     <i class="fas fa-shopping-cart fa-3x mb-3"></i>
                     <p>Tu carrito está vacío</p>
-                    <a href="./catalog.html" class="btn btn-primary">Ver catálogo</a>
+                    <a href="/floresvalentin_app/catalogo/" class="btn btn-primary">Ver catálogo</a>
                 </div>
-            `;
-            return;
-        }
+            `; // Asegúrate que la URL del catálogo sea correcta
+         }
+     }
 
-        // Genera el HTML para cada producto en el carrito
-        this.contenedorProductos.innerHTML = this.productos.map(item => `
-            <div class="cart-item d-flex align-items-center mb-3 p-3 border rounded" data-product-id="${item.id}">
-                <div class="cart-item-image-container me-4" style="width: 120px; height: 120px; flex-shrink: 0; overflow: hidden;">
-                    <img src="${item.image_url}" 
-                         alt="${item.name}" 
-                         class="cart-item-image"
-                         style="width: 100%; height: 100%; object-fit: cover;">
-                </div>
-                <div class="cart-item-details flex-grow-1">
-                    <h5 class="cart-item-title">${item.name}</h5>
-                    <p class="cart-item-price mb-1">$${(item.price * item.quantity).toFixed(2)}</p>
-                    <div class="quantity-controls">
-                        <button class="btn btn-sm btn-outline-secondary quantity-btn" data-action="decrease">-</button>
-                        <input type="number" class="form-control d-inline-block mx-2" style="width: 60px;" value="${item.quantity}" readonly>
-                        <button class="btn btn-sm btn-outline-secondary quantity-btn" data-action="increase">+</button>
-                    </div>
-                </div>
-                <button class="btn btn-link text-danger remove-item">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-        `).join('');
-    }
+      // Fallback: Recalcula totales basado en el DOM (menos fiable que recibirlo del backend)
+      recalcularTotalesLocalmente() {
+         let subtotal = 0;
+         this.contenedorProductos?.querySelectorAll('.cart-item').forEach(item => {
+             const priceText = item.querySelector('.cart-item-price')?.textContent || '$0';
+             const price = parseFloat(priceText.replace(/[^0-9.-]+/g,""));
+             subtotal += price;
+         });
 
-    // Guarda el estado del carrito en localStorage
-    guardarCarritoEnLocal() {
-        localStorage.setItem('cart', JSON.stringify(this.productos));
-    }
+         const envio = subtotal > 0 ? 15000.00 : 0; // Asume la misma lógica de envío
+         const impuesto = subtotal * 0.19; // Asume mismo IVA
+         const total = subtotal + envio + impuesto;
 
-    // Carga el carrito desde localStorage
-    cargarCarritoDeLocal(){
-        try {
-            const carritoGuardado = localStorage.getItem('cart');
-            this.productos = carritoGuardado ? JSON.parse(carritoGuardado) : [];
-            if (this.productos.length === 0) return;
-            this.renderizarCarrito();
-            this.calcularTotales();
-        } catch (error) {
-            console.error('Error al cargar el carrito desde localStorage:', error);
-        }
-    }
+         if (this.elementoSubtotal) this.elementoSubtotal.textContent = `$${subtotal.toFixed(2)}`;
+         if (this.elementoEnvio) this.elementoEnvio.textContent = `$${envio.toFixed(2)}`;
+         if (this.elementoImpuesto) this.elementoImpuesto.textContent = `$${impuesto.toFixed(2)}`;
+         if (this.elementoTotal) this.elementoTotal.textContent = `$${total.toFixed(2)}`;
+      }
 
-    // Carga el carrito desde Supabase o localStorage como fallback
-    async cargarCarritoDeSupabase() {
-        try {
-            const usuario = await this.supabase.auth.getUser();
-            if (usuario.data?.user) {
-                const { data, error } = await this.supabase
-                    .from('shopping_cart')
-                    .select('items')
-                    .eq('user_id', usuario.data.user.id)
-                    .single();
 
-                if (error) throw error;
-                if (data?.items) {
-                    this.productos = data.items;
-                }
-            } else {
-                this.cargarCarritoDeLocal();
-            }
-        } catch (error) {
-            console.error('Error al cargar el carrito de Supabase:', error);
-            this.cargarCarritoDeLocal();
-        }
-        if (this.productos.length === 0) return;
-        this.renderizarCarrito();
-        this.calcularTotales();
-    }
-
-    // Maneja la lógica de aplicación de cupones de descuento
-    aplicarCupon() {
+    // Llama a la vista Django para aplicar cupón
+    async aplicarCupon() {
         const codigoCupon = this.inputCupon?.value.trim();
         if (!codigoCupon) {
             alert('Por favor ingrese un código de cupón');
             return;
         }
 
-        alert('Funcionalidad de cupones en desarrollo');
-    }
-
-    // Procesa el pago y crea la orden en Supabase
-    async procesarPago() {
-        if (this.productos.length === 0) {
-            alert('Su carrito está vacío');
-            return;
-        }
+        const url = '/floresvalentin_app/carrito/aplicar-cupon/'; // URL Django
+        this.botonCupon.disabled = true;
 
         try {
-            const usuario = await this.supabase.auth.getUser();
-            if (!usuario.data?.user) {
-                alert('Por favor inicie sesión para continuar con la compra');
-                window.location.href = '/login.html';
-                return;
+             const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ coupon_code: codigoCupon })
+            });
+
+             if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error || `Error ${response.status}`);
             }
 
-            // Crea la orden en Supabase
-            const { data, error } = await this.supabase
-                .from('orders')
-                .insert({
-                    user_id: usuario.data.user.id,
-                    items: this.productos,
-                    total_amount: this.calcularTotal(),
-                    status: 'pending'
-                })
-                .select()
-                .single();
+             const data = await response.json(); // Espera { success: true, summary_html: "...", message: "..." }
 
-            if (error) throw error;
+             if (data.success) {
+                 this.actualizarResumenPedido(data.summary_html);
+                 this.showToast(data.message || 'Cupón aplicado.');
+                 if (this.inputCupon) this.inputCupon.value = ''; // Limpiar input
+             } else {
+                 throw new Error(data.error || 'Cupón inválido o no aplicable.');
+             }
 
-            // Limpia el carrito y redirige al checkout
-            this.productos = [];
-            await this.actualizarCarrito();
-
-            window.location.href = `/checkout.html?order_id=${data.id}`;
         } catch (error) {
-            console.error('Error durante el checkout:', error);
-            alert('Ha ocurrido un error durante el proceso de pago');
+            console.error('Error al aplicar cupón:', error);
+            this.showToast(`Error: ${error.message}`, 'error');
+        } finally {
+            this.botonCupon.disabled = false;
         }
     }
 
-    // Calcula el total final incluyendo subtotal, envío e impuestos
-    calcularTotal() {
-        const subtotal = this.productos.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        const envio = subtotal > 0 ? 15000.00 : 0;
-        const impuesto = subtotal * 0.19;
-        return subtotal + envio + impuesto;
-    }
-
-    // Método para añadir un producto al carrito
-    async agregarProducto(producto, cantidad = 1) {
-        // Verificar si el producto ya está en el carrito
-        const productoExistente = this.productos.find(item => item.id === producto.id);
-        
-        if (productoExistente) {
-            // Si el producto ya existe, actualiza su cantidad
-            productoExistente.quantity += cantidad;
-        } else {
-            // Si no existe, agrega el producto con la cantidad especificada
-            this.productos.push({
-                id: producto.id,
-                name: producto.name,
-                price: producto.price,
-                image_url: producto.image_url,
-                quantity: cantidad
-            });
-        }
-        
-        // Actualiza el carrito en todas las capas
-        await this.actualizarCarrito();
-        
-        // Opcional: Mostrar confirmación visual
-        this.mostrarConfirmacion(producto.name, cantidad);
-    }
-    
-    // Método para mostrar una confirmación visual de producto añadido
-    mostrarConfirmacion(nombreProducto, cantidad) {
-        const mensaje = `${nombreProducto} (${cantidad}) añadido al carrito`;
-        
-        // Crear elemento de notificación
-        const notificacion = document.createElement('div');
-        notificacion.className = 'alert alert-success position-fixed top-0 end-0 m-3';
-        notificacion.style.zIndex = '1000';
-        notificacion.innerHTML = `
-            <i class="fas fa-check-circle me-2"></i>
-            ${mensaje}
-        `;
-        
-        // Añadir al DOM
-        document.body.appendChild(notificacion);
-        
-        // Remover después de 3 segundos
-        setTimeout(() => {
-            notificacion.remove();
-        }, 3000);
-    }
+     // Función para mostrar notificaciones (reutilizar la de catalog.js o similar)
+     showToast(message, type = 'success') {
+         // Implementación similar a la de catalog.js
+         const toastId = `toast-${Date.now()}`;
+         const toastHtml = `
+             <div id="${toastId}" class="toast show align-items-center text-white ${type === 'success' ? 'bg-success' : 'bg-danger'} border-0 position-fixed bottom-0 end-0 m-3" role="alert" aria-live="assertive" aria-atomic="true" style="z-index: 1050;">
+               <div class="d-flex">
+                 <div class="toast-body">
+                   ${message}
+                 </div>
+                 <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+               </div>
+             </div>
+         `;
+         document.body.insertAdjacentHTML('beforeend', toastHtml);
+         const toastElement = document.getElementById(toastId);
+         const bsToast = new bootstrap.Toast(toastElement, { delay: 3000 });
+         bsToast.show();
+         toastElement.addEventListener('hidden.bs.toast', () => toastElement.remove());
+     }
 }
 
-// Inicializa el carrito cuando el DOM está completamente cargado
+// Inicializar el carrito cuando el DOM esté completamente cargado
 document.addEventListener('DOMContentLoaded', () => {
-    window.carrito = new CarritoCompras();
+    // No necesitamos exponerlo globalmente si solo se usa en esta página
+    const carrito = new CarritoCompras();
 });
-
-// Exponer el carrito globalmente para que pueda ser usado desde otras páginas
-export default CarritoCompras;

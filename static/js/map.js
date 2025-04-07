@@ -1,15 +1,19 @@
 document.addEventListener('DOMContentLoaded', function() {
+    const mapElement = document.getElementById('map');
+    if (!mapElement) return; // Salir si no hay mapa en la página
+
+    const iconUrl = mapElement.dataset.iconUrl || '/static/images/placeholder-icon.png'; // Usa placeholder si no se pasó la URL
     const lat = 6.241362256908526;
     const lng = -75.58840591379317;
 
     const map = L.map('map').setView([lat, lng], 15);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
     const customIcon = L.icon({
-        iconUrl: 'assets/images/logo.svg',
+        iconUrl: iconUrl, // <--- URL dinámica
         iconSize: [32, 32],
         iconAnchor: [16, 32],
         popupAnchor: [0, -32]
@@ -24,6 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     `).openPopup();
 
+    // El círculo no necesita cambios
     var circle = L.circle([lat, lng], {
         color: 'red',
         fillColor: '#f03',

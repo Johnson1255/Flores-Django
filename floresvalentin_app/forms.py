@@ -46,12 +46,25 @@ class CheckoutForm(forms.Form):
 # Custom Registration Form
 class CustomUserCreationForm(UserCreationForm):
     # Add fields from the User model that aren't in UserCreationForm by default
-    first_name = forms.CharField(max_length=30, required=True, label="Nombre")
-    last_name = forms.CharField(max_length=150, required=True, label="Apellidos")
-    email = forms.EmailField(required=True, label="Correo Electrónico")
+    # Explicitly define widgets
+    first_name = forms.CharField(
+        max_length=30, required=True, label="Nombre",
+        widget=forms.TextInput(attrs={'placeholder': 'Tu nombre'}) # Example placeholder
+    )
+    last_name = forms.CharField(
+        max_length=150, required=True, label="Apellidos",
+        widget=forms.TextInput(attrs={'placeholder': 'Tus apellidos'})
+    )
+    email = forms.EmailField(
+        required=True, label="Correo Electrónico",
+        widget=forms.EmailInput(attrs={'placeholder': 'tu@correo.com'})
+    )
 
-    # Add fields from the Profile model
-    phone = forms.CharField(max_length=20, required=True, label="Teléfono")
+    # Add fields from the Profile model with explicit widgets
+    phone = forms.CharField(
+        max_length=20, required=True, label="Teléfono",
+        widget=forms.TextInput(attrs={'placeholder': 'Tu número de teléfono'})
+    )
     country = forms.CharField(max_length=50, required=True, label="País")
     city = forms.CharField(max_length=50, required=True, label="Ciudad")
     neighborhood = forms.CharField(max_length=100, required=True, label="Barrio")
@@ -102,3 +115,8 @@ class CustomUserCreationForm(UserCreationForm):
             profile.newsletter = self.cleaned_data["newsletter"]
             profile.save() # Save the Profile instance
         return user
+
+# Minimal Login Form for Debugging
+class MinimalLoginForm(forms.Form):
+    username = forms.CharField(max_length=150, required=True)
+    password = forms.CharField(widget=forms.PasswordInput, required=True)

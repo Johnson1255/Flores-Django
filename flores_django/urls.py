@@ -21,23 +21,25 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+# Import views from the app (keep for register view)
+from floresvalentin_app import views as app_views
+# Import built-in LoginView and LogoutView
 # Import views from the app
 from floresvalentin_app import views as app_views
-# Import built-in LogoutView
+# Import built-in LogoutView (LoginView not needed here anymore)
 from django.contrib.auth.views import LogoutView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    # Custom login/register URLs
-    # Maps GET and POST requests for '/login/' to our custom view
+    # Restore custom login/register view URL
     path('login/', app_views.login_register_view, name='login'),
-    # Maps POST requests for '/register/' to our custom registration view
+    # Keep custom registration view URL
     path('register/', app_views.register, name='register'),
-    # Uses Django's built-in LogoutView, redirecting to index after logout
+    # Keep LogoutView
     path('logout/', LogoutView.as_view(next_page='floresvalentin_app:index'), name='logout'),
 
-    # Include other auth URLs (password reset, etc.) from django.contrib.auth.urls if needed.
+    # Include other auth URLs (password reset, etc.) from django.contrib.auth.urls.
     # This line provides URLs like /accounts/password_reset/, etc.
     # It's included *after* our custom 'login/' so ours takes precedence if there were overlap.
     # The default 'accounts/login/' from this include won't be used because we defined 'login/' above.

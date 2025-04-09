@@ -1,17 +1,17 @@
 import uuid
-import uuid
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import login, authenticate, logout # Added logout
-from django.contrib.auth.forms import AuthenticationForm
-# from django.contrib.auth.views import LoginView # No longer needed here if handled in view
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.forms import AuthenticationForm # Restore AuthenticationForm
+# from django.contrib.auth.views import LoginView
 from django.contrib import messages
-from django.urls import reverse_lazy, reverse # Added reverse
+from django.urls import reverse_lazy, reverse
 
-# Corrected model imports: Replaced Cart with ShoppingCart, removed CartItem and Coupon
-from .models import Product, Category, Order, OrderItem, SpecialOrder, ShoppingCart, Profile # Added Profile explicitly
-from .forms import SpecialOrderForm, ContactForm, ProfileForm, CheckoutForm, CustomUserCreationForm # Added CustomUserCreationForm
+# Corrected model imports
+from .models import Product, Category, Order, OrderItem, SpecialOrder, ShoppingCart, Profile
+# Remove MinimalLoginForm import
+from .forms import SpecialOrderForm, ContactForm, ProfileForm, CheckoutForm, CustomUserCreationForm
 
 # Página principal
 def index(request):
@@ -441,14 +441,15 @@ def login_register_view(request):
     and POST requests for login attempts.
     Registration POSTs are handled by the 'register' view.
     """
+    # Restore AuthenticationForm
     login_form = AuthenticationForm(request, data=request.POST or None)
     # Pass a fresh registration form for GET or failed login POST
     register_form = CustomUserCreationForm()
 
     if request.method == 'POST':
-        # Check if the login form is valid (this assumes POST is for login)
-        # The registration form POSTs to a different URL ('register')
+        # Check if the AuthenticationForm is valid
         if login_form.is_valid():
+            # Restore original login logic
             username = login_form.cleaned_data.get('username')
             password = login_form.cleaned_data.get('password')
             user = authenticate(request, username=username, password=password)
@@ -478,6 +479,7 @@ def login_register_view(request):
         'login_form': login_form,    # Contains errors if login POST failed
         'register_form': register_form # Fresh form instance
     }
+    # Removed debugging print statements
     return render(request, 'registration/login.html', context)
 
 
@@ -493,12 +495,13 @@ def register(request):
             return redirect('floresvalentin_app:index') # Redirect to home page
         else:
             # Registration failed. Prepare context to re-render the page.
-            # Need a fresh login form instance for display.
-            login_form_instance = AuthenticationForm()
+            # Need a fresh AuthenticationForm instance for display.
+            login_form_instance = AuthenticationForm() # Restore AuthenticationForm
             messages.error(request, 'Por favor corrige los errores en el formulario de registro.')
             # Explicitly define context, passing the invalid registration form back
+            # Fix indentation here
             context = {
-                'login_form': login_form_instance,
+                'login_form': login_form_instance, # Pass AuthenticationForm
                 'register_form': submitted_register_form # Pass the invalid form
             }
             return render(request, 'registration/login.html', context)

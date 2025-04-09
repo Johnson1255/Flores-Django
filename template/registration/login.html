@@ -7,6 +7,10 @@
     <title>{% trans "Iniciar Sesión / Registrarse" %} - Flores San Valentín</title>
 
     {# --- STYLES --- #}
+    {# Core CSS Files (Needed since this page doesn't extend base.html) #}
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/layout.css' %}">
+    <link rel="stylesheet" href="{% static 'css/components.css' %}">
     {# Specific CSS for the login page #}
     <link rel="stylesheet" href="{% static 'css/login.css' %}">
     {# Font Awesome (Include directly as base.html is not used) #}
@@ -43,8 +47,8 @@
     }
     </style>
 </head>
-{# Add data-theme attribute if your theme JS relies on it #}
-<body data-theme="light"> {# Or dynamically set by theme.js #}
+{# Add data-theme attribute if your theme JS relies on it AND the class for login-specific body styles #}
+<body data-theme="light" class="login-page-body"> {# Or dynamically set by theme.js #}
 
 <div class="login-container">
     <div class="login-card">

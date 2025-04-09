@@ -39,22 +39,22 @@ body {
     font-size: 0.9rem;
     margin-bottom: 25px;
     transition: color 0.3s;
-    
-    &:hover {
-        color: #ff4d6d;
-    }
+}
+
+.back-button:hover { /* Fixed syntax */
+    color: #ff4d6d;
 }
 
 /* Header Section */
 .login-header {
     text-align: center;
     margin-bottom: 30px;
-    
-    & h1 {
-        color: #333;
-        font-size: 1.8rem;
-        margin-bottom: 10px;
-    }
+}
+
+.login-header h1 { /* Fixed syntax */
+    color: #333;
+    font-size: 1.8rem;
+    margin-bottom: 10px;
 }
 
 .login-logo {
@@ -85,11 +85,11 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s;
-    
-    &.active {
-        color: #ff4d6d;
-        border-bottom-color: #ff4d6d;
-    }
+}
+
+.tab-button.active { /* Fixed syntax */
+    color: #ff4d6d;
+    border-bottom-color: #ff4d6d;
 }
 
 /* Form Styles */
@@ -116,30 +116,32 @@ label {
     }
 }
 
+/* Restore original positioning */
 .input-with-icon {
-    position: relative;
-    
-    & i {
-        position: absolute;
-        left: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #666;
-    }
+    position: relative; /* Restored */
 }
 
+.input-with-icon i { /* Restored */
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+}
+
+/* Restore original input padding */
 input {
     width: 100%;
-    padding: 12px 15px 12px 45px;
+    padding: 12px 15px 12px 45px; /* Restored original padding */
     border: 1px solid #ddd;
     border-radius: 8px;
     font-size: 1rem;
     transition: border-color 0.3s;
-    
-    &:focus {
-        outline: none;
-        border-color: #ff4d6d;
-    }
+}
+
+input:focus { /* Fixed syntax */
+    outline: none;
+    border-color: #ff4d6d;
 }
 
 /* Form Options */
@@ -162,10 +164,10 @@ input {
     color: #ff4d6d;
     text-decoration: none;
     font-size: 0.9rem;
-    
-    &:hover {
-        text-decoration: underline;
-    }
+}
+
+.forgot-password:hover { /* Fixed syntax */
+    text-decoration: underline;
 }
 
 /* Login Button */
@@ -184,41 +186,42 @@ input {
     justify-content: center;
     gap: 10px;
     transition: background 0.3s;
-    
-    &:hover {
-        background: #ff3355;
-    }
+}
+
+.login-button:hover { /* Fixed syntax */
+    background: #ff3355;
 }
 
 /* Social Login */
 .social-login {
     margin-top: 30px;
     text-align: center;
-    
-    & p {
-        color: #666;
-        margin-bottom: 15px;
-        position: relative;
-        
-        &::before,
-        &::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            width: 30%;
-            height: 1px;
-            background: #ddd;
-        }
-        
-        &::before {
-            left: 0;
-        }
-        
-        &::after {
-            right: 0;
-        }
-    }
 }
+
+.social-login p { /* Fixed syntax */
+    color: #666;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.social-login p::before, /* Fixed syntax */
+.social-login p::after { /* Fixed syntax */
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 30%;
+    height: 1px;
+    background: #ddd;
+}
+
+.social-login p::before { /* Fixed syntax */
+    left: 0;
+}
+
+.social-login p::after { /* Fixed syntax */
+    right: 0;
+}
+
 
 .social-buttons {
     display: flex;
@@ -239,21 +242,21 @@ input {
     justify-content: center;
     gap: 8px;
     transition: all 0.3s;
-    
-    &:hover {
-        background: #f8f8f8;
-        border-color: #ccc;
-    }
-    
-    &.google:hover {
-        color: #DB4437;
-        border-color: #DB4437;
-    }
-    
-    &.facebook:hover {
-        color: #4267B2;
-        border-color: #4267B2;
-    }
+}
+
+.social-button:hover { /* Fixed syntax */
+    background: #f8f8f8;
+    border-color: #ccc;
+}
+
+.social-button.google:hover { /* Fixed syntax */
+    color: #DB4437;
+    border-color: #DB4437;
+}
+
+.social-button.facebook:hover { /* Fixed syntax */
+    color: #4267B2;
+    border-color: #4267B2;
 }
 
 /* Responsive Design */
@@ -286,15 +289,15 @@ input {
     gap: 8px;
     color: #666;
     font-size: 0.9rem;
-    
-    &.required {
-        color: #333;
-    }
-    
-    & input[type="checkbox"] {
-        width: auto;
-        padding: 0;
-    }
+}
+
+.checkbox-label.required { /* Fixed syntax */
+    color: #333;
+}
+
+.checkbox-label input[type="checkbox"] { /* Fixed syntax */
+    width: auto;
+    padding: 0;
 }
 
 /* Mensaje de error */
@@ -308,3 +311,5 @@ input {
 .input-error {
     border-color: #ff4d6d;
 }
+
+/* Removed diagnostic CSS */

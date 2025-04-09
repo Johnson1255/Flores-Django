@@ -75,8 +75,9 @@
         {# The action points to the 'login' URL name, which maps to login_register_view #}
         <form method="post" action="{% url 'login' %}" class="login-form" id="login-form-content">
             {% csrf_token %} {# CSRF token for security #}
+            {# Removed debug text #}
 
-            {# Manual rendering for more control (matches original structure) #}
+            {# Manual rendering (Restored) #}
             <div class="form-group">
                 <label for="{{ login_form.username.id_for_label }}">{% trans "Correo Electrónico o Usuario" %}</label>
                 <div class="input-with-icon">
@@ -122,10 +123,13 @@
 
         {# --- Registration Form --- #}
         {# The action points to the 'register' URL name #}
-        <form method="post" action="{% url 'register' %}" class="register-form" id="register-form-content" style="display: none;">
-            {% csrf_token %} {# CSRF token for security #}
+        {# Temporarily removed style="display: none;" for debugging #}
+        {# Restore display:none later if needed by JS #}
+        <form method="post" action="{% url 'register' %}" class="register-form" id="register-form-content">
+             {% csrf_token %} {# CSRF token for security #}
+             {# Removed debug text and conditional check #}
 
-            {# Manual rendering for consistency #}
+            {# Manual rendering (Restored) #}
             <div class="form-group">
                 <label for="{{ register_form.first_name.id_for_label }}">{{ register_form.first_name.label }}</label>
                 <div class="input-with-icon">
@@ -258,7 +262,7 @@
             </button>
         </form>
 
-        {# Social Login (Keep structure, functionality needs separate implementation e.g., django-allauth) #}
+        {# Social Login (Keep structure) #}
         <div class="social-login">
             <p>{% trans "O inicia sesión con" %}</p>
             <div class="social-buttons">

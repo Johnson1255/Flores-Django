@@ -1,62 +1,63 @@
-// Importar SOLO si mantienes theme/i18n JS
+// Keep theme import if used globally
 import { initTheme } from './theme.js';
-// import i18n from './i18n.js';
-// import LanguageSelector from './language.js';
-// NO importar auth.js
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Inicializar tema y (opcionalmente) i18n
+    // Initialize the theme
     initTheme();
+    // Remove language selector and i18n initialization if not used elsewhere
     // const languageSelector = new LanguageSelector();
     // i18n.updatePageContent();
 
-    // Obtener elementos del DOM para las pestañas
-    const loginTab = document.querySelector('.tab-button[data-i18n="login"]'); // O usa un ID/clase más específico
-    const registerTab = document.querySelector('.tab-button[data-i18n="register"]');
-    const loginForm = document.querySelector('.login-form');
-    const registerForm = document.querySelector('.register-form');
+    // Get DOM elements using updated selectors for Django template
+    const loginTab = document.querySelector('.tab-button[data-tab="login"]');
+    const registerTab = document.querySelector('.tab-button[data-tab="register"]');
+    const loginForm = document.getElementById('login-form-content'); // Use ID
+    const registerForm = document.getElementById('register-form-content'); // Use ID
 
-    // Función para mostrar el formulario de inicio de sesión
+    // Function to show the login form
     function showLoginForm() {
-        if (!loginTab || !registerTab || !loginForm || !registerForm) return;
+        // Add checks to ensure elements exist before manipulating them
+        if (!loginTab || !registerTab || !loginForm || !registerForm) {
+            console.warn("Login/Register tab or form elements not found.");
+            return;
+        }
         loginTab.classList.add('active');
         registerTab.classList.remove('active');
         loginForm.style.display = 'block';
         registerForm.style.display = 'none';
     }
 
-    // Función para mostrar el formulario de registro
+    // Function to show the registration form
     function showRegisterForm() {
-        if (!loginTab || !registerTab || !loginForm || !registerForm) return;
+        if (!loginTab || !registerTab || !loginForm || !registerForm) {
+             console.warn("Login/Register tab or form elements not found.");
+            return;
+        }
         registerTab.classList.add('active');
         loginTab.classList.remove('active');
         registerForm.style.display = 'block';
         loginForm.style.display = 'none';
     }
 
-    // Asignar eventos click a las pestañas
+    // Assign click events to the tabs
     if (loginTab) {
-        loginTab.addEventListener('click', (e) => {
-            e.preventDefault();
+        loginTab.addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent default anchor behavior if it were an anchor
             showLoginForm();
         });
     }
 
     if (registerTab) {
-        registerTab.addEventListener('click', (e) => {
+        registerTab.addEventListener('click', function(e) {
             e.preventDefault();
             showRegisterForm();
         });
     }
 
-    // Mostrar el formulario correcto al inicio (login por defecto)
+    // Show the login form by default when the page loads
     showLoginForm();
 
-    // --- IMPORTANTE ---
-    // La lógica de envío de formularios (submit listeners) se ha ELIMINADO.
-    // Los formularios ahora deben tener method="post" y action="{% url '...' %}"
-    // y un {% csrf_token %}. Django manejará el envío, la validación,
-    // el inicio de sesión/registro y la redirección.
-    // Puedes añadir validaciones básicas de frontend aquí si quieres (ej. campos no vacíos),
-    // pero la validación principal y la lógica ocurren en el backend.
+    // REMOVED: Event listeners for form submission (loginForm.addEventListener('submit', ...))
+    // REMOVED: Event listeners for form submission (registerForm.addEventListener('submit', ...))
+    // Django now handles form submission via the 'action' and 'method' attributes in the HTML.
 });

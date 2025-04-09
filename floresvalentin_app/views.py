@@ -1,11 +1,17 @@
 import uuid
+import uuid
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login, authenticate, logout # Added logout
+from django.contrib.auth.forms import AuthenticationForm
+# from django.contrib.auth.views import LoginView # No longer needed here if handled in view
 from django.contrib import messages
+from django.urls import reverse_lazy, reverse # Added reverse
+
 # Corrected model imports: Replaced Cart with ShoppingCart, removed CartItem and Coupon
-from .models import Product, Category, Order, OrderItem, SpecialOrder, ShoppingCart
-from .forms import SpecialOrderForm, ContactForm, ProfileForm, CheckoutForm # Assuming CheckoutForm exists
+from .models import Product, Category, Order, OrderItem, SpecialOrder, ShoppingCart, Profile # Added Profile explicitly
+from .forms import SpecialOrderForm, ContactForm, ProfileForm, CheckoutForm, CustomUserCreationForm # Added CustomUserCreationForm
 
 # Página principal
 def index(request):
@@ -425,3 +431,75 @@ def gallery(request):
 
 def location(request):
     return render(request, 'floresvalentin_app/location.html')
+
+
+# --- Authentication Views ---
+
+def login_register_view(request):
+    """
+    Handles GET requests to display login/register forms
+    and POST requests for login attempts.
+    Registration POSTs are handled by the 'register' view.
+    """
+    login_form = AuthenticationForm(request, data=request.POST or None)
+    # Pass a fresh registration form for GET or failed login POST
+    register_form = CustomUserCreationForm()
+
+    if request.method == 'POST':
+        # Check if the login form is valid (this assumes POST is for login)
+        # The registration form POSTs to a different URL ('register')
+        if login_form.is_valid():
+            username = login_form.cleaned_data.get('username')
+            password = login_form.cleaned_data.get('password')
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, f'Bienvenido de nuevo, {user.username}!')
+                # Redirect to 'next' URL or default
+                next_url = request.POST.get('next', request.GET.get('next', ''))
+                # Basic security check for open redirect vulnerability
+                if next_url and not next_url.startswith('/'):
+                    next_url = reverse('floresvalentin_app:index') # Or some safe default
+
+                return redirect(next_url or 'floresvalentin_app:index')
+            else:
+                # Invalid login credentials
+                messages.error(request, 'Usuario o contraseña inválidos.')
+                # Fall through to render the page again with the login_form containing errors
+        else:
+            # Login form is not valid, could be missing fields or other errors
+            # Don't display a generic error if specific field errors are shown by the form
+            if '__all__' not in login_form.errors:
+                 messages.error(request, 'Por favor corrige los errores en el formulario de inicio de sesión.')
+            # Fall through to render the page again with the login_form containing errors
+
+    # For GET request or failed POST login attempt, render the page
+    return render(request, 'registration/login.html', {
+        'login_form': login_form,    # Contains errors if login POST failed
+        'register_form': register_form # Fresh form for display
+    })
+
+
+def register(request):
+    """ Handles user registration POST requests """
+    if request.method == 'POST':
+        form = CustomUserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user) # Log the user in directly
+            messages.success(request, 'Registro exitoso. ¡Bienvenido!')
+            return redirect('floresvalentin_app:index') # Redirect to home page
+        else:
+            # If registration form is invalid, re-render the login/register page
+            # This time, pass the invalid registration form back.
+            login_form = AuthenticationForm() # Need a fresh login form for display
+            messages.error(request, 'Por favor corrige los errores en el formulario de registro.')
+            return render(request, 'registration/login.html', {
+                'login_form': login_form,
+                'register_form': form # Pass the invalid registration form
+            })
+    else:
+        # If someone tries to GET /register/, redirect them to the main login page
+        return redirect('login') # Redirect to the named URL for login_register_view
+
+# Logout view will use Django's built-in view configured in urls.py

@@ -473,31 +473,35 @@ def login_register_view(request):
                  messages.error(request, 'Por favor corrige los errores en el formulario de inicio de sesión.')
             # Fall through to render the page again with the login_form containing errors
 
-    # For GET request or failed POST login attempt, render the page
-    return render(request, 'registration/login.html', {
+    # Explicitly define context for GET request or failed POST login attempt
+    context = {
         'login_form': login_form,    # Contains errors if login POST failed
-        'register_form': register_form # Fresh form for display
-    })
+        'register_form': register_form # Fresh form instance
+    }
+    return render(request, 'registration/login.html', context)
 
 
 def register(request):
     """ Handles user registration POST requests """
     if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
+        # Use a distinct variable name for the submitted form instance
+        submitted_register_form = CustomUserCreationForm(request.POST)
+        if submitted_register_form.is_valid():
+            user = submitted_register_form.save()
             login(request, user) # Log the user in directly
             messages.success(request, 'Registro exitoso. ¡Bienvenido!')
             return redirect('floresvalentin_app:index') # Redirect to home page
         else:
-            # If registration form is invalid, re-render the login/register page
-            # This time, pass the invalid registration form back.
-            login_form = AuthenticationForm() # Need a fresh login form for display
+            # Registration failed. Prepare context to re-render the page.
+            # Need a fresh login form instance for display.
+            login_form_instance = AuthenticationForm()
             messages.error(request, 'Por favor corrige los errores en el formulario de registro.')
-            return render(request, 'registration/login.html', {
-                'login_form': login_form,
-                'register_form': form # Pass the invalid registration form
-            })
+            # Explicitly define context, passing the invalid registration form back
+            context = {
+                'login_form': login_form_instance,
+                'register_form': submitted_register_form # Pass the invalid form
+            }
+            return render(request, 'registration/login.html', context)
     else:
         # If someone tries to GET /register/, redirect them to the main login page
         return redirect('login') # Redirect to the named URL for login_register_view

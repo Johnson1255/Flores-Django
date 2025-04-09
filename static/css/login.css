@@ -102,19 +102,24 @@ label {
     margin-bottom: 8px;
     color: #333;
     font-weight: 600;
-    
-    &::after {
-        content: "*";
-        color: #ff4d6d;
-        margin-left: 4px;
-    }
-    
-    &:not([for="ocasiones"])::after {
-        content: "*";
-        color: #ff4d6d;
-        margin-left: 4px;
-    }
+    /* Removed invalid nested pseudo-elements. We'll add the asterisk back if needed via template or JS,
+       or apply it to all labels for now and remove specifically for 'ocasiones'. */
 }
+
+/* Apply asterisk to all labels by default */
+label::after { /* Fixed syntax */
+    content: "*";
+    color: #ff4d6d;
+    margin-left: 4px;
+}
+
+/* Specifically remove asterisk for the 'ocasiones' label if it exists */
+/* Note: This assumes the label for preferences has for="id_preferences" or similar */
+/* Adjust selector if needed based on how Django renders the preferences label */
+label[for^="id_preferences"]::after { /* Fixed syntax - targeting label for preferences */
+   content: ""; /* Remove asterisk */
+}
+
 
 /* Restore original positioning */
 .input-with-icon {

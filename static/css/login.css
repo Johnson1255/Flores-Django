@@ -314,3 +314,85 @@ input:focus {
 .input-error {
     border-color: var(--primary-color); /* Use variable */
 }
+
+/* Django Form Error List Styling */
+.errorlist {
+    color: var(--primary-color); /* Use theme color */
+    font-size: 0.85rem;
+    list-style: none;
+    padding: 0;
+    margin-top: 5px;
+    margin-bottom: 10px; /* Add some space below errors */
+    text-align: left; /* Align error text left */
+}
+
+.errorlist.non-field-errors { /* Specific styling for non-field errors */
+    padding: 10px;
+    background-color: rgba(255, 77, 109, 0.1); /* Light red background */
+    border: 1px solid var(--primary-color);
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+/* Theme Toggle Button (Moved from inline style) */
+.theme-toggle-btn {
+    position: absolute; /* Position relative to login-card or container */
+    top: 20px;
+    right: 20px;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-color); /* Use theme variable */
+    z-index: 10; /* Ensure it's above other card elements */
+}
+
+/* Adjust color for dark theme if needed (JS might also handle this) */
+html[data-theme='dark'] .theme-toggle-btn {
+    color: var(--text-color); /* Use theme variable */
+}
+
+/* Basic Alert Styling (for Django Messages) */
+.alert {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.25rem;
+    text-align: left; /* Ensure text aligns left */
+}
+
+.alert-info {
+    color: #0c5460; /* Example color */
+    background-color: #d1ecf1; /* Example color */
+    border-color: #bee5eb; /* Example color */
+}
+
+.alert-success {
+    color: #155724;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+}
+
+.alert-warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+}
+
+.alert-error, /* Django uses 'error' tag */
+.alert-danger { /* Bootstrap uses 'danger' */
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+/* Style for initially hidden registration form */
+.register-form {
+    display: none;
+}
+
+/* Style for messages container */
+.messages-container {
+    padding: 10px;
+    margin-bottom: 15px;
+}

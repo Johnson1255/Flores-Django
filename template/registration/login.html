@@ -20,32 +20,6 @@
     {# Add any other global styles if needed, e.g., from main.css if login.css doesn't cover everything #}
     {# <link rel="stylesheet" href="{% static 'css/main.css' %}"> #}
 
-    {# Inline style for theme toggle button if needed #}
-    <style>
-    /* Styles for theme toggle button if needed specifically here */
-    .theme-toggle-btn {
-        position: absolute; /* Or fixed */
-        top: 20px;
-        right: 20px;
-        background: transparent;
-        border: none;
-        font-size: 1.5rem;
-        cursor: pointer;
-        /* Adjust color based on theme - JS might handle this */
-        color: #333; /* Example default color */
-    }
-    html[data-theme='dark'] .theme-toggle-btn {
-        color: #f1f1f1; /* Example dark theme color */
-    }
-    /* Ensure form elements inherit theme variables if needed */
-    .errorlist { /* Basic styling for Django form errors */
-        color: #ff4d6d;
-        font-size: 0.85rem;
-        list-style: none;
-        padding: 0;
-        margin-top: 5px;
-    }
-    </style>
 </head>
 {# Add data-theme attribute if your theme JS relies on it AND the class for login-specific body styles #}
 <body data-theme="light" class="login-page-body"> {# Or dynamically set by theme.js #}
@@ -66,9 +40,9 @@
 
         {# Display Django messages (e.g., login errors, registration success) #}
         {% if messages %}
-            <div class="messages-container" style="padding: 10px; margin-bottom: 15px;">
+            <div class="messages-container"> {# Removed inline style #}
                 {% for message in messages %}
-                    {# Using Bootstrap alert classes for styling consistency if available #}
+                    {# Using alert classes defined in login.css #}
                     <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %}" role="alert">
                         {{ message }}
                     </div>
@@ -133,8 +107,8 @@
 
         {# --- Registration Form --- #}
         {# The action points to the 'register' URL name #}
-        {# Restore display:none; JS should handle visibility #}
-        <form method="post" action="{% url 'register' %}" class="register-form" id="register-form-content" style="display: none;">
+        {# Removed inline style="display: none;"; CSS class .register-form handles this #}
+        <form method="post" action="{% url 'register' %}" class="register-form" id="register-form-content">
              {% csrf_token %} {# CSRF token for security #}
 
             {# Manual rendering (Restored) #}

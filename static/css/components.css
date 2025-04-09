@@ -1,0 +1,612 @@
+/* Component Styles */
+
+/* Navbar */
+.navbar .nav-link {
+  color: var(--navbar-text-color) !important; /* Ensure visibility against primary color */
+  transition: color 0.3s ease;
+}
+
+/* Banner */
+.banner-title {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  color: var(--white-color);
+  font-family: "Borel", serif;
+  font-size: 3.5rem;
+  text-shadow: 2px 2px 4px var(--banner-shadow);
+  width: 100%;
+  padding: 0 20px;
+  margin: 0;
+  text-align: center;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.banner {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none; /* Controlled by JS */
+  animation: fade 1s ease-in-out;
+}
+
+@keyframes fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Gallery */
+.gallery img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  border-radius: 10px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+.gallery img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px var(--shadow-color);
+}
+
+@media (max-width: 480px) {
+  .gallery img {
+    height: 200px;
+  }
+}
+
+/* Video */
+#video iframe {
+  margin-top: 15px;
+  max-width: 100%;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px var(--shadow-color);
+  transition: box-shadow 0.3s ease;
+}
+
+/* Contact Form */
+form {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  width: 50%; /* Consider making this more flexible or using container */
+  margin-left: auto;
+  margin-right: auto;
+  background: var(--form-bg);
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px var(--shadow-color);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input, textarea {
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  background-color: var(--white-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+button { /* General button style, might need refinement */
+  background: var(--primary-color);
+  color: var(--white-color);
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background: var(--primary-hover);
+}
+
+@media (max-width: 768px) {
+  form {
+    width: 90%;
+  }
+}
+
+/* Floating WhatsApp Button */
+#float-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--whatsapp-color);
+  color: var(--white-color);
+  padding: 15px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 6px var(--shadow-color);
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center icon */
+  width: 50px; /* Explicit size */
+  height: 50px; /* Explicit size */
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  z-index: 999;
+}
+
+#float-button i {
+  font-size: 24px;
+}
+
+/* Footer Components */
+.footer-section h3 {
+  color: var(--white-color);
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  position: relative;
+  padding-bottom: 10px;
+  transition: color 0.3s ease;
+}
+
+.footer-section h3::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 50px;
+  height: 2px;
+  background-color: var(--white-color);
+  transition: background-color 0.3s ease;
+}
+
+.footer-section p {
+  line-height: 1.6;
+  margin: 0;
+}
+
+.footer-hours,
+.footer-contact {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: left; /* Align list items left */
+}
+
+.footer-hours li,
+.footer-contact li {
+  margin-bottom: 10px;
+}
+
+.footer-contact li i {
+  margin-right: 10px;
+  width: 20px;
+  text-align: center;
+}
+
+.social-links {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.social-links a {
+  color: var(--white-color);
+  text-decoration: none;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--white-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.social-links a:hover {
+  background: var(--white-color);
+  color: var(--primary-color);
+  transform: translateY(-3px);
+}
+
+.social-links i {
+  font-size: 1.2rem;
+}
+
+.footer-links {
+  margin-top: 10px;
+}
+
+.footer-links a {
+  color: var(--white-color);
+  text-decoration: none;
+  margin: 0 10px;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .social-links {
+    justify-content: center;
+  }
+  .footer-hours,
+  .footer-contact {
+    text-align: center; /* Center align on smaller screens */
+  }
+}
+
+/* Header Components */
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
+.brand-text h1 {
+  color: var(--primary-color);
+  margin: 0;
+  font-size: 1.8rem;
+  transition: color 0.3s ease;
+}
+
+.brand-text p {
+  color: var(--light-text);
+  margin: 5px 0 0 0;
+  font-size: 1rem;
+  transition: color 0.3s ease;
+}
+
+.header-actions {
+  display: flex;
+  gap: 15px;
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: 2px solid var(--primary-color);
+  border-radius: 25px;
+  background: transparent;
+  color: var(--primary-color);
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.action-button:hover {
+  background: var(--primary-color);
+  color: var(--white-color);
+  text-decoration: none;
+}
+
+.action-button.primary {
+  background: var(--primary-color);
+  color: var(--white-color);
+}
+
+.action-button.primary:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+/* Cart Counter Badge */
+.cart-counter {
+    display: inline-flex; /* Use flex to center content */
+    position: absolute;
+    top: -8px; /* Adjust position relative to button */
+    right: -8px; /* Adjust position relative to button */
+    background-color: var(--primary-hover); /* Use theme variable (or a specific red if preferred) */
+    color: var(--white-color);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    justify-content: center;
+    align-items: center;
+    line-height: 1; /* Ensure text is vertically centered */
+    font-weight: bold;
+    padding: 0; /* Remove default padding if any */
+}
+
+/* Ensure parent button is relative for absolute positioning */
+.action-button {
+    position: relative; /* This should already be set, but good to ensure */
+}
+
+
+.social-icons {
+  display: flex;
+  gap: 10px;
+}
+
+.social-icons a {
+  color: var(--white-color);
+  text-decoration: none;
+  transition: opacity 0.3s ease, color 0.3s ease;
+}
+
+.social-icons a:hover {
+  opacity: 0.8;
+}
+
+@media (max-width: 968px) {
+  .logo-container {
+    flex-direction: column;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .action-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Music Control Button */
+.music-control {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 1000;
+}
+
+.music-button {
+  background: var(--primary-color);
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 4px 10px var(--shadow-color);
+  transition: all 0.3s ease;
+}
+
+.music-button i {
+  color: var(--white-color);
+  font-size: 1.2rem;
+  transition: transform 0.3s ease;
+  z-index: 2;
+}
+
+.music-button:hover {
+  transform: scale(1.05);
+  background: var(--primary-hover);
+}
+
+.music-button.playing .fa-music {
+  animation: pulse 1s infinite;
+}
+
+.music-waves {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  display: none; /* Hidden by default */
+}
+
+.music-waves span {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  left: 0;
+  top: 0;
+  animation: none; /* No animation by default */
+}
+
+.music-button.playing .music-waves {
+  display: block; /* Show waves when playing */
+}
+
+.music-button.playing .music-waves span {
+  animation: waves 2s infinite; /* Start animation when playing */
+}
+
+.music-waves span:nth-child(1) { animation-delay: 0.0s; }
+.music-waves span:nth-child(2) { animation-delay: 0.3s; }
+.music-waves span:nth-child(3) { animation-delay: 0.6s; }
+.music-waves span:nth-child(4) { animation-delay: 0.9s; }
+
+@keyframes waves {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* Catalog Cards */
+#catalogo .card {
+  transition: transform 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+  border: none;
+  box-shadow: 0 4px 8px var(--shadow-color);
+  background-color: var(--card-bg);
+  color: var(--text-color);
+}
+
+#catalogo .card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px var(--shadow-color);
+}
+
+#catalogo .card-img-top {
+  height: 200px;
+  object-fit: cover;
+}
+
+#catalogo .btn-primary { /* Specific to catalog buttons */
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--white-color);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+#catalogo .btn-primary:hover {
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+/* Location Info Panel */
+.info-card {
+  background: var(--card-bg);
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px var(--shadow-color);
+  height: 100%;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.info-card h3 {
+  color: var(--primary-color);
+  margin-bottom: 25px;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: color 0.3s ease;
+}
+
+.info-item {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding: 10px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.info-item:hover {
+  background-color: var(--secondary-color);
+}
+
+.info-item i {
+  color: var(--primary-color);
+  font-size: 1.2rem;
+  margin-top: 4px;
+  transition: color 0.3s ease;
+}
+
+.info-item p {
+  margin: 0;
+  color: var(--light-text);
+  transition: color 0.3s ease;
+}
+
+.info-item strong {
+  display: block;
+  color: var(--text-color);
+  margin-bottom: 5px;
+  transition: color 0.3s ease;
+}
+
+/* Map Controls */
+#map { /* Map container itself */
+  height: 100%;
+  width: 100%;
+}
+
+.leaflet-control-zoom {
+  margin-right: 15px !important;
+  margin-bottom: 15px !important;
+}
+
+.leaflet-control-zoom a {
+  color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.leaflet-control-zoom a:hover {
+  background-color: var(--primary-color) !important;
+  color: var(--white-color) !important;
+}
+
+/* Theme Toggle Button */
+#theme-toggle {
+  position: fixed;
+  top: 80px; /* Adjust position as needed */
+  right: 20px;
+  background-color: var(--primary-color);
+  color: var(--white-color);
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  box-shadow: 0 2px 5px var(--shadow-color);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+#theme-toggle:hover {
+  transform: scale(1.1);
+  background-color: var(--primary-hover);
+}
+
+/* Authentication Buttons */
+.auth-button {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background-color: var(--primary-color, #ff4b4b); /* Fallback color */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.3s, transform 0.2s;
+  margin-left: 1rem; /* Spacing from other elements */
+}
+
+.auth-button:hover {
+  background-color: var(--primary-hover); /* Use hover variable */
+  transform: translateY(-2px);
+}
+
+.auth-button i {
+  margin-right: 0.5rem;
+}
+
+/* Specific Logout Button Style */
+#logout-button {
+  background-color: var(--primary-color); /* Or a different color if desired */
+}
+
+#logout-button:hover {
+  background-color: var(--primary-hover);
+}

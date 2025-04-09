@@ -1,0 +1,237 @@
+/* Layout Styles */
+
+/* Header Styles */
+.main-header {
+  background: var(--header-bg);
+  box-shadow: 0 2px 5px var(--shadow-color);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Top Bar */
+.top-bar {
+  background: var(--top-bar-bg);
+  color: var(--white-color);
+  font-size: 0.9rem;
+  padding: 8px 0;
+  position: relative;
+  z-index: 1030;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.top-bar .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.contact-info span {
+  margin-right: 20px;
+}
+
+.contact-info i {
+  margin-right: 5px;
+}
+
+.opening-hours i {
+  margin-right: 5px;
+}
+
+.top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Main Header Content */
+.main-header-content {
+  padding: 20px 0;
+  background-color: var(--header-bg);
+  transition: background-color 0.3s ease;
+}
+
+.main-header-content .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Menú de navegación */
+.navbar {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  background-color: var(--primary-color) !important; /* Overrides Bootstrap potentially */
+  font-weight: bold;
+  z-index: 1020;
+  transition: background-color 0.3s ease;
+}
+
+/* Nav Placeholder for Sticky Menu */
+.nav-placeholder {
+  height: 60px; /* Adjust based on actual navbar height */
+}
+
+/* Banner Container */
+.banner-container {
+  position: relative;
+  width: 100%;
+  height: 350px;
+  overflow: hidden;
+  margin-top: 0px; /* Adjust if needed */
+  background-color: var(--background-color);
+}
+
+/* Section Layouts */
+#galeria {
+  /* padding handled by .section in base.css */
+  background-color: var(--background-color);
+  transition: background-color 0.3s ease;
+}
+
+.gallery {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 0 15px; /* Specific padding for gallery grid */
+}
+
+#video {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* padding handled by .section in base.css */
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: var(--background-color);
+  transition: background-color 0.3s ease;
+}
+
+#contacto {
+  /* padding handled by .section in base.css */
+  background-color: var(--background-color);
+  transition: background-color 0.3s ease;
+}
+
+#catalogo {
+  /* padding handled by .section in base.css */
+  background-color: var(--background-color);
+  transition: background-color 0.3s ease;
+}
+
+/* Ubicacion Layout */
+#ubicacion {
+  /* padding handled by .section in base.css */
+  background-color: var(--background-color);
+  transition: background-color 0.3s ease;
+}
+
+.location-container {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 30px;
+  margin-top: 20px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.location-info-panel {
+  height: 100%; /* Ensure panel takes full height in grid */
+}
+
+.map-wrapper {
+  height: 450px;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px var(--shadow-color);
+  transition: box-shadow 0.3s ease;
+}
+
+/* Footer Layout */
+.main-footer {
+  background: var(--footer-bg);
+  color: var(--white-color);
+  padding: 40px 0 0 0;
+  margin-top: 50px;
+  box-shadow: 0 -4px 8px var(--shadow-color);
+  transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+  padding: 0 20px;
+}
+
+.footer-section {
+  margin-bottom: 30px;
+}
+
+.footer-bottom {
+  margin-top: 30px;
+  padding: 20px;
+  background: var(--footer-dark-bg);
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
+/* Responsive Layout Adjustments */
+@media (max-width: 968px) {
+  .top-bar .container {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+
+  .main-header-content .container {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .gallery {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .footer-content {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .footer-section h3::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .location-container {
+    grid-template-columns: 1fr;
+  }
+
+  .map-wrapper {
+    height: 350px;
+  }
+
+  .contact-info span {
+    display: block;
+    margin: 5px 0;
+  }
+
+  .top-bar-right {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .gallery {
+    grid-template-columns: 1fr;
+  }
+}

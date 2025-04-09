@@ -1,15 +1,8 @@
-  /* Estilos para la página de pedido especial */
-
-/* Estilos generales */
-body {
-    background-color: var(--background-color);
-    color: var(--text-color);
-    font-family: 'Raleway', sans-serif;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
+/* Styles specific to the Special Order page */
 
 /* Estilos para el contenedor principal */
-main.container {
+/* Note: General body styles are inherited from base.css */
+main.container.special-order-container { /* Add specific class */
     padding-top: 2rem;
     padding-bottom: 2rem;
 }

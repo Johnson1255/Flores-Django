@@ -5,10 +5,10 @@
     box-sizing: border-box;
 }
 
-body {
-    font-family: 'Raleway', sans-serif;
-    background: linear-gradient(135deg, #ffe0e0, #fff5f5);
-    min-height: 100vh;
+/* Apply specific background and layout for login page body */
+/* Note: font-family and min-height are inherited from base.css */
+body.login-page-body { /* Added a class to target this specific body */
+    background: linear-gradient(135deg, var(--secondary-color), var(--background-color)); /* Use variables */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -22,11 +22,12 @@ body {
 }
 
 .login-card {
-    background: white;
+    background: var(--card-bg); /* Use variable */
     border-radius: 20px;
     padding: 40px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 25px var(--shadow-color); /* Use variable */
     position: relative;
+    color: var(--text-color); /* Ensure text color matches theme */
 }
 
 /* Back Button */
@@ -34,15 +35,15 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    color: #666;
+    color: var(--light-text); /* Use variable */
     text-decoration: none;
     font-size: 0.9rem;
     margin-bottom: 25px;
     transition: color 0.3s;
 }
 
-.back-button:hover { /* Fixed syntax */
-    color: #ff4d6d;
+.back-button:hover {
+    color: var(--primary-color); /* Use variable */
 }
 
 /* Header Section */
@@ -51,8 +52,8 @@ body {
     margin-bottom: 30px;
 }
 
-.login-header h1 { /* Fixed syntax */
-    color: #333;
+.login-header h1 {
+    color: var(--heading-color); /* Use variable */
     font-size: 1.8rem;
     margin-bottom: 10px;
 }
@@ -64,7 +65,7 @@ body {
 }
 
 .login-message {
-    color: #666;
+    color: var(--light-text); /* Use variable */
     font-size: 0.95rem;
 }
 
@@ -80,16 +81,16 @@ body {
     padding: 12px;
     border: none;
     background: none;
-    border-bottom: 2px solid #ddd;
-    color: #666;
+    border-bottom: 2px solid var(--border-color); /* Use variable */
+    color: var(--light-text); /* Use variable */
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s;
 }
 
-.tab-button.active { /* Fixed syntax */
-    color: #ff4d6d;
-    border-bottom-color: #ff4d6d;
+.tab-button.active {
+    color: var(--primary-color); /* Use variable */
+    border-bottom-color: var(--primary-color); /* Use variable */
 }
 
 /* Form Styles */
@@ -100,53 +101,50 @@ body {
 label {
     display: block;
     margin-bottom: 8px;
-    color: #333;
+    color: var(--text-color); /* Use variable */
     font-weight: 600;
-    /* Removed invalid nested pseudo-elements. We'll add the asterisk back if needed via template or JS,
-       or apply it to all labels for now and remove specifically for 'ocasiones'. */
 }
 
-/* Apply asterisk to all labels by default */
-label::after { /* Fixed syntax */
+/* Style for required field indicator */
+label.required::after {
     content: "*";
-    color: #ff4d6d;
+    color: var(--primary-color); /* Use variable */
     margin-left: 4px;
 }
 
-/* Specifically remove asterisk for the 'ocasiones' label if it exists */
-/* Note: This assumes the label for preferences has for="id_preferences" or similar */
-/* Adjust selector if needed based on how Django renders the preferences label */
-label[for^="id_preferences"]::after { /* Fixed syntax - targeting label for preferences */
-   content: ""; /* Remove asterisk */
-}
-
-
-/* Restore original positioning */
 .input-with-icon {
-    position: relative; /* Restored */
+    position: relative;
 }
 
-.input-with-icon i { /* Restored */
+.input-with-icon i {
     position: absolute;
     left: 15px;
     top: 50%;
     transform: translateY(-50%);
-    color: #666;
+    color: var(--light-text); /* Use variable */
 }
 
-/* Restore original input padding */
-input {
+input[type="text"],
+input[type="email"],
+input[type="password"] { /* Be more specific */
     width: 100%;
-    padding: 12px 15px 12px 45px; /* Restored original padding */
-    border: 1px solid #ddd;
+    padding: 12px 15px 12px 45px; /* Adjust padding if icon is present */
+    border: 1px solid var(--border-color); /* Use variable */
     border-radius: 8px;
     font-size: 1rem;
     transition: border-color 0.3s;
+    background-color: var(--white-color); /* Ensure background matches theme */
+    color: var(--text-color); /* Ensure text color matches theme */
 }
 
-input:focus { /* Fixed syntax */
+/* Style for inputs without icons */
+input:not(.input-with-icon input) {
+    padding: 12px 15px;
+}
+
+input:focus {
     outline: none;
-    border-color: #ff4d6d;
+    border-color: var(--primary-color); /* Use variable */
 }
 
 /* Form Options */
@@ -161,17 +159,17 @@ input:focus { /* Fixed syntax */
     display: flex;
     align-items: center;
     gap: 5px;
-    color: #666;
+    color: var(--light-text); /* Use variable */
     font-size: 0.9rem;
 }
 
 .forgot-password {
-    color: #ff4d6d;
+    color: var(--primary-color); /* Use variable */
     text-decoration: none;
     font-size: 0.9rem;
 }
 
-.forgot-password:hover { /* Fixed syntax */
+.forgot-password:hover {
     text-decoration: underline;
 }
 
@@ -179,8 +177,8 @@ input:focus { /* Fixed syntax */
 .login-button {
     width: 100%;
     padding: 14px;
-    background: #ff4d6d;
-    color: white;
+    background: var(--primary-color); /* Use variable */
+    color: var(--white-color); /* Use variable */
     border: none;
     border-radius: 8px;
     font-size: 1rem;
@@ -193,8 +191,8 @@ input:focus { /* Fixed syntax */
     transition: background 0.3s;
 }
 
-.login-button:hover { /* Fixed syntax */
-    background: #ff3355;
+.login-button:hover {
+    background: var(--primary-hover); /* Use variable */
 }
 
 /* Social Login */
@@ -203,30 +201,29 @@ input:focus { /* Fixed syntax */
     text-align: center;
 }
 
-.social-login p { /* Fixed syntax */
-    color: #666;
+.social-login p {
+    color: var(--light-text); /* Use variable */
     margin-bottom: 15px;
     position: relative;
 }
 
-.social-login p::before, /* Fixed syntax */
-.social-login p::after { /* Fixed syntax */
+.social-login p::before,
+.social-login p::after {
     content: '';
     position: absolute;
     top: 50%;
     width: 30%;
     height: 1px;
-    background: #ddd;
+    background: var(--border-color); /* Use variable */
 }
 
-.social-login p::before { /* Fixed syntax */
+.social-login p::before {
     left: 0;
 }
 
-.social-login p::after { /* Fixed syntax */
+.social-login p::after {
     right: 0;
 }
-
 
 .social-buttons {
     display: flex;
@@ -236,10 +233,10 @@ input:focus { /* Fixed syntax */
 .social-button {
     flex: 1;
     padding: 12px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color); /* Use variable */
     border-radius: 8px;
-    background: white;
-    color: #666;
+    background: var(--card-bg); /* Use variable */
+    color: var(--text-color); /* Use variable */
     font-weight: 600;
     cursor: pointer;
     display: flex;
@@ -249,18 +246,18 @@ input:focus { /* Fixed syntax */
     transition: all 0.3s;
 }
 
-.social-button:hover { /* Fixed syntax */
-    background: #f8f8f8;
-    border-color: #ccc;
+.social-button:hover {
+    background: var(--secondary-color); /* Use variable for hover background */
+    border-color: #ccc; /* Consider using a variable if available */
 }
 
-.social-button.google:hover { /* Fixed syntax */
-    color: #DB4437;
+.social-button.google:hover {
+    color: #DB4437; /* Keep specific brand colors */
     border-color: #DB4437;
 }
 
-.social-button.facebook:hover { /* Fixed syntax */
-    color: #4267B2;
+.social-button.facebook:hover {
+    color: #4267B2; /* Keep specific brand colors */
     border-color: #4267B2;
 }
 
@@ -292,29 +289,28 @@ input:focus { /* Fixed syntax */
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #666;
+    color: var(--light-text); /* Use variable */
     font-size: 0.9rem;
 }
 
-.checkbox-label.required { /* Fixed syntax */
-    color: #333;
+.checkbox-label.required {
+    color: var(--text-color); /* Use variable */
 }
 
-.checkbox-label input[type="checkbox"] { /* Fixed syntax */
+.checkbox-label input[type="checkbox"] {
     width: auto;
     padding: 0;
+    accent-color: var(--primary-color); /* Style checkbox color */
 }
 
 /* Mensaje de error */
 .error-message {
-    color: #ff4d6d;
+    color: var(--primary-color); /* Use variable */
     font-size: 0.85rem;
     margin-top: 5px;
-    display: none;
+    display: none; /* Controlled by JS */
 }
 
 .input-error {
-    border-color: #ff4d6d;
+    border-color: var(--primary-color); /* Use variable */
 }
-
-/* Removed diagnostic CSS */

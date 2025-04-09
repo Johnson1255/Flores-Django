@@ -1,24 +1,44 @@
-{% extends "floresvalentin_app/base.html" %}
 {% load static i18n %} {# Load static and i18n tags #}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% trans "Iniciar Sesión / Registrarse" %} - Flores San Valentín</title>
 
-{% block title %}{% trans "Iniciar Sesión / Registrarse" %} - Flores San Valentín{% endblock %}
-
-{% block extra_head %}
-    {# Link specific CSS for the login page #}
+    {# --- STYLES --- #}
+    {# Specific CSS for the login page #}
     <link rel="stylesheet" href="{% static 'css/login.css' %}">
-    {# Font Awesome is likely already in base.html, but include if needed #}
-    {# <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> #}
-    {# Google Fonts are likely already in base.html #}
-    {# <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700&display=swap" rel="stylesheet"> #}
-    {# Inline style for theme toggle button if not handled globally or in login.css #}
+    {# Font Awesome (Include directly as base.html is not used) #}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    {# Google Fonts (Include directly) #}
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700&display=swap" rel="stylesheet">
+    {# Add any other global styles if needed, e.g., from main.css if login.css doesn't cover everything #}
+    {# <link rel="stylesheet" href="{% static 'css/main.css' %}"> #}
+
+    {# Inline style for theme toggle button if needed #}
     <style>
     /* Styles for theme toggle button if needed specifically here */
-    /* .theme-toggle-btn { ... } */
+    .theme-toggle-btn {
+        position: absolute; /* Or fixed */
+        top: 20px;
+        right: 20px;
+        background: transparent;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        /* Adjust color based on theme - JS might handle this */
+        color: #333; /* Example default color */
+    }
+    html[data-theme='dark'] .theme-toggle-btn {
+        color: #f1f1f1; /* Example dark theme color */
+    }
     /* Ensure form elements inherit theme variables if needed */
     </style>
-{% endblock %}
+</head>
+{# Add data-theme attribute if your theme JS relies on it #}
+<body data-theme="light"> {# Or dynamically set by theme.js #}
 
-{% block content %}
 <div class="login-container">
     <div class="login-card">
         {# Back button - assuming index URL is named 'index' in floresvalentin_app urls #}
@@ -37,6 +57,7 @@
         {% if messages %}
             <div class="messages-container" style="padding: 10px; margin-bottom: 15px;">
                 {% for message in messages %}
+                    {# Using Bootstrap alert classes for styling consistency if available #}
                     <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %}" role="alert">
                         {{ message }}
                     </div>
@@ -55,10 +76,9 @@
         <form method="post" action="{% url 'login' %}" class="login-form" id="login-form-content">
             {% csrf_token %} {# CSRF token for security #}
 
-            {# Render the login form fields. You can render manually or use {{ login_form.as_p }} etc. #}
             {# Manual rendering for more control (matches original structure) #}
             <div class="form-group">
-                <label for="{{ login_form.username.id_for_label }}">{% trans "Correo Electrónico o Usuario" %}</label> {# Django's default is username #}
+                <label for="{{ login_form.username.id_for_label }}">{% trans "Correo Electrónico o Usuario" %}</label>
                 <div class="input-with-icon">
                     <i class="fas fa-envelope"></i>
                     {{ login_form.username }} {# Renders the input field #}
@@ -90,8 +110,6 @@
             <input type="hidden" name="next" value="{{ request.GET.next }}">
 
             <div class="form-options">
-                {# 'Remember me' is not standard in AuthenticationForm, handle if needed #}
-                {# <label class="remember-me"> <input type="checkbox" name="remember"> <span>Recordarme</span> </label> #}
                 {# Link to Django's password reset view #}
                 <a href="{% url 'password_reset' %}" class="forgot-password">{% trans "¿Olvidaste tu contraseña?" %}</a>
             </div>
@@ -107,10 +125,7 @@
         <form method="post" action="{% url 'register' %}" class="register-form" id="register-form-content" style="display: none;">
             {% csrf_token %} {# CSRF token for security #}
 
-            {# Render the registration form fields. Using {{ register_form.as_p }} is simpler #}
-            {# but manual rendering gives control matching the original style. #}
-
-            {# Example: Manual rendering for a few fields #}
+            {# Manual rendering for consistency #}
             <div class="form-group">
                 <label for="{{ register_form.first_name.id_for_label }}">{{ register_form.first_name.label }}</label>
                 <div class="input-with-icon">
@@ -261,12 +276,16 @@
     </div> {# End login-card #}
 </div> {# End login-container #}
 
-{# Theme toggle button - might be better placed in base.html if global #}
-{# <button id="theme-toggle" class="theme-toggle-btn"> <i class="fas fa-moon"></i> </button> #}
+{# Theme toggle button - Placed outside the main container #}
+<button id="theme-toggle" class="theme-toggle-btn">
+    <i class="fas fa-moon"></i> {# Icon will be updated by JS #}
+</button>
 
-{% endblock %}
+{# --- SCRIPTS --- #}
+{# Load theme JS first if it sets body attributes needed by login.js #}
+<script type="module" src="{% static 'js/theme.js' %}"></script>
+{# Load specific JS for the login page #}
+<script type="module" src="{% static 'js/login.js' %}"></script>
 
-{% block extra_js %}
-    {# Load specific JS for the login page #}
-    <script type="module" src="{% static 'js/login.js' %}"></script>
-{% endblock %}
+</body>
+</html>

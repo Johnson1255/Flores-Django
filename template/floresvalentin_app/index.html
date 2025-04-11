@@ -1,38 +1,159 @@
 {% extends 'floresvalentin_app/base.html' %}
 {% load static i18n %}
 
-{% block title %}{% trans "Inicio - Flores Valentín" %}{% endblock %}
+{% block title %}{% trans "Inicio" %} - {% trans "Flores San Valentín" %}{% endblock %}
 
+{# Add any index-specific CSS links here if needed, Leaflet CSS is already in base.html #}
 {% block extra_head %}
-    {# Posibles estilos específicos para la página de inicio #}
-    {# <link rel="stylesheet" href="{% static 'css/index_specific.css' %}"> #}
+    {# Example: <link rel="stylesheet" href="{% static 'css/index_specific.css' %}"> #}
+    {# We assume main styles are covered by base.css, layout.css, components.css loaded in base.html #}
 {% endblock %}
 
 {% block content %}
-    {# --- Aquí pega TODO el contenido que era específico de tu index.html original --- #}
-    {# (El banner, sección catálogo preview, galería, ubicación, video, contacto) #}
-    {# Asegúrate de actualizar las rutas de imágenes con {% static %} y los enlaces internos con {% url %} #}
+<section id="home">
+    <div class="banner-container">
+        {# Assuming banner titles/text might be dynamic later, keep h1 for structure #}
+        {# <h1 class="banner-title">{% trans "Flores para San Valentín" %}</h1> #}
+        <img class="banner" src="{% static 'images/banner1.jpg' %}" alt="{% trans 'Flores 1' %}">
+        <img class="banner" src="{% static 'images/banner2.jpg' %}" alt="{% trans 'Flores 2' %}">
+        <img class="banner" src="{% static 'images/banner3.jpg' %}" alt="{% trans 'Flores 3' %}">
+    </div>
+</section>
 
-    <section id="home">
-       <div class="banner-container">
-            <h1 class="banner-title">{% trans "Flores para San Valentín" %}</h1>
-            <img class="banner" src="{% static 'images/banner1.jpg' %}" alt="Flores 1">
-            {# ... más banners ... #}
+<section id="catalogo" class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">{% trans "Nuestro Catálogo" %}</h2>
+        <div class="row g-4">
+            {# These should ideally be loaded dynamically from the database in the future #}
+            <!-- Categoría 1 -->
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <img src="{% static 'images/rosas-rojas.jpg' %}" class="card-img-top" alt="{% trans 'Rosas Rojas' %}">
+                    <div class="card-body">
+                        <h5 class="card-title">{% trans "Rosas Rojas" %}</h5>
+                        <p class="card-text">{% trans "Ramos elegantes de rosas rojas, perfectos para expresar amor y pasión." %}</p>
+                        <p class="card-text"><small class="text-muted">{% trans "Desde" %} $50.000</small></p>
+                        {# Link to the full catalog page #}
+                        <a href="{% url 'floresvalentin_app:catalogo' %}" class="btn btn-primary">{% trans "Ver detalles" %}</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Categoría 2 -->
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <img src="{% static 'images/tulipanes.jpg' %}" class="card-img-top" alt="{% trans 'Tulipanes' %}">
+                    <div class="card-body">
+                        <h5 class="card-title">{% trans "Tulipanes" %}</h5>
+                        <p class="card-text">{% trans "Arreglos coloridos de tulipanes holandeses frescos." %}</p>
+                        <p class="card-text"><small class="text-muted">{% trans "Desde" %} $45.000</small></p>
+                        <a href="{% url 'floresvalentin_app:catalogo' %}" class="btn btn-primary">{% trans "Ver detalles" %}</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Categoría 3 -->
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <img src="{% static 'images/orquideas.jpg' %}" class="card-img-top" alt="{% trans 'Orquídeas' %}">
+                    <div class="card-body">
+                        <h5 class="card-title">{% trans "Orquídeas" %}</h5>
+                        <p class="card-text">{% trans "Elegantes arreglos de orquídeas para ocasiones especiales." %}</p>
+                        <p class="card-text"><small class="text-muted">{% trans "Desde" %} $75.000</small></p>
+                        <a href="{% url 'floresvalentin_app:catalogo' %}" class="btn btn-primary">{% trans "Ver detalles" %}</a>
+                    </div>
+                </div>
+            </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    {# ... resto de las secciones: catalogo preview, galeria, ubicacion, video, contacto ... #}
-     <section id="ubicacion" class="py-5">
-         {# ... contenido de ubicación ... #}
-         <div class="map-wrapper">
-             <div id="map"></div> {# El div para Leaflet sigue aquí #}
-         </div>
-         {# ... #}
-     </section>
-{% endblock %}
+<section id="galeria">
+    <h2>{% trans "Galería de Imágenes" %}</h2>
+    <div class="gallery">
+        {# These images should ideally be managed via the admin or a model #}
+        <img src="{% static 'images/flor1.jpg' %}" alt="{% trans 'Rosas' %}">
+        <img src="{% static 'images/flor2.jpg' %}" alt="{% trans 'Tulipanes' %}">
+        <img src="{% static 'images/flor3.jpg' %}" alt="{% trans 'Lirios' %}">
+        <img src="{% static 'images/flor4.jpg' %}" alt="{% trans 'Orquídeas' %}">
+        <img src="{% static 'images/flor5.jpg' %}" alt="{% trans 'Girasoles' %}">
+        <img src="{% static 'images/flor6.jpg' %}" alt="{% trans 'Claveles' %}">
+    </div>
+</section>
 
-{% block extra_js %}
-    {# Carga map.js solo en esta página si el mapa solo está aquí #}
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script> {# Leaflet JS #}
-    <script type="module" src="{% static 'js/map.js' %}"></script>
-{% endblock %}
+<section id="ubicacion" class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-4">{% trans "Nuestra Ubicación" %}</h2>
+        <div class="location-container">
+            <!-- Panel de información -->
+            <div class="location-info-panel">
+                <div class="info-card">
+                    <h3><i class="fas fa-map-marked-alt"></i> {% trans "Visítanos" %}</h3>
+                    <div class="info-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <strong>{% trans "Dirección:" %}</strong>
+                            <p>Av. Principal 123, Ciudad</p> {# Consider making this dynamic #}
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-phone"></i>
+                        <div>
+                            <strong>{% trans "Teléfono:" %}</strong>
+                            <p>+57 300 123 4567</p> {# Consider making this dynamic #}
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <strong>{% trans "Horario de atención:" %}</strong>
+                            <p>{% trans "Lunes a Viernes: 9:00 - 20:00" %}</p>
+                            <p>{% trans "Sábados: 9:00 - 18:00" %}</p>
+                            <p>{% trans "Domingos: 10:00 - 14:00" %}</p>
+                        </div>
+                    </div>
+                    {# This link might point to Google Maps or similar #}
+                    <a href="#" class="btn btn-primary mt-3">
+                        <i class="fas fa-directions"></i> {% trans "Cómo llegar" %}
+                    </a>
+                </div>
+            </div>
+
+            <!-- Contenedor del mapa -->
+            <div class="map-wrapper">
+                <div id="map"></div> {# Leaflet map will be initialized here by map.js #}
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="video">
+    <h2>{% trans "Flores para San Valentín" %}</h2>
+    {# Consider making the video URL dynamic #}
+    <iframe width="560" height="315" src="https://www.youtube.com/embed/rrl4u6xIJUs?autoplay=0&mute=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</section>
+
+
+<section id="contacto">
+    <h2>{% trans "Contacto" %}</h2>
+    {# This form needs a corresponding Django view and form class to handle submissions #}
+    {# The action attribute should point to the URL of that view #}
+    <form method="post" action="#"> {# Replace # with {% url 'your_contact_view_name' %} #}
+        {% csrf_token %} {# Important for security #}
+        {# Replace inputs with Django form fields eventually: {{ form.as_p }} or manual rendering #}
+        <label for="name">{% trans "Nombre:" %}</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="email">{% trans "Correo Electrónico:" %}</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="message">{% trans "Mensaje:" %}</label>
+        <textarea id="message" name="message" required></textarea>
+
+        <button type="submit">{% trans "Enviar" %}</button>
+    </form>
+</section>
+
+{# Add index-specific JavaScript here #}
+{# map.js is needed for the #ubicacion section #}
+<script type="module" src="{% static 'js/map.js' %}"></script>
+
+{% endblock content %}

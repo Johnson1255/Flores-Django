@@ -1,0 +1,52 @@
+{% load i18n %}
+
+{% if page_obj.has_other_pages %}
+<nav aria-label="{% trans 'Navegación de productos' %}">
+    <ul class="pagination justify-content-center">
+        {# Previous Button #}
+        {% if page_obj.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="#" data-page="{{ page_obj.previous_page_number }}" aria-label="{% trans 'Anterior' %}">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">&laquo;</span>
+            </li>
+        {% endif %}
+
+        {# Page Numbers #}
+        {% for i in page_obj.paginator.page_range %}
+            {% if page_obj.number == i %}
+                <li class="page-item active" aria-current="page"><span class="page-link">{{ i }}</span></li>
+            {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
+                 {# Show pages around the current page #}
+                <li class="page-item"><a class="page-link" href="#" data-page="{{ i }}">{{ i }}</a></li>
+            {% elif i == page_obj.paginator.page_range.0 or i == page_obj.paginator.page_range|last %}
+                 {# Always show first and last page links, maybe with ellipsis #}
+                 {% if i == page_obj.paginator.page_range.0 and page_obj.number > 3 %}
+                     <li class="page-item"><a class="page-link" href="#" data-page="{{ i }}">{{ i }}</a></li>
+                     <li class="page-item disabled"><span class="page-link">...</span></li>
+                 {% elif i == page_obj.paginator.page_range|last and page_obj.number < page_obj.paginator.num_pages|add:'-2' %}
+                     <li class="page-item disabled"><span class="page-link">...</span></li>
+                     <li class="page-item"><a class="page-link" href="#" data-page="{{ i }}">{{ i }}</a></li>
+                 {% endif %}
+            {% endif %}
+        {% endfor %}
+
+        {# Next Button #}
+        {% if page_obj.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="#" data-page="{{ page_obj.next_page_number }}" aria-label="{% trans 'Siguiente' %}">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        {% else %}
+            <li class="page-item disabled">
+                <span class="page-link" aria-hidden="true">&raquo;</span>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}

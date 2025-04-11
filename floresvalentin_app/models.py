@@ -47,6 +47,12 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        from django.urls import reverse
+        # Assumes 'product_detail' is the name of the URL pattern for product details
+        # and it takes 'product_id' as an argument. Adjust if your URL name is different.
+        return reverse('floresvalentin_app:product_detail', kwargs={'product_id': self.id})
+
     class Meta:
         ordering = ['name'] # Ordenar por nombre por defecto
 

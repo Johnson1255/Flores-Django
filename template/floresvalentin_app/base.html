@@ -234,6 +234,9 @@
     <script type="module" src="{% static 'js/theme.js' %}"></script> {# Si el tema es global #}
 
     {# --- BLOQUE PARA SCRIPTS EXTRA (JS específicos de página) --- #}
+    {% block extra_js %}{% endblock %}
 
+    {# Hidden span for catalog.js to get initial cart count #}
+    <span id="initial-cart-count" style="display: none;">{{ cart_item_count|default:0 }}</span>
 </body>
 </html>

@@ -7,6 +7,9 @@ from django.contrib.auth.forms import AuthenticationForm # Restore Authenticatio
 # from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.urls import reverse_lazy, reverse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger # Added for pagination
+from django.template.loader import render_to_string # Added for rendering partials
+from django.db.models import Q # Added for search
 
 # Corrected model imports
 from .models import Product, Category, Order, OrderItem, SpecialOrder, ShoppingCart, Profile
@@ -37,31 +40,66 @@ def catalog(request):
     })
 
 def catalog_api(request):
-    # Para filtrado AJAX
-    products = Product.objects.all()
-    
-    # Aplicar filtros si existen
+    # Para filtrado, ordenamiento y paginación AJAX
+    products_list = Product.objects.filter(available=True) # Start with available products
+
+    # Filtrado
     category_id = request.GET.get('category')
-    price_min = request.GET.get('price_min')
-    price_max = request.GET.get('price_max')
-    
+    search_term = request.GET.get('search')
+    # Add price filters if needed later
+    # price_min = request.GET.get('price_min')
+    # price_max = request.GET.get('price_max')
+
     if category_id:
-        products = products.filter(category_id=category_id)
-    if price_min:
-        products = products.filter(price__gte=float(price_min))
-    if price_max:
-        products = products.filter(price__lte=float(price_max))
-    
-    # Convertir a JSON
-    products_data = [{
-        'id': str(p.id),
-        'name': p.name,
-        'price': float(p.price),
-        'image_url': p.image.url if p.image else None,
-        'url': f'/producto/{p.id}/'
-    } for p in products]
-    
-    return JsonResponse({'products': products_data})
+        products_list = products_list.filter(category_id=category_id)
+    if search_term:
+        products_list = products_list.filter(
+            Q(name__icontains=search_term) | Q(description__icontains=search_term)
+        )
+    # Add price filtering logic here if implemented
+
+    # Ordenamiento
+    sort_option = request.GET.get('sort_by', 'name-asc') # Default sort
+    if sort_option == 'name-asc':
+        products_list = products_list.order_by('name')
+    elif sort_option == 'name-desc':
+        products_list = products_list.order_by('-name')
+    elif sort_option == 'price-asc':
+        products_list = products_list.order_by('price')
+    elif sort_option == 'price-desc':
+        products_list = products_list.order_by('-price')
+    # Add more sorting options if needed
+
+    # Paginación
+    paginator = Paginator(products_list, 9) # Show 9 products per page (adjust as needed)
+    page_number = request.GET.get('page', 1)
+    try:
+        page_obj = paginator.page(page_number)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        page_obj = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        page_obj = paginator.page(paginator.num_pages)
+
+    # Renderizar partials a HTML
+    products_html = render_to_string(
+        'floresvalentin_app/partials/_product_list.html',
+        {'products': page_obj} # Pass page object which contains products for the current page
+    )
+    pagination_html = render_to_string(
+        'floresvalentin_app/partials/_pagination.html',
+        {'page_obj': page_obj}
+    )
+
+    # Devolver JSON
+    return JsonResponse({
+        'products_html': products_html,
+        'pagination_html': pagination_html,
+        'count': paginator.count, # Total number of products matching filters
+        'page': page_obj.number,
+        'pages': paginator.num_pages,
+    })
 
 def product_detail(request, product_id):
     product = get_object_or_404(Product, id=product_id)
@@ -143,30 +181,50 @@ def cart_detail(request):
         'cart_total': cart_total,
     })
 
-# Needs refactoring to use ShoppingCart.items JSONField
+# Updated to handle AJAX requests and return JSON
 def cart_add(request, product_id):
+    # Check if it's an AJAX request (important for security and response type)
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+
     cart = get_or_create_cart(request)
     if not cart:
-        # Handle case where user is not logged in or cart creation failed
-        return redirect('login') # Or wherever appropriate
+        message = "Debes iniciar sesión para añadir productos al carrito."
+        if is_ajax:
+            return JsonResponse({'success': False, 'error': message, 'login_required': True}, status=401) # Unauthorized
+        else:
+            messages.error(request, message)
+            return redirect('login') # Redirect non-AJAX requests
 
     product = get_object_or_404(Product, id=product_id)
-    quantity = int(request.POST.get('quantity', 1))
+    # For AJAX, quantity might come from JSON body, but JS currently doesn't send one. Default to 1.
+    # quantity = int(request.POST.get('quantity', 1)) # Keep for non-AJAX if needed
+    quantity = 1 # Default for current AJAX implementation
     product_id_str = str(product.id)
 
     # Update JSONField
     if product_id_str in cart.items:
-        cart.items[product_id_str]['quantity'] += quantity
+        cart.items[product_id_str]['quantity'] = cart.items[product_id_str].get('quantity', 0) + quantity
     else:
         cart.items[product_id_str] = {
             'quantity': quantity,
             'price': float(product.price) # Store price at time of adding
         }
     cart.save()
-    
-    messages.success(request, f'{product.name} añadido al carrito')
-    # Use the correct URL name from floresvalentin_app/urls.py
-    return redirect('floresvalentin_app:ver_carrito')
+
+    # Calculate current total items in cart for the counter
+    cart_count = sum(item.get('quantity', 0) for item in cart.items.values())
+    success_message = f'{product.name} añadido al carrito'
+
+    if is_ajax:
+        return JsonResponse({
+            'success': True,
+            'message': success_message,
+            'cart_count': cart_count
+        })
+    else:
+        # Fallback for non-AJAX requests (e.g., if JS fails)
+        messages.success(request, success_message)
+        return redirect(request.META.get('HTTP_REFERER', 'floresvalentin_app:catalogo')) # Redirect back or to catalog
 
 # Needs refactoring to use ShoppingCart.items JSONField
 def cart_update(request, item_id): # Changed parameter to item_id (which is product_id here)

@@ -28,7 +28,15 @@
     {# TODO: Populate categories dynamically from view context #}
     <div id="category-tabs" class="mb-4 category-tabs">
         <ul class="nav nav-pills flex-nowrap overflow-auto pb-2">
-            {# Example: <li class="nav-item"><a class="nav-link active" data-category="all">Todas</a></li> #}
+            <li class="nav-item">
+                <a class="nav-link active" href="#" data-category="">{% trans "Todas" %}</a> {# Added trans tag #}
+            </li>
+            {% for category in categories %}
+            <li class="nav-item">
+                {# Use category.id or category.slug depending on what catalog.js expects #}
+                <a class="nav-link" href="#" data-category="{{ category.id }}">{{ category.name }}</a>
+            </li>
+            {% endfor %}
         </ul>
     </div>
 
@@ -43,16 +51,12 @@
             </div>
         </div>
         <div class="col-md-3 mb-3 mb-md-0">
-            {# TODO: Populate categories dynamically from view context #}
             <select id="category-filter" class="form-select">
-                <option value="">Todas las categorías</option>
-                {# Example:
+                <option value="">{% trans "Todas las categorías" %}</option> {# Added trans tag #}
                 {% for category in categories %}
-                    <option value="{{ category.slug }}" {% if category.slug == request.GET.category %}selected{% endif %}>
-                        {{ category.name }}
-                    </option>
+                    {# Use category.id or category.slug depending on what catalog.js expects #}
+                    <option value="{{ category.id }}">{{ category.name }}</option>
                 {% endfor %}
-                #}
             </select>
         </div>
         <div class="col-md-3 mb-3 mb-md-0">

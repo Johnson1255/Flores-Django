@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const mapElement = document.getElementById('map');
     if (!mapElement) return; // Salir si no hay mapa en la página
 
-    const iconUrl = mapElement.dataset.iconUrl || '/static/images/placeholder-icon.png'; // Usa placeholder si no se pasó la URL
+    const iconUrl = mapElement.dataset.iconUrl || '/static/images/logo.svg'; // Usa placeholder si no se pasó la URL
     const lat = 6.241362256908526;
     const lng = -75.58840591379317;
 

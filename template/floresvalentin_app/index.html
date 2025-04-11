@@ -63,6 +63,12 @@
                 </div>
             </div>
         </div>
+        {# Add button to view full catalog #}
+        <div class="text-center mt-4">
+            <a href="{% url 'floresvalentin_app:catalogo' %}" class="btn btn-primary btn-lg d-inline-flex align-items-center">
+                <i class="fas fa-store me-2"></i> {% trans "Ver Catálogo Completo" %}
+            </a>
+        </div>
     </div>
 </section>
 

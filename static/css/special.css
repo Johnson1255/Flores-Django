@@ -251,8 +251,8 @@ label[for="special-instructions"]:after {
     box-shadow: 0 4px 8px var(--shadow-color);
 }
 
-/* Estilo para indicar campos obligatorios */
-.card-body::before {
+/* Estilo para indicar campos obligatorios (solo en la página de pedido especial) */
+.special-order-container .card-body::before {
     content: "* Campos obligatorios";
     display: block;
     color: var(--primary-color);

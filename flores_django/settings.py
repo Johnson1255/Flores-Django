@@ -47,6 +47,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware', # Add LocaleMiddleware here
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -112,9 +113,21 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+# Define supported languages
+LANGUAGES = [
+    ('en', 'English'),
+    ('es', 'Español'),
+]
 
-TIME_ZONE = 'UTC'
+# Set default language
+LANGUAGE_CODE = 'es' # Let's default to Spanish based on the project context
+
+# Specify path for translation files
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',
+]
+
+TIME_ZONE = 'UTC' # Keep as UTC unless specific timezone logic is needed
 
 USE_I18N = True
 

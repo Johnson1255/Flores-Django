@@ -650,3 +650,33 @@
 #logout-button:hover {
   background-color: var(--primary-hover);
 }
+
+/* Language Switcher Styles */
+.language-switcher {
+  gap: 5px; /* Space between buttons */
+}
+
+.lang-button {
+  background: none;
+  border: 1px solid var(--white-color);
+  color: var(--white-color);
+  padding: 2px 6px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  opacity: 0.7;
+}
+
+.lang-button:hover {
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.lang-button.active {
+  opacity: 1;
+  background-color: var(--white-color);
+  color: var(--top-bar-bg); /* Use top bar background for text color */
+  border-color: var(--white-color);
+}

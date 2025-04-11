@@ -70,6 +70,21 @@
                             <i class="fas fa-moon"></i>
                         </button>
                     </div>
+                    {# --- Language Switcher --- #}
+                    <form action="{% url 'set_language' %}" method="post" class="language-switcher d-inline-flex ms-2">
+                        {% csrf_token %}
+                        <input name="next" type="hidden" value="{{ request.path }}">
+                        {% get_current_language as LANGUAGE_CODE %}
+                        {% get_available_languages as LANGUAGES %}
+                        {% get_language_info_list for LANGUAGES as languages %}
+                        {% for language in languages %}
+                            <button type="submit" name="language" value="{{ language.code }}"
+                                    class="lang-button {% if language.code == LANGUAGE_CODE %}active{% endif %}"
+                                    title="{{ language.name_local }}">
+                                {{ language.code|upper }}
+                            </button>
+                        {% endfor %}
+                    </form>
                 </div>
                 {# --- LÓGICA DE AUTENTICACIÓN --- #}
                 {% if user.is_authenticated %}

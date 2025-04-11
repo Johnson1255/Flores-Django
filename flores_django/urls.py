@@ -28,9 +28,13 @@ from floresvalentin_app import views as app_views
 from floresvalentin_app import views as app_views
 # Import built-in LogoutView (LoginView not needed here anymore)
 from django.contrib.auth.views import LogoutView
+# Import include for i18n urls
+from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('i18n/', include('django.conf.urls.i18n')), # Add this line for language switching
+
 
     # Restore custom login/register view URL
     path('login/', app_views.login_register_view, name='login'),

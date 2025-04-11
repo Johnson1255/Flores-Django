@@ -136,12 +136,14 @@
 <section id="video">
     <h2>{% trans "Flores para San Valentín" %}</h2>
     {# Consider making the video URL dynamic #}
-    <iframe width="560" height="315" src="https://www.youtube.com/embed/rrl4u6xIJUs?autoplay=0&mute=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    <div class="video-wrapper"> {# Added wrapper for responsive video #}
+        <iframe src="https://www.youtube.com/embed/rrl4u6xIJUs?autoplay=0&mute=1" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
 </section>
 
 
 <section id="contacto">
-    <h2>{% trans "Contacto" %}</h2>
+    <h2>{% trans "¿Requieres de una asesoría? ¡Deja tu Información!" %}</h2>
     {# This form needs a corresponding Django view and form class to handle submissions #}
     {# The action attribute should point to the URL of that view #}
     <form method="post" action="#"> {# Replace # with {% url 'your_contact_view_name' %} #}

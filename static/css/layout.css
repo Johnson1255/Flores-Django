@@ -107,6 +107,7 @@
   margin: 0 auto;
   background-color: var(--background-color);
   transition: background-color 0.3s ease;
+  margin-bottom: 40px; /* Add space below video section */
 }
 
 #contacto {

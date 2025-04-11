@@ -38,9 +38,16 @@
 }
 
 /* Gallery */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Responsive grid */
+  gap: 15px; /* Spacing between images */
+  margin-top: 20px; /* Add some space above the gallery */
+}
+
 .gallery img {
   width: 100%;
-  height: 250px;
+  height: 250px; /* Maintain image height */
   object-fit: cover;
   border-radius: 10px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -483,6 +490,7 @@ button:hover {
   box-shadow: 0 4px 15px var(--shadow-color);
   height: 100%;
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  text-align: center; /* Center text content */
 }
 
 .info-card h3 {
@@ -491,6 +499,7 @@ button:hover {
   font-size: 1.5rem;
   display: flex;
   align-items: center;
+  justify-content: center; /* Center flex items (icon + text) */
   gap: 10px;
   transition: color 0.3s ease;
 }

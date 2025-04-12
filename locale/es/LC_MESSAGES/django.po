@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-11 18:01+0000\n"
+"POT-Creation-Date: 2025-04-12 23:11+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,111 +19,134 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
 "1 : 2;\n"
 
+#: floresvalentin_app/forms.py:30
+msgid "Tu nombre completo"
+msgstr ""
+
+#: floresvalentin_app/forms.py:31
+msgid "tu@correo.com"
+msgstr ""
+
+#: floresvalentin_app/forms.py:32
+msgid "Escribe tu mensaje aquí..."
+msgstr ""
+
+#: floresvalentin_app/forms.py:35
+msgid "Nombre"
+msgstr ""
+
+#: floresvalentin_app/forms.py:36
+msgid "Correo Electrónico"
+msgstr ""
+
+#: floresvalentin_app/forms.py:37
+msgid "Mensaje"
+msgstr ""
+
 #: template/floresvalentin_app/base.html:69
 msgid "Cambiar tema"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:79
+#: template/floresvalentin_app/base.html:94
 msgid "Cerrar sesión"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:85
+#: template/floresvalentin_app/base.html:100
 msgid "Iniciar sesión"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:95
-#: template/floresvalentin_app/base.html:97
+#: template/floresvalentin_app/base.html:110
+#: template/floresvalentin_app/base.html:112
 #: template/floresvalentin_app/index.html:4 template/registration/login.html:36
 msgid "Flores San Valentín"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:98
+#: template/floresvalentin_app/base.html:113
 msgid "Arreglos florales únicos y personalizados"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:105
+#: template/floresvalentin_app/base.html:120
 msgid "Pedido Especial"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:110
+#: template/floresvalentin_app/base.html:125
 msgid "Comprar Ahora"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:123
+#: template/floresvalentin_app/base.html:138
 #: template/floresvalentin_app/index.html:4
 msgid "Inicio"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:131
+#: template/floresvalentin_app/base.html:146
 msgid "Catálogo"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:136
-#: template/floresvalentin_app/base.html:147
+#: template/floresvalentin_app/base.html:151
+#: template/floresvalentin_app/base.html:163
 msgid "Galería"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:139
-#: template/floresvalentin_app/base.html:150
+#: template/floresvalentin_app/base.html:154
+#: template/floresvalentin_app/base.html:166
 msgid "Ubicación"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:142
-#: template/floresvalentin_app/base.html:153
-#: template/floresvalentin_app/base.html:191
+#: template/floresvalentin_app/base.html:158
+#: template/floresvalentin_app/base.html:205
 msgid "Contacto"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:160
+#: template/floresvalentin_app/base.html:174
 msgid "Mi Cuenta"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:179
+#: template/floresvalentin_app/base.html:193
 msgid "Sobre Nosotros"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:180
+#: template/floresvalentin_app/base.html:194
 msgid ""
 "Somos especialistas en arreglos florales únicos y personalizados. Con más de "
 "15 años de experiencia llevando belleza y color a momentos especiales."
 msgstr ""
 
-#: template/floresvalentin_app/base.html:183
+#: template/floresvalentin_app/base.html:197
 msgid "Horario de Atención"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:185
+#: template/floresvalentin_app/base.html:199
 #: template/floresvalentin_app/index.html:116
 msgid "Lunes a Viernes: 9:00 - 20:00"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:186
+#: template/floresvalentin_app/base.html:200
 #: template/floresvalentin_app/index.html:117
 msgid "Sábados: 9:00 - 18:00"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:187
+#: template/floresvalentin_app/base.html:201
 #: template/floresvalentin_app/index.html:118
 msgid "Domingos: 10:00 - 14:00"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:199
+#: template/floresvalentin_app/base.html:213
 msgid "Síguenos"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:209
+#: template/floresvalentin_app/base.html:223
 msgid "Todos los derechos reservados."
 msgstr ""
 
-#: template/floresvalentin_app/base.html:211
+#: template/floresvalentin_app/base.html:225
 msgid "Política de Privacidad"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:212
+#: template/floresvalentin_app/base.html:226
 msgid "Términos y Condiciones"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:213
+#: template/floresvalentin_app/base.html:227
 msgid "Política de Cookies"
 msgstr ""
 
@@ -249,18 +272,6 @@ msgstr ""
 
 #: template/floresvalentin_app/index.html:146
 msgid "¿Requieres de una asesoría? ¡Deja tu Información!"
-msgstr ""
-
-#: template/floresvalentin_app/index.html:152
-msgid "Nombre:"
-msgstr ""
-
-#: template/floresvalentin_app/index.html:155
-msgid "Correo Electrónico:"
-msgstr ""
-
-#: template/floresvalentin_app/index.html:158
-msgid "Mensaje:"
 msgstr ""
 
 #: template/floresvalentin_app/index.html:161

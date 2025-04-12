@@ -2,6 +2,8 @@ from django import forms
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+# Import gettext_lazy for translations in forms/models
+from django.utils.translation import gettext_lazy as _
 # Import the new ContactMessage model
 from .models import SpecialOrder, Profile, ContactMessage
 
@@ -25,14 +27,14 @@ class ContactMessageForm(forms.ModelForm):
         model = ContactMessage
         fields = ['name', 'email', 'message'] # Fields to include in the form
         widgets = {
-            'name': forms.TextInput(attrs={'placeholder': 'Ingresa tu Nombre Completo'}),
-            'email': forms.EmailInput(attrs={'placeholder': 'IngresaTu@Correo.com'}),
-            'message': forms.Textarea(attrs={'placeholder': 'Escribe tu mensaje aquí...'}), # Removed rows attribute
+            'name': forms.TextInput(attrs={'placeholder': _('Tu nombre completo')}),
+            'email': forms.EmailInput(attrs={'placeholder': _('tu@correo.com')}),
+            'message': forms.Textarea(attrs={'placeholder': _('Escribe tu mensaje aquí...')}), # Removed rows attribute
         }
         labels = {
-            'name': 'Nombre',
-            'email': 'Correo Electrónico',
-            'message': 'Mensaje',
+            'name': _('Nombre'),
+            'email': _('Correo Electrónico'),
+            'message': _('Mensaje'),
         }
 
 class ProfileForm(forms.ModelForm):

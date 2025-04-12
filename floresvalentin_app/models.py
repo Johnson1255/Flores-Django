@@ -185,3 +185,21 @@ class ShoppingCart(models.Model):
 
     def __str__(self):
         return f"Carrito de {self.user.username}"
+
+
+# Modelo para Mensajes de Contacto
+class ContactMessage(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    message = models.TextField()
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False) # Optional: track if message has been read
+
+    def __str__(self):
+        return f"Mensaje de {self.name} ({self.email}) el {self.submitted_at.strftime('%Y-%m-%d %H:%M')}"
+
+    class Meta:
+        ordering = ['-submitted_at'] # Show newest messages first
+        verbose_name = "Mensaje de Contacto"
+        verbose_name_plural = "Mensajes de Contacto"

@@ -144,20 +144,20 @@
 
 <section id="contacto">
     <h2>{% trans "¿Requieres de una asesoría? ¡Deja tu Información!" %}</h2>
-    {# This form needs a corresponding Django view and form class to handle submissions #}
-    {# The action attribute should point to the URL of that view #}
-    <form method="post" action="#"> {# Replace # with {% url 'your_contact_view_name' %} #}
+    {# Display Django messages here (e.g., success message after submission) #}
+    {% if messages %}
+        <div class="messages container mb-3">
+            {% for message in messages %}
+                <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %}" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {# Use the new URL and render the form using Django template tags #}
+    <form method="post" action="{% url 'floresvalentin_app:contact_submit' %}">
         {% csrf_token %} {# Important for security #}
-        {# Replace inputs with Django form fields eventually: {{ form.as_p }} or manual rendering #}
-        <label for="name">{% trans "Nombre:" %}</label>
-        <input type="text" id="name" name="name" required>
-
-        <label for="email">{% trans "Correo Electrónico:" %}</label>
-        <input type="email" id="email" name="email" required>
-
-        <label for="message">{% trans "Mensaje:" %}</label>
-        <textarea id="message" name="message" required></textarea>
-
+        {{ contact_form.as_p }} {# Render form fields as paragraphs #}
         <button type="submit">{% trans "Enviar" %}</button>
     </form>
 </section>

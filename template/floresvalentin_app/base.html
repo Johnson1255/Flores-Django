@@ -154,6 +154,7 @@
                         <a class="nav-link" href="{% url 'floresvalentin_app:index' %}#ubicacion">{% trans "Ubicación" %}</a>
                     </li>
                     <li class="nav-item">
+                        {# Link to the contact section on the index page #}
                         <a class="nav-link" href="{% url 'floresvalentin_app:index' %}#contacto">{% trans "Contacto" %}</a>
                     </li>
                     {# Opción B: Si se convierten en páginas separadas, necesitarían sus propias URLs #}
@@ -164,9 +165,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'floresvalentin_app:location' %}">{% trans "Ubicación" %}</a>
                     </li>
-                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'floresvalentin_app:contact' %}">{% trans "Contacto" %}</a>
-                    </li>
+                     {# The li element below containing the old contact link has been removed entirely #}
                     #}
                     {# --- Puedes añadir más enlaces aquí (ej. Mi Cuenta si el usuario está logueado) --- #}
                     {% if user.is_authenticated %}

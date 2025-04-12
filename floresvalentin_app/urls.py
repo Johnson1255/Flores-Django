@@ -36,7 +36,7 @@ urlpatterns = [
     path('mis-pedidos/<uuid:order_id>/', views.order_detail, name='order_detail'),
     
     # Otras páginas
-    path('contacto/', views.contact, name='contact'),
+    path('contact-submit/', views.contact_view, name='contact_submit'), # Changed URL and view name
     path('galeria/', views.gallery, name='gallery'), # Assuming gallery is part of index
     path('ubicacion/', views.location, name='location'), # Assuming location is also part of index or needs its own template
 ]

@@ -1,7 +1,9 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django import forms
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import SpecialOrder, Profile
+# Import the new ContactMessage model
+from .models import SpecialOrder, Profile, ContactMessage
 
 class SpecialOrderForm(forms.ModelForm):
     class Meta:
@@ -17,11 +19,21 @@ class SpecialOrderForm(forms.ModelForm):
             # 'products': forms.Textarea(attrs={'rows': 3}),
         }
 
-class ContactForm(forms.Form):
-    name = forms.CharField(max_length=100, required=True, label="Nombre")
-    email = forms.EmailField(required=True, label="Correo Electrónico")
-    subject = forms.CharField(max_length=150, required=True, label="Asunto")
-    message = forms.CharField(widget=forms.Textarea, required=True, label="Mensaje")
+# Replace the old ContactForm with a ModelForm for ContactMessage
+class ContactMessageForm(forms.ModelForm):
+    class Meta:
+        model = ContactMessage
+        fields = ['name', 'email', 'message'] # Fields to include in the form
+        widgets = {
+            'name': forms.TextInput(attrs={'placeholder': 'Tu nombre completo'}),
+            'email': forms.EmailInput(attrs={'placeholder': 'tu@correo.com'}),
+            'message': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Escribe tu mensaje aquí...'}),
+        }
+        labels = {
+            'name': 'Nombre',
+            'email': 'Correo Electrónico',
+            'message': 'Mensaje',
+        }
 
 class ProfileForm(forms.ModelForm):
     # You might want to customize which fields are editable

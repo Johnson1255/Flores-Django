@@ -12,16 +12,22 @@ from django.template.loader import render_to_string # Added for rendering partia
 from django.db.models import Q # Added for search
 
 # Corrected model imports
-from .models import Product, Category, Order, OrderItem, SpecialOrder, ShoppingCart, Profile
-# Remove MinimalLoginForm import
-from .forms import SpecialOrderForm, ContactForm, ProfileForm, CheckoutForm, CustomUserCreationForm
+from .models import Product, Category, Order, OrderItem, SpecialOrder, ShoppingCart, Profile, ContactMessage # Added ContactMessage
+# Import the correct form
+from .forms import SpecialOrderForm, ContactMessageForm, ProfileForm, CheckoutForm, CustomUserCreationForm # Changed ContactForm to ContactMessageForm
 
 # Página principal
 def index(request):
     # Changed filter: Get first 6 available products, newest first, instead of non-existent 'featured' field
     featured_products = Product.objects.filter(available=True).order_by('-created_at')[:6]
+    # Instantiate the contact form for the index page
+    contact_form = ContactMessageForm()
+    # TODO: Handle displaying errors if redirected from contact_view after invalid POST
+    # This might involve checking session or specific GET parameters if needed.
+    # For now, just passing a fresh form instance.
     return render(request, 'floresvalentin_app/index.html', {
-        'featured_products': featured_products # Renamed variable in context for clarity, but kept original name for compatibility if template uses it
+        'featured_products': featured_products,
+        'contact_form': contact_form, # Add form to context
     })
 
 # Catálogo y productos
@@ -471,21 +477,38 @@ def order_detail(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
     return render(request, 'floresvalentin_app/order_detail.html', {'order': order})
 
-# Otras páginas
-def contact(request):
+# Otras páginas (Contact View updated to save to DB)
+def contact_view(request): # Renamed view for clarity
     if request.method == 'POST':
-        form = ContactForm(request.POST)
+        form = ContactMessageForm(request.POST)
         if form.is_valid():
-            # Enviar correo o guardar mensaje
-            messages.success(request, 'Tu mensaje ha sido enviado. Te contactaremos pronto.')
-            return redirect('floresvalentin_app:contact')
+            form.save() # Save the message to the database
+            messages.success(request, '¡Gracias por tu mensaje! Nos pondremos en contacto contigo pronto.')
+            # Redirect back to the index page (or wherever the form was)
+            # Assuming the form is on the index page based on previous context
+            return redirect(reverse('floresvalentin_app:index') + '#contacto')
+        else:
+            # If form is invalid, add an error message
+            # We will render the index page again, passing the invalid form
+            # This requires modifying the index view slightly to handle this
+            messages.error(request, 'Hubo un error en el formulario. Por favor, revisa los campos.')
+            # We'll handle rendering the form with errors in the index view
+            # Store the invalid form in the session to pass it back? Or modify index view.
+            # Let's modify index view for simplicity for now.
+            # We'll pass the invalid form back through the redirect/session or re-render index here.
+            # Re-rendering index here is complex as we need all its context.
+            # Best approach: Redirect back to index and let index view handle displaying errors.
+            # For now, just redirecting back to the section. Error display needs index view update.
+            return redirect(reverse('floresvalentin_app:index') + '#contacto-error') # Redirect to an error anchor maybe? Or just index.
     else:
-        form = ContactForm()
-    
-    return render(request, 'floresvalentin_app/contact.html', {'form': form})
+        # If GET request, redirect to index page where the form is displayed
+        return redirect(reverse('floresvalentin_app:index') + '#contacto')
+
 
 def gallery(request):
-    return render(request, 'floresvalentin_app/gallery.html')
+    # This view likely isn't used if gallery is just a section on index.html
+    # If it should be a separate page, create gallery.html template
+    return render(request, 'floresvalentin_app/gallery.html') # Assuming template exists if needed
 
 def location(request):
     return render(request, 'floresvalentin_app/location.html')

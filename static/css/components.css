@@ -111,13 +111,22 @@
 
 #contacto input, 
 #contacto textarea { /* Scope to #contacto */
+  width: 100%; /* Make inputs/textarea take full width */
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
   margin-bottom: 15px; /* Increase spacing below inputs */
   padding: 12px; /* Increase padding */
   border: 1px solid var(--border-color);
+  /* min-height removed from combined rule */
   border-radius: 5px;
   background-color: var(--white-color);
   color: var(--text-color);
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#contacto textarea { /* Specific style for textarea height and width */
+  display: block; /* Ensure it takes block-level width */
+  min-height: 150px; /* Set minimum height */
+  resize: vertical; /* Allow vertical resizing */
 }
 
 #contacto input:focus, 

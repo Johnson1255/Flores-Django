@@ -25,9 +25,9 @@ class ContactMessageForm(forms.ModelForm):
         model = ContactMessage
         fields = ['name', 'email', 'message'] # Fields to include in the form
         widgets = {
-            'name': forms.TextInput(attrs={'placeholder': 'Tu nombre completo'}),
-            'email': forms.EmailInput(attrs={'placeholder': 'tu@correo.com'}),
-            'message': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Escribe tu mensaje aquí...'}),
+            'name': forms.TextInput(attrs={'placeholder': 'Ingresa tu Nombre Completo'}),
+            'email': forms.EmailInput(attrs={'placeholder': 'IngresaTu@Correo.com'}),
+            'message': forms.Textarea(attrs={'placeholder': 'Escribe tu mensaje aquí...'}), # Removed rows attribute
         }
         labels = {
             'name': 'Nombre',

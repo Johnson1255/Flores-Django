@@ -516,78 +516,70 @@ def location(request):
 
 # --- Authentication Views ---
 
-def login_register_view(request):
+def login_view(request): # Renamed from login_register_view
     """
-    Handles GET requests to display login/register forms
+    Handles GET requests to display the login form
     and POST requests for login attempts.
-    Registration POSTs are handled by the 'register' view.
     """
-    # Restore AuthenticationForm
-    login_form = AuthenticationForm(request, data=request.POST or None)
-    # Pass a fresh registration form for GET or failed login POST
-    register_form = CustomUserCreationForm()
+    if request.user.is_authenticated:
+        return redirect('floresvalentin_app:index') # Redirect logged-in users
 
     if request.method == 'POST':
-        # Check if the AuthenticationForm is valid
+        login_form = AuthenticationForm(request, data=request.POST)
         if login_form.is_valid():
-            # Restore original login logic
             username = login_form.cleaned_data.get('username')
             password = login_form.cleaned_data.get('password')
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
                 messages.success(request, f'Bienvenido de nuevo, {user.username}!')
-                # Redirect to 'next' URL or default
                 next_url = request.POST.get('next', request.GET.get('next', ''))
-                # Basic security check for open redirect vulnerability
                 if next_url and not next_url.startswith('/'):
-                    next_url = reverse('floresvalentin_app:index') # Or some safe default
-
+                    next_url = reverse('floresvalentin_app:index')
                 return redirect(next_url or 'floresvalentin_app:index')
             else:
-                # Invalid login credentials
                 messages.error(request, 'Usuario o contraseña inválidos.')
                 # Fall through to render the page again with the login_form containing errors
         else:
-            # Login form is not valid, could be missing fields or other errors
-            # Don't display a generic error if specific field errors are shown by the form
+            # Login form is not valid
             if '__all__' not in login_form.errors:
-                 messages.error(request, 'Por favor corrige los errores en el formulario de inicio de sesión.')
+                 messages.error(request, 'Por favor corrige los errores en el formulario.')
             # Fall through to render the page again with the login_form containing errors
+    else: # GET request
+        login_form = AuthenticationForm()
 
-    # Explicitly define context for GET request or failed POST login attempt
+    # Context for GET request or failed POST login attempt
     context = {
-        'login_form': login_form,    # Contains errors if login POST failed
-        'register_form': register_form # Fresh form instance
+        'form': login_form, # Pass the form as 'form' consistent with login.html
     }
-    # Removed debugging print statements
     return render(request, 'registration/login.html', context)
 
 
-def register(request):
-    """ Handles user registration POST requests """
+def register_view(request): # Renamed from register
+    """ Handles GET and POST requests for user registration """
+    if request.user.is_authenticated:
+        return redirect('floresvalentin_app:index') # Redirect logged-in users
+
     if request.method == 'POST':
-        # Use a distinct variable name for the submitted form instance
-        submitted_register_form = CustomUserCreationForm(request.POST)
-        if submitted_register_form.is_valid():
-            user = submitted_register_form.save()
+        register_form = CustomUserCreationForm(request.POST)
+        if register_form.is_valid():
+            user = register_form.save()
             login(request, user) # Log the user in directly
             messages.success(request, 'Registro exitoso. ¡Bienvenido!')
             return redirect('floresvalentin_app:index') # Redirect to home page
         else:
-            # Registration failed. Prepare context to re-render the page.
-            # Need a fresh AuthenticationForm instance for display.
-            login_form_instance = AuthenticationForm() # Restore AuthenticationForm
+            # Registration failed. Re-render the registration page with errors.
             messages.error(request, 'Por favor corrige los errores en el formulario de registro.')
-            # Explicitly define context, passing the invalid registration form back
-            # Fix indentation here
+            # No need to pass login_form here
             context = {
-                'login_form': login_form_instance, # Pass AuthenticationForm
-                'register_form': submitted_register_form # Pass the invalid form
+                'register_form': register_form # Pass the invalid form back
             }
-            return render(request, 'registration/login.html', context)
-    else:
-        # If someone tries to GET /register/, redirect them to the main login page
-        return redirect('login') # Redirect to the named URL for login_register_view
+            return render(request, 'registration/register.html', context) # Render register.html
+    else: # GET request
+        register_form = CustomUserCreationForm()
+        context = {
+            'register_form': register_form
+        }
+        return render(request, 'registration/register.html', context) # Render register.html
 
 # Logout view will use Django's built-in view configured in urls.py

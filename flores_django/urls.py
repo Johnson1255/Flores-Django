@@ -36,10 +36,10 @@ urlpatterns = [
     path('i18n/', include('django.conf.urls.i18n')), # Add this line for language switching
 
 
-    # Restore custom login/register view URL
-    path('login/', app_views.login_register_view, name='login'),
-    # Keep custom registration view URL
-    path('register/', app_views.register, name='register'),
+    # Point to the new dedicated login view
+    path('login/', app_views.login_view, name='login'),
+    # Point to the new dedicated register view
+    path('register/', app_views.register_view, name='register'),
     # Keep LogoutView
     path('logout/', LogoutView.as_view(next_page='floresvalentin_app:index'), name='logout'),
 

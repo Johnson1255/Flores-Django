@@ -386,9 +386,13 @@ html[data-theme='dark'] .theme-toggle-btn {
     border-color: #f5c6cb;
 }
 
-/* Style for initially hidden registration form */
-.register-form {
+/* Visibility classes for forms */
+.form-hidden {
     display: none;
+}
+
+.form-active {
+    display: block; /* Or flex, grid, etc., depending on form layout needs */
 }
 
 /* Style for messages container */

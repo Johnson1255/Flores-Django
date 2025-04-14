@@ -23,8 +23,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         loginTab.classList.add('active');
         registerTab.classList.remove('active');
-        loginForm.style.display = 'block';
-        registerForm.style.display = 'none';
+        // Use classes for visibility
+        loginForm.classList.add('form-active');
+        loginForm.classList.remove('form-hidden');
+        registerForm.classList.add('form-hidden');
+        registerForm.classList.remove('form-active');
     }
 
     // Function to show the registration form
@@ -35,8 +38,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         registerTab.classList.add('active');
         loginTab.classList.remove('active');
-        registerForm.style.display = 'block';
-        loginForm.style.display = 'none';
+        // Use classes for visibility
+        registerForm.classList.add('form-active');
+        registerForm.classList.remove('form-hidden');
+        loginForm.classList.add('form-hidden');
+        loginForm.classList.remove('form-active');
     }
 
     // Assign click events to the tabs

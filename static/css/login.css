@@ -279,10 +279,25 @@ input:focus {
 }
 
 .checkbox-group {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+    /* display: grid; */ /* Removed grid */
+    /* grid-template-columns: repeat(2, 1fr); */
+    /* gap: 10px; */
     margin-top: 8px;
+    /* Use flexbox to center items vertically */
+    display: flex;
+    flex-direction: column; /* Stack vertically */
+    align-items: center; /* Center horizontally */
+    gap: 5px; /* Add small gap between items */
+}
+
+/* Keep rules to reset default list styling from Django widget */
+.checkbox-group ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    /* We want the ul itself to be centered by the flex container */
+    /* display: contents; */ /* Removed this */
+    width: fit-content; /* Make ul only as wide as its content */
 }
 
 .checkbox-label {

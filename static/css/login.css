@@ -400,3 +400,26 @@ html[data-theme='dark'] .theme-toggle-btn {
     padding: 10px;
     margin-bottom: 15px;
 }
+
+/* Styles for the alternate action link (Register/Login link below form) */
+.alternate-action {
+    margin-top: 25px; /* Adds space above this section */
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--light-text); /* Lighter color for the text part */
+}
+
+.alternate-action p {
+    margin: 0; /* Remove default paragraph margin */
+}
+
+.alternate-action a {
+    color: var(--primary-color); /* Link color using theme variable */
+    text-decoration: none;
+    font-weight: 600; /* Make link slightly bolder */
+    transition: text-decoration 0.3s;
+}
+
+.alternate-action a:hover {
+    text-decoration: underline; /* Underline on hover */
+}

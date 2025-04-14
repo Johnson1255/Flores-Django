@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% trans "Iniciar Sesión / Registrarse" %} - Flores San Valentín</title>
+    <title>{% trans "Iniciar Sesión" %} - Flores San Valentín</title> {# Changed Title #}
 
     {# --- STYLES --- #}
     {# Core CSS Files (Needed since this page doesn't extend base.html) #}
@@ -35,10 +35,10 @@
         <div class="login-header">
             <img src="{% static 'images/logo.svg' %}" alt="{% trans 'Flores San Valentín' %}" class="login-logo">
             <h1>{% trans "Bienvenido a Flores San Valentín" %}</h1>
-            <p class="login-message">{% trans "Para continuar con tu compra, por favor inicia sesión o crea una cuenta nueva" %}</p>
+            <p class="login-message">{% trans "Inicia sesión para continuar con tu compra." %}</p> {# Changed Message #}
         </div>
 
-        {# Display Django messages (e.g., login errors, registration success) #}
+        {# Display Django messages (e.g., login errors) #}
         {% if messages %}
             <div class="messages-container"> {# Removed inline style #}
                 {% for message in messages %}
@@ -50,15 +50,12 @@
             </div>
         {% endif %}
 
-        <div class="login-tabs">
-            {# Add data attributes for JS tab switching #}
-            <button class="tab-button active" data-tab="login">{% trans "Iniciar Sesión" %}</button>
-            <button class="tab-button" data-tab="register">{% trans "Registrarse" %}</button>
-        </div>
+        {# REMOVED Tabs #}
 
         {# --- Login Form --- #}
-        {# The action points to the 'login' URL name, which maps to login_register_view #}
-        <form method="post" action="{% url 'login' %}" class="login-form" id="login-form-content">
+        {# Action points to the 'login' URL name #}
+        {# Removed form-active class and id, only one form now #}
+        <form method="post" action="{% url 'login' %}" class="login-form">
             {% csrf_token %} {# CSRF token for security #}
 
             {# Manual rendering - Use 'form' variable provided by LoginView #}
@@ -105,146 +102,14 @@
             </button>
         </form>
 
-        {# --- Registration Form --- #}
-        {# The action points to the 'register' URL name #}
-        {# Removed inline style="display: none;"; CSS class .register-form handles this #}
-        <form method="post" action="{% url 'register' %}" class="register-form" id="register-form-content">
-             {% csrf_token %} {# CSRF token for security #}
+        {# REMOVED Registration Form #}
 
-            {# Manual rendering (Restored) #}
-            <div class="form-group">
-                <label for="{{ register_form.first_name.id_for_label }}">{{ register_form.first_name.label }}</label>
-                <div class="input-with-icon">
-                    <i class="fas fa-user"></i>
-                    {{ register_form.first_name }}
-                </div>
-                {% if register_form.first_name.errors %}<div class="errorlist">{{ register_form.first_name.errors }}</div>{% endif %}
-            </div>
-            <div class="form-group">
-                <label for="{{ register_form.last_name.id_for_label }}">{{ register_form.last_name.label }}</label>
-                <div class="input-with-icon">
-                    <i class="fas fa-user"></i>
-                    {{ register_form.last_name }}
-                </div>
-                {% if register_form.last_name.errors %}<div class="errorlist">{{ register_form.last_name.errors }}</div>{% endif %}
-            </div>
-             <div class="form-group">
-                <label for="{{ register_form.email.id_for_label }}">{{ register_form.email.label }}</label>
-                <div class="input-with-icon">
-                    <i class="fas fa-envelope"></i>
-                    {{ register_form.email }}
-                </div>
-                {% if register_form.email.errors %}<div class="errorlist">{{ register_form.email.errors }}</div>{% endif %}
-            </div>
-             <div class="form-group">
-                <label for="{{ register_form.phone.id_for_label }}">{{ register_form.phone.label }}</label>
-                <div class="input-with-icon">
-                    <i class="fas fa-phone"></i>
-                    {{ register_form.phone }}
-                </div>
-                {% if register_form.phone.errors %}<div class="errorlist">{{ register_form.phone.errors }}</div>{% endif %}
-            </div>
+        {# Link to Registration Page #}
+        <div class="alternate-action">
+             <p>{% trans "¿No tienes una cuenta?" %} <a href="{% url 'register' %}">{% trans "Regístrate aquí" %}</a></p>
+        </div>
 
-            {# Address Fields #}
-             <div class="form-group">
-                <label for="{{ register_form.country.id_for_label }}">{{ register_form.country.label }}</label>
-                <div class="input-with-icon">
-                    <i class="fas fa-globe"></i>
-                    {{ register_form.country }}
-                </div>
-                {% if register_form.country.errors %}<div class="errorlist">{{ register_form.country.errors }}</div>{% endif %}
-            </div>
-             <div class="form-group">
-                <label for="{{ register_form.city.id_for_label }}">{{ register_form.city.label }}</label>
-                <div class="input-with-icon">
-                    <i class="fas fa-city"></i>
-                    {{ register_form.city }}
-                </div>
-                {% if register_form.city.errors %}<div class="errorlist">{{ register_form.city.errors }}</div>{% endif %}
-            </div>
-             <div class="form-group">
-                <label for="{{ register_form.neighborhood.id_for_label }}">{{ register_form.neighborhood.label }}</label>
-                <div class="input-with-icon">
-                    <i class="fas fa-h-square"></i> {# Consider a different icon? #}
-                    {{ register_form.neighborhood }}
-                </div>
-                {% if register_form.neighborhood.errors %}<div class="errorlist">{{ register_form.neighborhood.errors }}</div>{% endif %}
-            </div>
-             <div class="form-group">
-                <label for="{{ register_form.address.id_for_label }}">{{ register_form.address.label }}</label>
-                <div class="input-with-icon">
-                    <i class="fas fa-home"></i>
-                    {{ register_form.address }}
-                </div>
-                {% if register_form.address.errors %}<div class="errorlist">{{ register_form.address.errors }}</div>{% endif %}
-            </div>
-             <div class="form-group">
-                <label for="{{ register_form.postal_code.id_for_label }}">{{ register_form.postal_code.label }}</label>
-                <div class="input-with-icon">
-                    <i class="fas fa-map-marker-alt"></i>
-                    {{ register_form.postal_code }}
-                </div>
-                {% if register_form.postal_code.errors %}<div class="errorlist">{{ register_form.postal_code.errors }}</div>{% endif %}
-            </div>
-
-            {# Password Fields (from UserCreationForm) #}
-             <div class="form-group">
-                <label for="{{ register_form.password1.id_for_label }}">{{ register_form.password1.label }}</label>
-                <div class="input-with-icon">
-                    <i class="fas fa-lock"></i>
-                    {{ register_form.password1 }}
-                </div>
-                {% if register_form.password1.help_text %}
-                    <small class="form-text text-muted">{{ register_form.password1.help_text|safe }}</small>
-                {% endif %}
-                {% if register_form.password1.errors %}<div class="errorlist">{{ register_form.password1.errors }}</div>{% endif %}
-            </div>
-             <div class="form-group">
-                <label for="{{ register_form.password2.id_for_label }}">{{ register_form.password2.label }}</label>
-                <div class="input-with-icon">
-                    <i class="fas fa-lock"></i>
-                    {{ register_form.password2 }}
-                </div>
-                {% if register_form.password2.errors %}<div class="errorlist">{{ register_form.password2.errors }}</div>{% endif %}
-            </div>
-
-            {# Preferences & Newsletter #}
-            <div class="form-group">
-                <label>{{ register_form.preferences.label }}</label>
-                <div class="checkbox-group">
-                    {{ register_form.preferences }} {# Renders checkboxes #}
-                </div>
-                 {% if register_form.preferences.errors %}<div class="errorlist">{{ register_form.preferences.errors }}</div>{% endif %}
-            </div>
-
-            <div class="form-group">
-                <label class="checkbox-label">
-                    {{ register_form.newsletter }} {{ register_form.newsletter.label }}
-                </label>
-                 {% if register_form.newsletter.errors %}<div class="errorlist">{{ register_form.newsletter.errors }}</div>{% endif %}
-            </div>
-
-            <div class="form-group">
-                <label class="checkbox-label required">
-                    {{ register_form.terms }} {{ register_form.terms.label }}
-                </label>
-                 {% if register_form.terms.errors %}<div class="errorlist">{{ register_form.terms.errors }}</div>{% endif %}
-            </div>
-
-            {# Display non-field errors for registration form #}
-            {% if register_form.non_field_errors %}
-                <div class="errorlist non-field-errors">
-                    {{ register_form.non_field_errors }}
-                </div>
-            {% endif %}
-
-            <button type="submit" class="login-button">
-                <span>{% trans "Crear Cuenta" %}</span>
-                <i class="fas fa-arrow-right"></i>
-            </button>
-        </form>
-
-        {# Social Login (Keep structure) #}
+        {# Social Login (Optional - Keep if desired on login page) #}
         <div class="social-login">
             <p>{% trans "O inicia sesión con" %}</p>
             <div class="social-buttons">
@@ -268,10 +133,9 @@
 </button>
 
 {# --- SCRIPTS --- #}
-{# Load theme JS first if it sets body attributes needed by login.js #}
+{# Only theme JS needed now #}
 <script type="module" src="{% static 'js/theme.js' %}"></script>
-{# Load specific JS for the login page #}
-<script type="module" src="{% static 'js/login.js' %}"></script>
+{# REMOVED login.js script tag #}
 
 </body>
 </html>

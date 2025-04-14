@@ -1,0 +1,204 @@
+{% load static i18n %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% trans "Registrarse" %} - Flores San Valentín</title> {# Changed Title #}
+
+    {# --- STYLES --- #}
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'css/layout.css' %}">
+    <link rel="stylesheet" href="{% static 'css/components.css' %}">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}"> {# Keep using login.css for styling #}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body data-theme="light" class="login-page-body"> {# Keep class for styling #}
+
+<div class="login-container">
+    <div class="login-card">
+        {# Back button #}
+        <a href="{% url 'floresvalentin_app:index' %}" class="back-button">
+            <i class="fas fa-arrow-left"></i>
+            <span>{% trans "Volver al inicio" %}</span>
+        </a>
+
+        <div class="login-header">
+            <img src="{% static 'images/logo.svg' %}" alt="{% trans 'Flores San Valentín' %}" class="login-logo">
+            <h1>{% trans "Crea tu Cuenta" %}</h1> {# Changed Heading #}
+            <p class="login-message">{% trans "Completa el formulario para registrarte en Flores San Valentín." %}</p> {# Changed Message #}
+        </div>
+
+        {# Display Django messages (e.g., registration errors/success) #}
+        {% if messages %}
+            <div class="messages-container">
+                {% for message in messages %}
+                    <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}info{% endif %}" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {# REMOVED Tabs #}
+
+        {# --- Registration Form --- #}
+        {# Action points to the 'register' URL name #}
+        {# Removed form-hidden class, this is the only form now #}
+        <form method="post" action="{% url 'register' %}" class="register-form" id="register-form-content">
+             {% csrf_token %}
+
+            {# Use register_form variable passed from the view #}
+            <div class="form-group">
+                <label for="{{ register_form.first_name.id_for_label }}">{{ register_form.first_name.label }}</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-user"></i>
+                    {{ register_form.first_name }}
+                </div>
+                {% if register_form.first_name.errors %}<div class="errorlist">{{ register_form.first_name.errors }}</div>{% endif %}
+            </div>
+            <div class="form-group">
+                <label for="{{ register_form.last_name.id_for_label }}">{{ register_form.last_name.label }}</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-user"></i>
+                    {{ register_form.last_name }}
+                </div>
+                {% if register_form.last_name.errors %}<div class="errorlist">{{ register_form.last_name.errors }}</div>{% endif %}
+            </div>
+             <div class="form-group">
+                <label for="{{ register_form.email.id_for_label }}">{{ register_form.email.label }}</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-envelope"></i>
+                    {{ register_form.email }}
+                </div>
+                {% if register_form.email.errors %}<div class="errorlist">{{ register_form.email.errors }}</div>{% endif %}
+            </div>
+             <div class="form-group">
+                <label for="{{ register_form.phone.id_for_label }}">{{ register_form.phone.label }}</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-phone"></i>
+                    {{ register_form.phone }}
+                </div>
+                {% if register_form.phone.errors %}<div class="errorlist">{{ register_form.phone.errors }}</div>{% endif %}
+            </div>
+
+            {# Address Fields #}
+             <div class="form-group">
+                <label for="{{ register_form.country.id_for_label }}">{{ register_form.country.label }}</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-globe"></i>
+                    {{ register_form.country }}
+                </div>
+                {% if register_form.country.errors %}<div class="errorlist">{{ register_form.country.errors }}</div>{% endif %}
+            </div>
+             <div class="form-group">
+                <label for="{{ register_form.city.id_for_label }}">{{ register_form.city.label }}</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-city"></i>
+                    {{ register_form.city }}
+                </div>
+                {% if register_form.city.errors %}<div class="errorlist">{{ register_form.city.errors }}</div>{% endif %}
+            </div>
+             <div class="form-group">
+                <label for="{{ register_form.neighborhood.id_for_label }}">{{ register_form.neighborhood.label }}</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-h-square"></i>
+                    {{ register_form.neighborhood }}
+                </div>
+                {% if register_form.neighborhood.errors %}<div class="errorlist">{{ register_form.neighborhood.errors }}</div>{% endif %}
+            </div>
+             <div class="form-group">
+                <label for="{{ register_form.address.id_for_label }}">{{ register_form.address.label }}</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-home"></i>
+                    {{ register_form.address }}
+                </div>
+                {% if register_form.address.errors %}<div class="errorlist">{{ register_form.address.errors }}</div>{% endif %}
+            </div>
+             <div class="form-group">
+                <label for="{{ register_form.postal_code.id_for_label }}">{{ register_form.postal_code.label }}</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                    {{ register_form.postal_code }}
+                </div>
+                {% if register_form.postal_code.errors %}<div class="errorlist">{{ register_form.postal_code.errors }}</div>{% endif %}
+            </div>
+
+            {# Password Fields #}
+             <div class="form-group">
+                <label for="{{ register_form.password1.id_for_label }}">{{ register_form.password1.label }}</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-lock"></i>
+                    {{ register_form.password1 }}
+                </div>
+                {% if register_form.password1.help_text %}
+                    <small class="form-text text-muted">{{ register_form.password1.help_text|safe }}</small>
+                {% endif %}
+                {% if register_form.password1.errors %}<div class="errorlist">{{ register_form.password1.errors }}</div>{% endif %}
+            </div>
+             <div class="form-group">
+                <label for="{{ register_form.password2.id_for_label }}">{{ register_form.password2.label }}</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-lock"></i>
+                    {{ register_form.password2 }}
+                </div>
+                {% if register_form.password2.errors %}<div class="errorlist">{{ register_form.password2.errors }}</div>{% endif %}
+            </div>
+
+            {# Preferences & Newsletter #}
+            <div class="form-group">
+                <label>{{ register_form.preferences.label }}</label>
+                <div class="checkbox-group">
+                    {{ register_form.preferences }}
+                </div>
+                 {% if register_form.preferences.errors %}<div class="errorlist">{{ register_form.preferences.errors }}</div>{% endif %}
+            </div>
+            <div class="form-group">
+                <label class="checkbox-label">
+                    {{ register_form.newsletter }} {{ register_form.newsletter.label }}
+                </label>
+                 {% if register_form.newsletter.errors %}<div class="errorlist">{{ register_form.newsletter.errors }}</div>{% endif %}
+            </div>
+            <div class="form-group">
+                <label class="checkbox-label required">
+                    {{ register_form.terms }} {{ register_form.terms.label }}
+                </label>
+                 {% if register_form.terms.errors %}<div class="errorlist">{{ register_form.terms.errors }}</div>{% endif %}
+            </div>
+
+            {# Display non-field errors #}
+            {% if register_form.non_field_errors %}
+                <div class="errorlist non-field-errors">
+                    {{ register_form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <button type="submit" class="login-button"> {# Keep class for styling #}
+                <span>{% trans "Crear Cuenta" %}</span>
+                <i class="fas fa-arrow-right"></i>
+            </button>
+        </form>
+
+        {# Link to Login Page #}
+        <div class="alternate-action">
+             <p>{% trans "¿Ya tienes una cuenta?" %} <a href="{% url 'login' %}">{% trans "Inicia Sesión aquí" %}</a></p>
+        </div>
+
+        {# REMOVED Social Login section for simplicity on register page, can be added back if needed #}
+
+    </div> {# End login-card #}
+</div> {# End login-container #}
+
+{# Theme toggle button #}
+<button id="theme-toggle" class="theme-toggle-btn">
+    <i class="fas fa-moon"></i>
+</button>
+
+{# --- SCRIPTS --- #}
+{# Only theme JS needed now #}
+<script type="module" src="{% static 'js/theme.js' %}"></script>
+{# REMOVED login.js script tag #}
+
+</body>
+</html>

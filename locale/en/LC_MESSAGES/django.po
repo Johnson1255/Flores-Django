@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-15 17:56+0000\n"
+"POT-Creation-Date: 2025-04-15 18:22+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,7 +22,7 @@ msgstr ""
 msgid "Tu nombre completo"
 msgstr "Your full name"
 
-#: floresvalentin_app/forms.py:31
+#: floresvalentin_app/forms.py:31 floresvalentin_app/forms.py:74
 msgid "tu@correo.com"
 msgstr "your@email.com"
 
@@ -30,17 +30,85 @@ msgstr "your@email.com"
 msgid "Escribe tu mensaje aquí..."
 msgstr "Write your message here..."
 
-#: floresvalentin_app/forms.py:35
+#: floresvalentin_app/forms.py:35 floresvalentin_app/forms.py:65
 msgid "Nombre"
 msgstr "Name"
 
-#: floresvalentin_app/forms.py:36
+#: floresvalentin_app/forms.py:36 floresvalentin_app/forms.py:73
 msgid "Correo Electrónico"
 msgstr "Email"
 
 #: floresvalentin_app/forms.py:37
 msgid "Mensaje"
 msgstr "Message"
+
+#: floresvalentin_app/forms.py:66
+msgid "Tu nombre"
+msgstr "Your name"
+
+#: floresvalentin_app/forms.py:69
+msgid "Apellidos"
+msgstr "Last Name"
+
+#: floresvalentin_app/forms.py:70
+msgid "Tus apellidos"
+msgstr "Your last name"
+
+#: floresvalentin_app/forms.py:79
+msgid "Teléfono"
+msgstr "Phone"
+
+#: floresvalentin_app/forms.py:80
+msgid "Tu número de teléfono"
+msgstr "Your phone number"
+
+#: floresvalentin_app/forms.py:82
+msgid "País"
+msgstr "Country"
+
+#: floresvalentin_app/forms.py:83
+msgid "Ciudad"
+msgstr "City"
+
+#: floresvalentin_app/forms.py:84
+msgid "Barrio"
+msgstr "Neighborhood"
+
+#: floresvalentin_app/forms.py:85
+msgid "Dirección de Entrega"
+msgstr "Delivery Address"
+
+#: floresvalentin_app/forms.py:86
+msgid "Código Postal"
+msgstr "Postal Code"
+
+#: floresvalentin_app/forms.py:91
+msgid "Cumpleaños"
+msgstr "Birthdays"
+
+#: floresvalentin_app/forms.py:92
+msgid "Aniversarios"
+msgstr "Anniversaries"
+
+#: floresvalentin_app/forms.py:93
+msgid "Bodas"
+msgstr "Weddings"
+
+#: floresvalentin_app/forms.py:94
+msgid "Condolencias"
+msgstr "Condolences"
+
+#: floresvalentin_app/forms.py:100
+msgid "Ocasiones de interés (opcional)"
+msgstr "Occasions of interest (optional)"
+
+#: floresvalentin_app/forms.py:103
+msgid "Deseo recibir ofertas y novedades por correo electrónico"
+msgstr "I wish to receive offers and news by email"
+
+#: floresvalentin_app/forms.py:104
+msgid "Acepto los términos y condiciones y la política de privacidad*"
+msgstr "I accept the terms and conditions and the privacy policy*"
 
 #: template/floresvalentin_app/base.html:71
 msgid "Cambiar tema"
@@ -365,7 +433,7 @@ msgstr "Create Account"
 
 #: template/registration/register.html:30
 msgid "Completa el formulario para registrarte en Flores San Valentín."
-msgstr ""
+msgstr "Complete the form to register at Valentine Flowers."
 
 #: template/registration/register.html:178
 msgid "Crear Cuenta"
@@ -373,7 +441,7 @@ msgstr "Create Account"
 
 #: template/registration/register.html:185
 msgid "¿Ya tienes una cuenta?"
-msgstr ""
+msgstr "Already have an account?"
 
 #: template/registration/register.html:185
 #, fuzzy

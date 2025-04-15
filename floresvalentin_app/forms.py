@@ -60,47 +60,48 @@ class CheckoutForm(forms.Form):
 # Custom Registration Form
 class CustomUserCreationForm(UserCreationForm):
     # Add fields from the User model that aren't in UserCreationForm by default
-    # Explicitly define widgets
+    # Explicitly define widgets and use _() for labels and placeholders
     first_name = forms.CharField(
-        max_length=30, required=True, label="Nombre",
-        widget=forms.TextInput(attrs={'placeholder': 'Tu nombre'}) # Example placeholder
+        max_length=30, required=True, label=_("Nombre"),
+        widget=forms.TextInput(attrs={'placeholder': _('Tu nombre')})
     )
     last_name = forms.CharField(
-        max_length=150, required=True, label="Apellidos",
-        widget=forms.TextInput(attrs={'placeholder': 'Tus apellidos'})
+        max_length=150, required=True, label=_("Apellidos"),
+        widget=forms.TextInput(attrs={'placeholder': _('Tus apellidos')})
     )
     email = forms.EmailField(
-        required=True, label="Correo Electrónico",
-        widget=forms.EmailInput(attrs={'placeholder': 'tu@correo.com'})
+        required=True, label=_("Correo Electrónico"),
+        widget=forms.EmailInput(attrs={'placeholder': _('tu@correo.com')})
     )
 
-    # Add fields from the Profile model with explicit widgets
+    # Add fields from the Profile model with explicit widgets and use _()
     phone = forms.CharField(
-        max_length=20, required=True, label="Teléfono",
-        widget=forms.TextInput(attrs={'placeholder': 'Tu número de teléfono'})
+        max_length=20, required=True, label=_("Teléfono"),
+        widget=forms.TextInput(attrs={'placeholder': _('Tu número de teléfono')})
     )
-    country = forms.CharField(max_length=50, required=True, label="País")
-    city = forms.CharField(max_length=50, required=True, label="Ciudad")
-    neighborhood = forms.CharField(max_length=100, required=True, label="Barrio")
-    address = forms.CharField(max_length=255, required=True, label="Dirección de Entrega")
-    postal_code = forms.CharField(max_length=20, required=True, label="Código Postal")
+    country = forms.CharField(max_length=50, required=True, label=_("País"))
+    city = forms.CharField(max_length=50, required=True, label=_("Ciudad"))
+    neighborhood = forms.CharField(max_length=100, required=True, label=_("Barrio"))
+    address = forms.CharField(max_length=255, required=True, label=_("Dirección de Entrega"))
+    postal_code = forms.CharField(max_length=20, required=True, label=_("Código Postal"))
 
     # For preferences (JSONField storing a list), use MultipleChoiceField with checkboxes
+    # Mark choices for translation
     OCCASION_CHOICES = [
-        ('cumpleanos', 'Cumpleaños'),
-        ('aniversarios', 'Aniversarios'),
-        ('bodas', 'Bodas'),
-        ('condolencias', 'Condolencias'),
+        ('cumpleanos', _('Cumpleaños')),
+        ('aniversarios', _('Aniversarios')),
+        ('bodas', _('Bodas')),
+        ('condolencias', _('Condolencias')),
     ]
     preferences = forms.MultipleChoiceField(
         choices=OCCASION_CHOICES,
         widget=forms.CheckboxSelectMultiple,
         required=False,
-        label="Ocasiones de interés (opcional)"
+        label=_("Ocasiones de interés (opcional)")
     )
 
-    newsletter = forms.BooleanField(required=False, label="Deseo recibir ofertas y novedades por correo electrónico")
-    terms = forms.BooleanField(required=True, label="Acepto los términos y condiciones y la política de privacidad*")
+    newsletter = forms.BooleanField(required=False, label=_("Deseo recibir ofertas y novedades por correo electrónico"))
+    terms = forms.BooleanField(required=True, label=_("Acepto los términos y condiciones y la política de privacidad*"))
 
     class Meta(UserCreationForm.Meta):
         model = User

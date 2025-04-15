@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-12 23:11+0000\n"
+"POT-Creation-Date: 2025-04-15 17:56+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -43,110 +43,111 @@ msgstr ""
 msgid "Mensaje"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:69
+#: template/floresvalentin_app/base.html:71
 msgid "Cambiar tema"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:94
+#: template/floresvalentin_app/base.html:96
 msgid "Cerrar sesión"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:100
+#: template/floresvalentin_app/base.html:102
 msgid "Iniciar sesión"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:110
 #: template/floresvalentin_app/base.html:112
+#: template/floresvalentin_app/base.html:114
 #: template/floresvalentin_app/index.html:4 template/registration/login.html:36
+#: template/registration/register.html:28
 msgid "Flores San Valentín"
-msgstr ""
+msgstr "Flores San Valentín"
 
-#: template/floresvalentin_app/base.html:113
+#: template/floresvalentin_app/base.html:115
 msgid "Arreglos florales únicos y personalizados"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:120
+#: template/floresvalentin_app/base.html:122
 msgid "Pedido Especial"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:125
+#: template/floresvalentin_app/base.html:127
 msgid "Comprar Ahora"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:138
+#: template/floresvalentin_app/base.html:140
 #: template/floresvalentin_app/index.html:4
 msgid "Inicio"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:146
+#: template/floresvalentin_app/base.html:148
 msgid "Catálogo"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:151
-#: template/floresvalentin_app/base.html:163
+#: template/floresvalentin_app/base.html:153
+#: template/floresvalentin_app/base.html:165
 msgid "Galería"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:154
-#: template/floresvalentin_app/base.html:166
+#: template/floresvalentin_app/base.html:156
+#: template/floresvalentin_app/base.html:168
 msgid "Ubicación"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:158
-#: template/floresvalentin_app/base.html:205
+#: template/floresvalentin_app/base.html:160
+#: template/floresvalentin_app/base.html:207
 msgid "Contacto"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:174
+#: template/floresvalentin_app/base.html:176
 msgid "Mi Cuenta"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:193
+#: template/floresvalentin_app/base.html:195
 msgid "Sobre Nosotros"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:194
+#: template/floresvalentin_app/base.html:196
 msgid ""
 "Somos especialistas en arreglos florales únicos y personalizados. Con más de "
 "15 años de experiencia llevando belleza y color a momentos especiales."
 msgstr ""
 
-#: template/floresvalentin_app/base.html:197
+#: template/floresvalentin_app/base.html:199
 msgid "Horario de Atención"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:199
+#: template/floresvalentin_app/base.html:201
 #: template/floresvalentin_app/index.html:116
 msgid "Lunes a Viernes: 9:00 - 20:00"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:200
+#: template/floresvalentin_app/base.html:202
 #: template/floresvalentin_app/index.html:117
 msgid "Sábados: 9:00 - 18:00"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:201
+#: template/floresvalentin_app/base.html:203
 #: template/floresvalentin_app/index.html:118
 msgid "Domingos: 10:00 - 14:00"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:213
+#: template/floresvalentin_app/base.html:215
 msgid "Síguenos"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:223
+#: template/floresvalentin_app/base.html:225
 msgid "Todos los derechos reservados."
 msgstr ""
 
-#: template/floresvalentin_app/base.html:225
+#: template/floresvalentin_app/base.html:227
 msgid "Política de Privacidad"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:226
+#: template/floresvalentin_app/base.html:228
 msgid "Términos y Condiciones"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:227
+#: template/floresvalentin_app/base.html:229
 msgid "Política de Cookies"
 msgstr ""
 
@@ -310,49 +311,68 @@ msgstr ""
 msgid "No se encontraron productos que coincidan con tus criterios."
 msgstr ""
 
-#: template/registration/login.html:7
-msgid "Iniciar Sesión / Registrarse"
-msgstr ""
+#: template/registration/login.html:7 template/registration/login.html:100
+msgid "Iniciar Sesión"
+msgstr "Iniciar Sesión"
 
-#: template/registration/login.html:32
+#: template/registration/login.html:32 template/registration/register.html:24
 msgid "Volver al inicio"
-msgstr ""
+msgstr "Volver al inicio"
 
 #: template/registration/login.html:37
 msgid "Bienvenido a Flores San Valentín"
-msgstr ""
+msgstr "Bienvenido a Flores San Valentín"
 
 #: template/registration/login.html:38
-msgid ""
-"Para continuar con tu compra, por favor inicia sesión o crea una cuenta nueva"
-msgstr ""
+msgid "Inicia sesión para continuar con tu compra."
+msgstr "Inicia sesión para continuar con tu compra."
 
-#: template/registration/login.html:55 template/registration/login.html:103
-msgid "Iniciar Sesión"
-msgstr ""
+#: template/registration/login.html:63
+msgid "Correo Electrónico o Usuario"
+msgstr "Correo Electrónico o Usuario"
 
-#: template/registration/login.html:56
+#: template/registration/login.html:74
+msgid "Contraseña"
+msgstr "Contraseña"
+
+#: template/registration/login.html:96
+msgid "¿Olvidaste tu contraseña?"
+msgstr "¿Olvidaste tu contraseña?"
+
+#: template/registration/login.html:109
+msgid "¿No tienes una cuenta?"
+msgstr "¿No tienes una cuenta?"
+
+#: template/registration/login.html:109
+msgid "Regístrate aquí"
+msgstr "Regístrate aquí"
+
+#: template/registration/login.html:114
+msgid "O inicia sesión con"
+msgstr "O inicia sesión con"
+
+#: template/registration/register.html:7
 msgid "Registrarse"
 msgstr ""
 
-#: template/registration/login.html:66
-msgid "Correo Electrónico o Usuario"
+#: template/registration/register.html:29
+msgid "Crea tu Cuenta"
 msgstr ""
 
-#: template/registration/login.html:77
-msgid "Contraseña"
+#: template/registration/register.html:30
+msgid "Completa el formulario para registrarte en Flores San Valentín."
 msgstr ""
 
-#: template/registration/login.html:99
-msgid "¿Olvidaste tu contraseña?"
-msgstr ""
-
-#: template/registration/login.html:242
+#: template/registration/register.html:178
 msgid "Crear Cuenta"
 msgstr ""
 
-#: template/registration/login.html:249
-msgid "O inicia sesión con"
+#: template/registration/register.html:185
+msgid "¿Ya tienes una cuenta?"
+msgstr ""
+
+#: template/registration/register.html:185
+msgid "Inicia Sesión aquí"
 msgstr ""
 
 #: venv/lib/python3.13/site-packages/django/contrib/messages/apps.py:16

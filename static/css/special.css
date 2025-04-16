@@ -45,7 +45,7 @@ main.container.special-order-container { /* Add specific class */
     border: 1px solid var(--border-color);
     border-radius: 6px;
     padding: 0.75rem;
-    background-color: var(--form-bg);
+    background-color: #ffffff; /* Set default background to white */
     color: var(--text-color);
     transition: all 0.3s ease;
 }
@@ -53,6 +53,7 @@ main.container.special-order-container { /* Add specific class */
 .form-control:focus, .form-select:focus {
     box-shadow: 0 0 0 0.25rem rgba(255, 77, 109, 0.25);
     border-color: var(--primary-color);
+    background-color: #ffffff; /* Ensure background stays white on focus */
 }
 
 html[data-theme="dark"] .form-control, 

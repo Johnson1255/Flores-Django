@@ -14,11 +14,25 @@ class SpecialOrderForm(forms.ModelForm):
         exclude = ['user', 'status', 'created_at', 'updated_at']
         # Add widgets if needed for styling or date pickers, etc.
         widgets = {
-            'delivery_date': forms.DateInput(attrs={'type': 'date'}),
-            'message': forms.Textarea(attrs={'rows': 3}),
-            'special_instructions': forms.Textarea(attrs={'rows': 3}),
-            # Add widgets for JSON fields if you want specific inputs
-            # 'products': forms.Textarea(attrs={'rows': 3}),
+            # Add Bootstrap classes for proper styling and alignment
+            'occasion': forms.TextInput(attrs={'class': 'form-control'}),
+            'budget': forms.Select(attrs={'class': 'form-select'}), # Assuming budget is a ChoiceField rendered as select
+            'delivery_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'delivery_time': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Mañana, Tarde, 14:00-16:00'}), # Added placeholder from image
+            'message': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+            'special_instructions': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+            # Add widgets for other fields if needed, e.g., recipient fields
+            'recipient_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'recipient_phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'delivery_address': forms.TextInput(attrs={'class': 'form-control'}),
+            'delivery_city': forms.TextInput(attrs={'class': 'form-control'}),
+            'delivery_postal_code': forms.TextInput(attrs={'class': 'form-control'}),
+            # Widgets for product inclusion options (adjust if using different field types)
+            'flower_types': forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}), # Example, adjust class if needed
+            'flower_colors': forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}), # Example
+            'chocolate_types': forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}), # Example
+            'plushie_type': forms.RadioSelect(attrs={'class': 'form-check-input'}), # Example
+            'other_gifts': forms.Textarea(attrs={'rows': 2, 'class': 'form-control'}), # Example
         }
 
 # Replace the old ContactForm with a ModelForm for ContactMessage

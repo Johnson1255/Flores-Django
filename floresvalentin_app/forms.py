@@ -16,7 +16,7 @@ class SpecialOrderForm(forms.ModelForm):
         widgets = {
             # Add Bootstrap classes for proper styling and alignment
             'occasion': forms.TextInput(attrs={'class': 'form-control'}),
-            'budget': forms.Select(attrs={'class': 'form-select'}), # Assuming budget is a ChoiceField rendered as select
+            'budget': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}), # Changed to NumberInput for DecimalField
             'delivery_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'delivery_time': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Mañana, Tarde, 14:00-16:00'}), # Added placeholder from image
             'message': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),

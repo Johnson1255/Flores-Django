@@ -157,7 +157,7 @@ class SpecialOrder(models.Model):
     delivery_postal_code = models.CharField(max_length=20, blank=True)
     occasion = models.CharField(max_length=100)
     delivery_date = models.DateField()
-    delivery_time = models.CharField(max_length=50, blank=True, help_text="Ej: Mañana, Tarde, 14:00-16:00")
+    delivery_time = models.CharField(max_length=50, blank=True) # Removed help_text
     budget = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     message = models.TextField(blank=True)
     special_instructions = models.TextField(blank=True)

@@ -148,6 +148,16 @@ class SpecialOrder(models.Model):
         ('in_progress', 'En Progreso'),
         ('completed', 'Completado'),
     )
+    # Define choices for the occasion field
+    OCCASION_CHOICES = [
+        ('cumpleanos', 'Cumpleaños'),
+        ('aniversario', 'Aniversario'),
+        ('boda', 'Boda'),
+        ('condolencias', 'Condolencias'),
+        ('agradecimiento', 'Agradecimiento'),
+        ('nacimiento', 'Nacimiento'),
+        ('otro', 'Otro'),
+    ]
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     recipient_name = models.CharField(max_length=150)
@@ -155,7 +165,7 @@ class SpecialOrder(models.Model):
     delivery_address = models.CharField(max_length=255)
     delivery_city = models.CharField(max_length=50)
     delivery_postal_code = models.CharField(max_length=20, blank=True)
-    occasion = models.CharField(max_length=100)
+    occasion = models.CharField(max_length=100, choices=OCCASION_CHOICES, default='otro') # Use choices
     delivery_date = models.DateField()
     delivery_time = models.CharField(max_length=50, blank=True) # Removed help_text
     budget = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)

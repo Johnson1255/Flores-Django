@@ -91,10 +91,13 @@
                 {# --- LÓGICA DE AUTENTICACIÓN --- #}
                 {% if user.is_authenticated %}
                     {# Usuario Logueado: Mostrar botón de cerrar sesión #}
-                    {# Usamos un enlace que apunta a la URL de logout de Django #}
-                    <a href="{% url 'logout' %}" id="logout-button" class="auth-button">
-                        <i class="fas fa-sign-out-alt"></i> {% trans "Cerrar sesión" %}
-                    </a>
+                    {# Usamos un formulario para enviar POST a la URL de logout #}
+                    <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" id="logout-button" class="auth-button" style="border: none; background: none; padding: 0; cursor: pointer;">
+                            <i class="fas fa-sign-out-alt"></i> {% trans "Cerrar sesión" %}
+                        </button>
+                    </form>
                     {# Podrías añadir un saludo: Bienvenido, {{ user.first_name|default:user.username }} #}
                 {% else %}
                     {# Usuario No Logueado: Mostrar botón de iniciar sesión #}

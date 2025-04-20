@@ -52,10 +52,44 @@ class ContactMessageForm(forms.ModelForm):
         }
 
 class ProfileForm(forms.ModelForm):
-    # You might want to customize which fields are editable
+    # Fields needed for registration and profile editing
+    # Mark choices for translation
+    OCCASION_CHOICES = [
+        ('cumpleanos', _('Cumpleaños')),
+        ('aniversarios', _('Aniversarios')),
+        ('bodas', _('Bodas')),
+        ('condolencias', _('Condolencias')),
+    ]
+    preferences = forms.MultipleChoiceField(
+        choices=OCCASION_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+        label=_("Ocasiones de interés (opcional)")
+    )
+
     class Meta:
         model = Profile
+        # Ensure all profile fields collected at registration are here
         fields = ['phone', 'country', 'city', 'neighborhood', 'address', 'postal_code', 'preferences', 'newsletter']
+        widgets = { # Add widgets for consistency if needed
+            'phone': forms.TextInput(attrs={'placeholder': _('Tu número de teléfono')}),
+            'country': forms.TextInput(),
+            'city': forms.TextInput(),
+            'neighborhood': forms.TextInput(),
+            'address': forms.TextInput(),
+            'postal_code': forms.TextInput(),
+            'newsletter': forms.CheckboxInput(),
+        }
+        labels = { # Add labels for clarity
+            'phone': _("Teléfono"),
+            'country': _("País"),
+            'city': _("Ciudad"),
+            'neighborhood': _("Barrio"),
+            'address': _("Dirección de Entrega"),
+            'postal_code': _("Código Postal"),
+            'newsletter': _("Deseo recibir ofertas y novedades por correo electrónico"),
+        }
+
 
 # Basic Checkout Form - Add fields as needed for your checkout process
 class CheckoutForm(forms.Form):
@@ -88,62 +122,32 @@ class CustomUserCreationForm(UserCreationForm):
         widget=forms.EmailInput(attrs={'placeholder': _('tu@correo.com')})
     )
 
-    # Add fields from the Profile model with explicit widgets and use _()
-    phone = forms.CharField(
-        max_length=20, required=True, label=_("Teléfono"),
-        widget=forms.TextInput(attrs={'placeholder': _('Tu número de teléfono')})
-    )
-    country = forms.CharField(max_length=50, required=True, label=_("País"))
-    city = forms.CharField(max_length=50, required=True, label=_("Ciudad"))
-    neighborhood = forms.CharField(max_length=100, required=True, label=_("Barrio"))
-    address = forms.CharField(max_length=255, required=True, label=_("Dirección de Entrega"))
-    postal_code = forms.CharField(max_length=20, required=True, label=_("Código Postal"))
+    # REMOVE Profile fields from here - they will be handled by ProfileForm
+    # phone = ...
+    # country = ...
+    # city = ...
+    # neighborhood = ...
+    # address = ...
+    # postal_code = ...
+    # preferences = ...
+    # newsletter = ...
 
-    # For preferences (JSONField storing a list), use MultipleChoiceField with checkboxes
-    # Mark choices for translation
-    OCCASION_CHOICES = [
-        ('cumpleanos', _('Cumpleaños')),
-        ('aniversarios', _('Aniversarios')),
-        ('bodas', _('Bodas')),
-        ('condolencias', _('Condolencias')),
-    ]
-    preferences = forms.MultipleChoiceField(
-        choices=OCCASION_CHOICES,
-        widget=forms.CheckboxSelectMultiple,
-        required=False,
-        label=_("Ocasiones de interés (opcional)")
+    # Add terms field here as it's related to User acceptance, not Profile data
+    terms = forms.BooleanField(
+        required=True,
+        label=_("Acepto los términos y condiciones y la política de privacidad*"),
+        error_messages={'required': _('Debes aceptar los términos y condiciones.')} # Add specific error message
     )
 
-    newsletter = forms.BooleanField(required=False, label=_("Deseo recibir ofertas y novedades por correo electrónico"))
-    terms = forms.BooleanField(required=True, label=_("Acepto los términos y condiciones y la política de privacidad*"))
 
     class Meta(UserCreationForm.Meta):
         model = User
-        # Fields from UserCreationForm + added User fields
-        fields = UserCreationForm.Meta.fields + ('first_name', 'last_name', 'email',)
+        # Define fields for User model ONLY
+        fields = UserCreationForm.Meta.fields + ('first_name', 'last_name', 'email',) # Includes username, password1, password2
 
-    def save(self, commit=True):
-        user = super().save(commit=False) # Save User instance but don't commit yet
-        user.first_name = self.cleaned_data["first_name"]
-        user.last_name = self.cleaned_data["last_name"]
-        user.email = self.cleaned_data["email"]
-        # Note: UserCreationForm sets username based on email if not provided,
-        # or you might want username = email explicitly if your model requires it.
-
-        if commit:
-            user.save() # Save the User instance
-            # Profile is created automatically by the signal in models.py
-            profile = user.profile # Access the related profile
-            profile.phone = self.cleaned_data["phone"]
-            profile.country = self.cleaned_data["country"]
-            profile.city = self.cleaned_data["city"]
-            profile.neighborhood = self.cleaned_data["neighborhood"]
-            profile.address = self.cleaned_data["address"]
-            profile.postal_code = self.cleaned_data["postal_code"]
-            profile.preferences = self.cleaned_data["preferences"] # This will be a list
-            profile.newsletter = self.cleaned_data["newsletter"]
-            profile.save() # Save the Profile instance
-        return user
+    # Remove the complex save method override - Profile saving will be handled in the view
+    # def save(self, commit=True):
+    #     ... (removed) ...
 
 # Minimal Login Form for Debugging
 class MinimalLoginForm(forms.Form):

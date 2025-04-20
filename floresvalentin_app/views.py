@@ -563,24 +563,47 @@ def register_view(request): # Renamed from register
         return redirect('floresvalentin_app:index') # Redirect logged-in users
 
     if request.method == 'POST':
-        register_form = CustomUserCreationForm(request.POST)
-        if register_form.is_valid():
-            user = register_form.save()
+        # Instantiate both forms with POST data
+        user_form = CustomUserCreationForm(request.POST)
+        profile_form = ProfileForm(request.POST)
+
+        # Validate both forms
+        if user_form.is_valid() and profile_form.is_valid():
+            # Save the User form first (commit=True is default and fine here)
+            user = user_form.save()
+
+            # Save the Profile form, associating it with the new user
+            # The Profile is created automatically by the signal, so we update it.
+            profile = user.profile # Get the auto-created profile
+            # Update profile fields from the profile_form
+            profile.phone = profile_form.cleaned_data['phone']
+            profile.country = profile_form.cleaned_data['country']
+            profile.city = profile_form.cleaned_data['city']
+            profile.neighborhood = profile_form.cleaned_data['neighborhood']
+            profile.address = profile_form.cleaned_data['address']
+            profile.postal_code = profile_form.cleaned_data['postal_code']
+            profile.preferences = profile_form.cleaned_data['preferences']
+            profile.newsletter = profile_form.cleaned_data['newsletter']
+            profile.save() # Save the updated profile
+
             login(request, user) # Log the user in directly
             messages.success(request, 'Registro exitoso. ¡Bienvenido!')
             return redirect('floresvalentin_app:index') # Redirect to home page
         else:
-            # Registration failed. Re-render the registration page with errors.
-            messages.error(request, 'Por favor corrige los errores en el formulario de registro.')
-            # No need to pass login_form here
+            # One or both forms are invalid. Re-render with errors.
+            # The template needs to display errors from both forms.
             context = {
-                'register_form': register_form # Pass the invalid form back
+                'user_form': user_form, # Pass user form back (might contain errors)
+                'profile_form': profile_form # Pass profile form back (might contain errors)
             }
             return render(request, 'registration/register.html', context) # Render register.html
     else: # GET request
-        register_form = CustomUserCreationForm()
+        # Instantiate empty forms for GET request
+        user_form = CustomUserCreationForm()
+        profile_form = ProfileForm()
         context = {
-            'register_form': register_form
+            'user_form': user_form,
+            'profile_form': profile_form
         }
         return render(request, 'registration/register.html', context) # Render register.html
 

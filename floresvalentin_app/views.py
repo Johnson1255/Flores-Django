@@ -150,8 +150,9 @@ def get_or_create_cart(request):
     return cart
 
 # Refactored to handle potential None cart and pass items differently
+@login_required # Require login to view the persistent cart detail
 def cart_detail(request):
-    cart = get_or_create_cart(request)
+    cart = get_or_create_cart(request) # This already handles user association
     cart_items_context = []
     cart_subtotal = 0
     if cart and cart.items:
@@ -432,6 +433,7 @@ def order_completed(request, order_id):
     return render(request, 'floresvalentin_app/order_completed.html', {'order': order})
 
 # Pedidos especiales
+@login_required # Require login to create a special order
 def special_order_create(request):
     if request.method == 'POST':
         form = SpecialOrderForm(request.POST, request.FILES)

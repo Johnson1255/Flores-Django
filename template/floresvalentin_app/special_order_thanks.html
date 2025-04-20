@@ -1,0 +1,22 @@
+{% extends "floresvalentin_app/base.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "Pedido Especial Enviado" %} - Flores Valentín{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="card shadow-sm p-4">
+                <h2 class="card-title mb-3">{% trans "¡Gracias por tu Pedido Especial!" %}</h2>
+                <p class="card-text">{% trans "Hemos recibido tu solicitud de pedido especial correctamente." %}</p>
+                <p class="card-text">{% trans "Nos pondremos en contacto contigo pronto para confirmar los detalles y el presupuesto." %}</p>
+                <hr>
+                <p class="card-text">{% trans "Mientras tanto, puedes seguir explorando nuestro catálogo." %}</p>
+                <a href="{% url 'floresvalentin_app:index' %}" class="btn btn-primary mt-3">{% trans "Volver al Inicio" %}</a>
+                <a href="{% url 'floresvalentin_app:catalogo' %}" class="btn btn-secondary mt-2">{% trans "Ver Catálogo" %}</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

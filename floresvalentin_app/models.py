@@ -3,6 +3,7 @@ from django.db import models
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils.translation import gettext_lazy as _ # Import gettext_lazy
 
 # Modelo para Categorías
 class Category(models.Model):
@@ -145,36 +146,36 @@ class SpecialOrder(models.Model):
         ('reviewing', 'En Revisión'),
         ('approved', 'Aprobado'),
         ('rejected', 'Rechazado'),
-        ('in_progress', 'En Progreso'),
-        ('completed', 'Completado'),
+        ('in_progress', _('En Progreso')),
+        ('completed', _('Completado')),
     )
-    # Define choices for the occasion field
+    # Define choices for the occasion field, marked for translation
     OCCASION_CHOICES = [
-        ('cumpleanos', 'Cumpleaños'),
-        ('aniversario', 'Aniversario'),
-        ('boda', 'Boda'),
-        ('condolencias', 'Condolencias'),
-        ('agradecimiento', 'Agradecimiento'),
-        ('nacimiento', 'Nacimiento'),
-        ('otro', 'Otro'),
+        ('cumpleanos', _('Cumpleaños')),
+        ('aniversario', _('Aniversario')),
+        ('boda', _('Boda')),
+        ('condolencias', _('Condolencias')),
+        ('agradecimiento', _('Agradecimiento')),
+        ('nacimiento', _('Nacimiento')),
+        ('otro', _('Otro')),
     ]
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    recipient_name = models.CharField(max_length=150)
-    recipient_phone = models.CharField(max_length=20, blank=True)
-    delivery_address = models.CharField(max_length=255)
-    delivery_city = models.CharField(max_length=50)
-    delivery_postal_code = models.CharField(max_length=20, blank=True)
-    occasion = models.CharField(max_length=100, choices=OCCASION_CHOICES, default='otro') # Use choices
-    delivery_date = models.DateField()
-    delivery_time = models.CharField(max_length=50, blank=True) # Removed help_text
-    budget = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    message = models.TextField(blank=True)
-    special_instructions = models.TextField(blank=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("Usuario"), on_delete=models.CASCADE)
+    recipient_name = models.CharField(_("Nombre del destinatario"), max_length=150)
+    recipient_phone = models.CharField(_("Teléfono del destinatario"), max_length=20, blank=True)
+    delivery_address = models.CharField(_("Dirección de entrega"), max_length=255)
+    delivery_city = models.CharField(_("Ciudad de entrega"), max_length=50)
+    delivery_postal_code = models.CharField(_("Código postal de entrega"), max_length=20, blank=True)
+    occasion = models.CharField(_("Ocasión"), max_length=100, choices=OCCASION_CHOICES, default='otro') # Use choices
+    delivery_date = models.DateField(_("Fecha de entrega"))
+    delivery_time = models.CharField(_("Hora de entrega"), max_length=50, blank=True) # Removed help_text
+    budget = models.DecimalField(_("Presupuesto"), max_digits=10, decimal_places=2, null=True, blank=True)
+    message = models.TextField(_("Mensaje para la tarjeta"), blank=True)
+    special_instructions = models.TextField(_("Instrucciones especiales"), blank=True)
     # Almacenaremos la descripción de los productos deseados o IDs como JSON
-    products = models.JSONField(blank=True, null=True, help_text="Descripción o lista de productos deseados")
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    created_at = models.DateTimeField(auto_now_add=True)
+    products = models.JSONField(_("Productos deseados"), blank=True, null=True, help_text=_("Descripción o lista de productos deseados"))
+    status = models.CharField(_("Estado"), max_length=20, choices=STATUS_CHOICES, default='pending')
+    created_at = models.DateTimeField(_("Fecha de creación"), auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -182,6 +183,8 @@ class SpecialOrder(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+        verbose_name = _("Pedido Especial")
+        verbose_name_plural = _("Pedidos Especiales")
 
 
 # Modelo para Carrito de Compras Persistente (Opcional)

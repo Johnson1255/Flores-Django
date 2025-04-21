@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-15 18:22+0000\n"
+"POT-Creation-Date: 2025-04-21 17:30+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,203 +19,327 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
 "1 : 2;\n"
 
-#: floresvalentin_app/forms.py:30
+#: floresvalentin_app/forms.py:44
 msgid "Tu nombre completo"
 msgstr "Tu nombre completo"
 
-#: floresvalentin_app/forms.py:31 floresvalentin_app/forms.py:74
+#: floresvalentin_app/forms.py:45 floresvalentin_app/forms.py:122
 msgid "tu@correo.com"
 msgstr "tu@correo.com"
 
-#: floresvalentin_app/forms.py:32
+#: floresvalentin_app/forms.py:46
 msgid "Escribe tu mensaje aquí..."
 msgstr "Escribe tu mensaje aquí..."
 
-#: floresvalentin_app/forms.py:35 floresvalentin_app/forms.py:65
+#: floresvalentin_app/forms.py:49 floresvalentin_app/forms.py:113
 msgid "Nombre"
 msgstr "Nombre"
 
-#: floresvalentin_app/forms.py:36 floresvalentin_app/forms.py:73
+#: floresvalentin_app/forms.py:50 floresvalentin_app/forms.py:121
 msgid "Correo Electrónico"
 msgstr "Correo Electrónico"
 
-#: floresvalentin_app/forms.py:37
+#: floresvalentin_app/forms.py:51
 msgid "Mensaje"
 msgstr "Mensaje"
 
-#: floresvalentin_app/forms.py:66
-msgid "Tu nombre"
-msgstr "Tu nombre"
-
-#: floresvalentin_app/forms.py:69
-msgid "Apellidos"
-msgstr "Apellidos"
-
-#: floresvalentin_app/forms.py:70
-msgid "Tus apellidos"
-msgstr "Tus apellidos"
-
-#: floresvalentin_app/forms.py:79
-msgid "Teléfono"
-msgstr "Teléfono"
-
-#: floresvalentin_app/forms.py:80
-msgid "Tu número de teléfono"
-msgstr "Tu número de teléfono"
-
-#: floresvalentin_app/forms.py:82
-msgid "País"
-msgstr "País"
-
-#: floresvalentin_app/forms.py:83
-msgid "Ciudad"
-msgstr "Ciudad"
-
-#: floresvalentin_app/forms.py:84
-msgid "Barrio"
-msgstr "Barrio"
-
-#: floresvalentin_app/forms.py:85
-msgid "Dirección de Entrega"
-msgstr "Dirección de Entrega"
-
-#: floresvalentin_app/forms.py:86
-msgid "Código Postal"
-msgstr "Código Postal"
-
-#: floresvalentin_app/forms.py:91
+#: floresvalentin_app/forms.py:58 floresvalentin_app/models.py:154
 msgid "Cumpleaños"
 msgstr "Cumpleaños"
 
-#: floresvalentin_app/forms.py:92
+#: floresvalentin_app/forms.py:59
 msgid "Aniversarios"
 msgstr "Aniversarios"
 
-#: floresvalentin_app/forms.py:93
+#: floresvalentin_app/forms.py:60
 msgid "Bodas"
 msgstr "Bodas"
 
-#: floresvalentin_app/forms.py:94
+#: floresvalentin_app/forms.py:61 floresvalentin_app/models.py:157
 msgid "Condolencias"
 msgstr "Condolencias"
 
-#: floresvalentin_app/forms.py:100
+#: floresvalentin_app/forms.py:67
 msgid "Ocasiones de interés (opcional)"
 msgstr "Ocasiones de interés (opcional)"
 
-#: floresvalentin_app/forms.py:103
+#: floresvalentin_app/forms.py:75
+msgid "Tu número de teléfono"
+msgstr "Tu número de teléfono"
+
+#: floresvalentin_app/forms.py:84
+msgid "Teléfono"
+msgstr "Teléfono"
+
+#: floresvalentin_app/forms.py:85
+msgid "País"
+msgstr "País"
+
+#: floresvalentin_app/forms.py:86
+msgid "Ciudad"
+msgstr "Ciudad"
+
+#: floresvalentin_app/forms.py:87
+msgid "Barrio"
+msgstr "Barrio"
+
+#: floresvalentin_app/forms.py:88
+msgid "Dirección de Entrega"
+msgstr "Dirección de Entrega"
+
+#: floresvalentin_app/forms.py:89
+msgid "Código Postal"
+msgstr "Código Postal"
+
+#: floresvalentin_app/forms.py:90
 msgid "Deseo recibir ofertas y novedades por correo electrónico"
 msgstr "Deseo recibir ofertas y novedades por correo electrónico"
 
-#: floresvalentin_app/forms.py:104
+#: floresvalentin_app/forms.py:114
+msgid "Tu nombre"
+msgstr "Tu nombre"
+
+#: floresvalentin_app/forms.py:117
+msgid "Apellidos"
+msgstr "Apellidos"
+
+#: floresvalentin_app/forms.py:118
+msgid "Tus apellidos"
+msgstr "Tus apellidos"
+
+#: floresvalentin_app/forms.py:138
 msgid "Acepto los términos y condiciones y la política de privacidad*"
 msgstr "Acepto los términos y condiciones y la política de privacidad*"
 
-#: template/floresvalentin_app/base.html:71
+#: floresvalentin_app/forms.py:139
+#, fuzzy
+#| msgid "Acepto los términos y condiciones y la política de privacidad*"
+msgid "Debes aceptar los términos y condiciones."
+msgstr "Acepto los términos y condiciones y la política de privacidad*"
+
+#: floresvalentin_app/models.py:149
+msgid "En Progreso"
+msgstr "En Progreso"
+
+#: floresvalentin_app/models.py:150
+#| msgid "Cumpleaños"
+msgid "Completado"
+msgstr "Completado"
+
+#: floresvalentin_app/models.py:155
+#| msgid "Aniversarios"
+msgid "Aniversario"
+msgstr "Aniversario"
+
+#: floresvalentin_app/models.py:156
+#| msgid "Bodas"
+msgid "Boda"
+msgstr "Boda"
+
+#: floresvalentin_app/models.py:158
+msgid "Agradecimiento"
+msgstr "Agradecimiento"
+
+#: floresvalentin_app/models.py:159
+msgid "Nacimiento"
+msgstr "Nacimiento"
+
+#: floresvalentin_app/models.py:160
+msgid "Otro"
+msgstr "Otro"
+
+#: floresvalentin_app/models.py:163
+msgid "Usuario"
+msgstr "Usuario"
+
+#: floresvalentin_app/models.py:164
+msgid "Nombre del destinatario"
+msgstr "Nombre del destinatario"
+
+#: floresvalentin_app/models.py:165
+msgid "Teléfono del destinatario"
+msgstr "Teléfono del destinatario"
+
+#: floresvalentin_app/models.py:166
+#| msgid "Dirección de Entrega"
+msgid "Dirección de entrega"
+msgstr "Dirección de entrega"
+
+#: floresvalentin_app/models.py:167
+msgid "Ciudad de entrega"
+msgstr "Ciudad de entrega"
+
+#: floresvalentin_app/models.py:168
+#| msgid "Código Postal"
+msgid "Código postal de entrega"
+msgstr "Código postal de entrega"
+
+#: floresvalentin_app/models.py:169
+#| msgid "Iniciar Sesión"
+msgid "Ocasión"
+msgstr "Ocasión"
+
+#: floresvalentin_app/models.py:170
+#| msgid "Dirección de Entrega"
+msgid "Fecha de entrega"
+msgstr "Fecha de entrega"
+
+#: floresvalentin_app/models.py:171
+#| msgid "Dirección de Entrega"
+msgid "Hora de entrega"
+msgstr "Hora de entrega"
+
+#: floresvalentin_app/models.py:172
+msgid "Presupuesto"
+msgstr "Presupuesto"
+
+#: floresvalentin_app/models.py:173
+msgid "Mensaje para la tarjeta"
+msgstr "Mensaje para la tarjeta"
+
+#: floresvalentin_app/models.py:174
+msgid "Instrucciones especiales"
+msgstr "Instrucciones especiales"
+
+#: floresvalentin_app/models.py:176
+msgid "Productos deseados"
+msgstr "Productos deseados"
+
+#: floresvalentin_app/models.py:176
+msgid "Descripción o lista de productos deseados"
+msgstr "Descripción o lista de productos deseados"
+
+#: floresvalentin_app/models.py:177
+msgid "Estado"
+msgstr "Estado"
+
+#: floresvalentin_app/models.py:178
+msgid "Fecha de creación"
+msgstr "Fecha de creación"
+
+#: floresvalentin_app/models.py:186 template/floresvalentin_app/base.html:135
+#: template/floresvalentin_app/special_order_form.html:4
+#: template/floresvalentin_app/special_order_form.html:17
+msgid "Pedido Especial"
+msgstr "Pedido Especial"
+
+#: floresvalentin_app/models.py:187
+msgid "Pedidos Especiales"
+msgstr "Pedidos Especiales"
+
+#: template/floresvalentin_app/base.html:44
+#, fuzzy
+#| msgid "Flores San Valentín"
+msgid "Logo Flores Valentín"
+msgstr "Flores San Valentín"
+
+#: template/floresvalentin_app/base.html:46
+#, fuzzy
+#| msgid "Bienvenido a Flores San Valentín"
+msgid "Bienvenido a Flores Valentín"
+msgstr "Bienvenido a Flores San Valentín"
+
+#: template/floresvalentin_app/base.html:81
 msgid "Cambiar tema"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:96
+#: template/floresvalentin_app/base.html:108
 msgid "Cerrar sesión"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:102
+#: template/floresvalentin_app/base.html:115
 msgid "Iniciar sesión"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:112
-#: template/floresvalentin_app/base.html:114
+#: template/floresvalentin_app/base.html:125
+#: template/floresvalentin_app/base.html:127
 #: template/floresvalentin_app/index.html:4 template/registration/login.html:36
 #: template/registration/register.html:28
 msgid "Flores San Valentín"
 msgstr "Flores San Valentín"
 
-#: template/floresvalentin_app/base.html:115
+#: template/floresvalentin_app/base.html:128
 msgid "Arreglos florales únicos y personalizados"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:122
-msgid "Pedido Especial"
-msgstr ""
-
-#: template/floresvalentin_app/base.html:127
+#: template/floresvalentin_app/base.html:140
 msgid "Comprar Ahora"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:140
+#: template/floresvalentin_app/base.html:153
 #: template/floresvalentin_app/index.html:4
 msgid "Inicio"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:148
+#: template/floresvalentin_app/base.html:161
 msgid "Catálogo"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:153
-#: template/floresvalentin_app/base.html:165
+#: template/floresvalentin_app/base.html:166
+#: template/floresvalentin_app/base.html:178
 msgid "Galería"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:156
-#: template/floresvalentin_app/base.html:168
+#: template/floresvalentin_app/base.html:169
+#: template/floresvalentin_app/base.html:181
 msgid "Ubicación"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:160
-#: template/floresvalentin_app/base.html:207
+#: template/floresvalentin_app/base.html:173
+#: template/floresvalentin_app/base.html:222
 msgid "Contacto"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:176
+#: template/floresvalentin_app/base.html:189
 msgid "Mi Cuenta"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:195
+#: template/floresvalentin_app/base.html:210
 msgid "Sobre Nosotros"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:196
+#: template/floresvalentin_app/base.html:211
 msgid ""
 "Somos especialistas en arreglos florales únicos y personalizados. Con más de "
 "15 años de experiencia llevando belleza y color a momentos especiales."
 msgstr ""
 
-#: template/floresvalentin_app/base.html:199
+#: template/floresvalentin_app/base.html:214
 msgid "Horario de Atención"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:201
+#: template/floresvalentin_app/base.html:216
 #: template/floresvalentin_app/index.html:116
 msgid "Lunes a Viernes: 9:00 - 20:00"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:202
+#: template/floresvalentin_app/base.html:217
 #: template/floresvalentin_app/index.html:117
 msgid "Sábados: 9:00 - 18:00"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:203
+#: template/floresvalentin_app/base.html:218
 #: template/floresvalentin_app/index.html:118
 msgid "Domingos: 10:00 - 14:00"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:215
+#: template/floresvalentin_app/base.html:230
 msgid "Síguenos"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:225
+#: template/floresvalentin_app/base.html:240
 msgid "Todos los derechos reservados."
 msgstr ""
 
-#: template/floresvalentin_app/base.html:227
+#: template/floresvalentin_app/base.html:242
 msgid "Política de Privacidad"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:228
+#: template/floresvalentin_app/base.html:243
 msgid "Términos y Condiciones"
 msgstr ""
 
-#: template/floresvalentin_app/base.html:229
+#: template/floresvalentin_app/base.html:244
 msgid "Política de Cookies"
 msgstr ""
 
@@ -359,24 +483,93 @@ msgstr ""
 msgid "Siguiente"
 msgstr ""
 
-#: template/floresvalentin_app/partials/_product_list.html:22
+#: template/floresvalentin_app/partials/_product_list.html:18
+#: template/floresvalentin_app/partials/_product_list.html:53
+msgid "Sin categoría"
+msgstr ""
+
+#: template/floresvalentin_app/partials/_product_list.html:24
 msgid "Añadir al carrito"
 msgstr ""
 
-#: template/floresvalentin_app/partials/_product_list.html:26
+#: template/floresvalentin_app/partials/_product_list.html:28
 msgid "Vista rápida"
 msgstr ""
 
-#: template/floresvalentin_app/partials/_product_list.html:55
+#: template/floresvalentin_app/partials/_product_list.html:59
 msgid "Añadir"
 msgstr ""
 
-#: template/floresvalentin_app/partials/_product_list.html:58
+#: template/floresvalentin_app/partials/_product_list.html:62
 msgid "Ver"
 msgstr ""
 
-#: template/floresvalentin_app/partials/_product_list.html:70
+#: template/floresvalentin_app/partials/_product_list.html:74
 msgid "No se encontraron productos que coincidan con tus criterios."
+msgstr ""
+
+#: template/floresvalentin_app/special_order_form.html:20
+msgid ""
+"Cuéntanos sobre tu ocasión especial y crearemos un arreglo floral único para "
+"ti."
+msgstr ""
+
+#: template/floresvalentin_app/special_order_form.html:28
+msgid "Información del destinatario"
+msgstr ""
+
+#: template/floresvalentin_app/special_order_form.html:81
+msgid "Detalles del pedido"
+msgstr ""
+
+#: template/floresvalentin_app/special_order_form.html:125
+msgid "Productos para incluir"
+msgstr ""
+
+#: template/floresvalentin_app/special_order_form.html:199
+msgid "Error: El formulario no está disponible."
+msgstr ""
+
+#: template/floresvalentin_app/special_order_form.html:203
+msgid ""
+"Nos comunicaremos contigo dentro de las próximas 24 horas para confirmar los "
+"detalles y el precio final de tu pedido especial."
+msgstr ""
+
+#: template/floresvalentin_app/special_order_form.html:208
+msgid "Enviar Pedido Especial"
+msgstr ""
+
+#: template/floresvalentin_app/special_order_thanks.html:4
+msgid "Pedido Especial Enviado"
+msgstr ""
+
+#: template/floresvalentin_app/special_order_thanks.html:11
+msgid "¡Gracias por tu Pedido Especial!"
+msgstr ""
+
+#: template/floresvalentin_app/special_order_thanks.html:12
+msgid "Hemos recibido tu solicitud de pedido especial correctamente."
+msgstr ""
+
+#: template/floresvalentin_app/special_order_thanks.html:13
+msgid ""
+"Nos pondremos en contacto contigo pronto para confirmar los detalles y el "
+"presupuesto."
+msgstr ""
+
+#: template/floresvalentin_app/special_order_thanks.html:15
+msgid "Mientras tanto, puedes seguir explorando nuestro catálogo."
+msgstr ""
+
+#: template/floresvalentin_app/special_order_thanks.html:16
+#, fuzzy
+#| msgid "Volver al inicio"
+msgid "Volver al Inicio"
+msgstr "Volver al inicio"
+
+#: template/floresvalentin_app/special_order_thanks.html:17
+msgid "Ver Catálogo"
 msgstr ""
 
 #: template/registration/login.html:7 template/registration/login.html:100
@@ -431,15 +624,15 @@ msgstr "Crea tu Cuenta"
 msgid "Completa el formulario para registrarte en Flores San Valentín."
 msgstr "Completa el formulario para registrarte en Flores San Valentín."
 
-#: template/registration/register.html:178
+#: template/registration/register.html:195
 msgid "Crear Cuenta"
 msgstr "Crear Cuenta"
 
-#: template/registration/register.html:185
+#: template/registration/register.html:202
 msgid "¿Ya tienes una cuenta?"
 msgstr "¿Ya tienes una cuenta?"
 
-#: template/registration/register.html:185
+#: template/registration/register.html:202
 msgid "Inicia Sesión aquí"
 msgstr "Inicia Sesión aquí"
 

@@ -1,7 +1,7 @@
 {% extends 'floresvalentin_app/base.html' %}
-{% load static %}
+{% load static i18n %}
 
-{% block title %}Pedido Especial - Flores Valentín{% endblock %}
+{% block title %}{% trans "Pedido Especial" %} - Flores Valentín{% endblock %}
 
 {% block extra_head %}
     {# Load special order form specific CSS #}
@@ -14,10 +14,10 @@
         <div class="col-lg-8 mx-auto">
             <div class="card shadow-sm">
                 <div class="card-header"> {# Removed bg-primary text-white as base.html might handle this or special.css #}
-                    <h2 class="mb-0"><i class="fas fa-gift me-2"></i>Pedido Especial</h2>
+                    <h2 class="mb-0"><i class="fas fa-gift me-2"></i>{% trans "Pedido Especial" %}</h2>
                 </div>
                 <div class="card-body">
-                    <p class="lead mb-4">Cuéntanos sobre tu ocasión especial y crearemos un arreglo floral único para ti.</p>
+                    <p class="lead mb-4">{% trans "Cuéntanos sobre tu ocasión especial y crearemos un arreglo floral único para ti." %}</p>
 
                     {# Assuming 'form' is passed from the Django view #}
                     <form id="special-order-form" method="post" action="{% url 'floresvalentin_app:special_order_create' %}">
@@ -25,7 +25,7 @@
 
                         {# Check if form object exists before iterating #}
                         {% if form %}
-                            <h4 class="mb-3">Información del destinatario</h4>
+                            <h4 class="mb-3">{% trans "Información del destinatario" %}</h4>
                             {# Render recipient fields if they exist in the form #}
                             {% if form.recipient_name %}
                             <div class="row mb-3">
@@ -78,7 +78,7 @@
                             </div>
                             {% endif %}
 
-                            <h4 class="mb-3">Detalles del pedido</h4>
+                            <h4 class="mb-3">{% trans "Detalles del pedido" %}</h4>
                              {# Render order detail fields #}
                             {% if form.occasion or form.budget %}
                             <div class="row mb-3">
@@ -122,7 +122,7 @@
                             {% endif %}
 
                             {# Render product inclusion fields - Adapt based on actual form fields #}
-                            <h4 class="mb-3">Productos para incluir</h4>
+                            <h4 class="mb-3">{% trans "Productos para incluir" %}</h4>
                             {% if form.include_flowers %}
                             <div class="form-check form-switch mb-2">
                                 {{ form.include_flowers }}
@@ -196,16 +196,16 @@
                             {% endif %}
 
                         {% else %}
-                            <p>Error: El formulario no está disponible.</p>
+                            <p>{% trans "Error: El formulario no está disponible." %}</p>
                         {% endif %}
 
                         <div class="alert alert-info" role="alert">
-                            <i class="fas fa-info-circle me-2"></i> Nos comunicaremos contigo dentro de las próximas 24 horas para confirmar los detalles y el precio final de tu pedido especial.
+                            <i class="fas fa-info-circle me-2"></i> {% blocktrans %}Nos comunicaremos contigo dentro de las próximas 24 horas para confirmar los detalles y el precio final de tu pedido especial.{% endblocktrans %}
                         </div>
 
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-paper-plane me-2"></i> Enviar Pedido Especial
+                                <i class="fas fa-paper-plane me-2"></i> {% trans "Enviar Pedido Especial" %}
                             </button>
                         </div>
                     </form>

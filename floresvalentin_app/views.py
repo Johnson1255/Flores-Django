@@ -1,4 +1,5 @@
 import uuid
+import logging # Added for logging errors
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -15,6 +16,9 @@ from django.db.models import Q # Added for search
 from .models import Product, Category, Order, OrderItem, SpecialOrder, ShoppingCart, Profile, ContactMessage # Added ContactMessage
 # Import the correct form
 from .forms import SpecialOrderForm, ContactMessageForm, ProfileForm, CheckoutForm, CustomUserCreationForm # Changed ContactForm to ContactMessageForm
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
 
 # Página principal
 def index(request):
@@ -33,103 +37,119 @@ def index(request):
 # Catálogo y productos
 def catalog(request):
     categories = Category.objects.all()
-    products = Product.objects.all()
-    
-    # Filtrado básico
-    category_id = request.GET.get('category')
-    if category_id:
-        products = products.filter(category_id=category_id)
-    
+    # products = Product.objects.all() # Removed, as products are loaded via API
+
+    # Filtrado básico (No longer needed here as API handles it)
+    # category_id = request.GET.get('category')
+    # if category_id:
+    #     products = products.filter(category_id=category_id)
+
     return render(request, 'floresvalentin_app/catalog.html', {
         'categories': categories,
-        'products': products
+        # 'products': products # Removed
     })
 
 def catalog_api(request):
-    # Para filtrado, ordenamiento y paginación AJAX
-    products_list = Product.objects.filter(available=True) # Start with available products
+    try: # Added try block for robust error handling
+        # Para filtrado, ordenamiento y paginación AJAX
+        products_list = Product.objects.filter(available=True) # Start with available products
 
-    # Filtrado
-    category_id = request.GET.get('category')
-    search_term = request.GET.get('search')
-    # Add price filters if needed later
-    # price_min = request.GET.get('price_min')
-    # price_max = request.GET.get('price_max')
+        # Filtrado
+        category_id = request.GET.get('category')
+        search_term = request.GET.get('search')
+        # Add price filters if needed later
+        # price_min = request.GET.get('price_min')
+        # price_max = request.GET.get('price_max')
 
-    if category_id:
-        products_list = products_list.filter(category_id=category_id)
-    if search_term:
-        products_list = products_list.filter(
-            Q(name__icontains=search_term) | Q(description__icontains=search_term)
+        if category_id:
+            products_list = products_list.filter(category_id=category_id)
+        if search_term:
+            products_list = products_list.filter(
+                Q(name__icontains=search_term) | Q(description__icontains=search_term)
+            )
+        # Add price filtering logic here if implemented
+
+        # Ordenamiento
+        sort_option = request.GET.get('sort_by', 'name-asc') # Default sort
+        if sort_option == 'name-asc':
+            products_list = products_list.order_by('name')
+        elif sort_option == 'name-desc':
+            products_list = products_list.order_by('-name')
+        elif sort_option == 'price-asc':
+            products_list = products_list.order_by('price')
+        elif sort_option == 'price-desc':
+            products_list = products_list.order_by('-price')
+        # Add more sorting options if needed
+
+        # Paginación
+        paginator = Paginator(products_list, 9) # Show 9 products per page (adjust as needed)
+        page_number_str = request.GET.get('page', '1') # Get page number as string
+        try:
+            page_number = int(page_number_str) # Attempt to convert to integer
+            page_obj = paginator.page(page_number)
+        except (ValueError, PageNotAnInteger): # Catch conversion errors too
+            # If page is not an integer or invalid, deliver first page.
+            page_obj = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999) or list is empty, deliver first page.
+            page_obj = paginator.page(1) # Return page 1 instead of last page
+
+        # Renderizar partials a HTML
+        # Pass the actual list of products from the page object
+        products_html = render_to_string(
+            'floresvalentin_app/partials/_product_list.html',
+            {'products': page_obj.object_list}
         )
-    # Add price filtering logic here if implemented
+        pagination_html = render_to_string(
+            'floresvalentin_app/partials/_pagination.html',
+            {'page_obj': page_obj}
+        )
 
-    # Ordenamiento
-    sort_option = request.GET.get('sort_by', 'name-asc') # Default sort
-    if sort_option == 'name-asc':
-        products_list = products_list.order_by('name')
-    elif sort_option == 'name-desc':
-        products_list = products_list.order_by('-name')
-    elif sort_option == 'price-asc':
-        products_list = products_list.order_by('price')
-    elif sort_option == 'price-desc':
-        products_list = products_list.order_by('-price')
-    # Add more sorting options if needed
+        # Devolver JSON
+        return JsonResponse({
+            'products_html': products_html,
+            'pagination_html': pagination_html,
+            'count': paginator.count, # Total number of products matching filters
+            'page': page_obj.number,
+            'pages': paginator.num_pages,
+        })
+    except Exception as e:
+        # Log the error for server-side debugging
+        logger.error(f"Error in catalog_api view: {e}", exc_info=True)
+        # Return an error response to the frontend
+        # Note: The frontend JS currently shows a generic error, but this helps debugging
+        return JsonResponse({'error': 'Internal server error processing catalog request.', 'details': str(e)}, status=500)
 
-    # Paginación
-    paginator = Paginator(products_list, 9) # Show 9 products per page (adjust as needed)
-    page_number = request.GET.get('page', 1)
-    try:
-        page_obj = paginator.page(page_number)
-    except PageNotAnInteger:
-        # If page is not an integer, deliver first page.
-        page_obj = paginator.page(1)
-    except EmptyPage:
-        # If page is out of range (e.g. 9999), deliver last page of results.
-        page_obj = paginator.page(paginator.num_pages)
-
-    # Renderizar partials a HTML
-    products_html = render_to_string(
-        'floresvalentin_app/partials/_product_list.html',
-        {'products': page_obj} # Pass page object which contains products for the current page
-    )
-    pagination_html = render_to_string(
-        'floresvalentin_app/partials/_pagination.html',
-        {'page_obj': page_obj}
-    )
-
-    # Devolver JSON
-    return JsonResponse({
-        'products_html': products_html,
-        'pagination_html': pagination_html,
-        'count': paginator.count, # Total number of products matching filters
-        'page': page_obj.number,
-        'pages': paginator.num_pages,
-    })
 
 def product_detail(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     related_products = Product.objects.filter(category=product.category).exclude(id=product_id)[:4]
-    
+
     return render(request, 'floresvalentin_app/product_detail.html', {
         'product': product,
         'related_products': related_products
     })
 
 def product_detail_api(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    
-    product_data = {
-        'id': str(product.id),
-        'name': product.name,
-        'price': float(product.price),
-        'description': product.description,
-        'stock': product.stock,
-        'category': product.category.name,
-        'image_url': product.image.url if product.image else None,
-    }
-    
-    return JsonResponse(product_data)
+    try: # Added try block
+        product = get_object_or_404(Product, id=product_id)
+
+        product_data = {
+            'id': str(product.id),
+            'name': product.name,
+            'price': float(product.price),
+            'description': product.description,
+            'stock': product.stock,
+            # Safely access category name
+            'category': product.category.name if product.category else None,
+            'image_url': product.image.url if product.image else None,
+        }
+
+        return JsonResponse(product_data)
+    except Exception as e:
+        logger.error(f"Error in product_detail_api view for product {product_id}: {e}", exc_info=True)
+        return JsonResponse({'error': 'Internal server error fetching product details.', 'details': str(e)}, status=500)
+
 
 # Carrito de compras
 # Refactored to use ShoppingCart model
@@ -202,36 +222,45 @@ def cart_add(request, product_id):
             messages.error(request, message)
             return redirect('login') # Redirect non-AJAX requests
 
-    product = get_object_or_404(Product, id=product_id)
-    # For AJAX, quantity might come from JSON body, but JS currently doesn't send one. Default to 1.
-    # quantity = int(request.POST.get('quantity', 1)) # Keep for non-AJAX if needed
-    quantity = 1 # Default for current AJAX implementation
-    product_id_str = str(product.id)
+    try: # Added try block
+        product = get_object_or_404(Product, id=product_id)
+        # For AJAX, quantity might come from JSON body, but JS currently doesn't send one. Default to 1.
+        # quantity = int(request.POST.get('quantity', 1)) # Keep for non-AJAX if needed
+        quantity = 1 # Default for current AJAX implementation
+        product_id_str = str(product.id)
 
-    # Update JSONField
-    if product_id_str in cart.items:
-        cart.items[product_id_str]['quantity'] = cart.items[product_id_str].get('quantity', 0) + quantity
-    else:
-        cart.items[product_id_str] = {
-            'quantity': quantity,
-            'price': float(product.price) # Store price at time of adding
-        }
-    cart.save()
+        # Update JSONField
+        if product_id_str in cart.items:
+            cart.items[product_id_str]['quantity'] = cart.items[product_id_str].get('quantity', 0) + quantity
+        else:
+            cart.items[product_id_str] = {
+                'quantity': quantity,
+                'price': float(product.price) # Store price at time of adding
+            }
+        cart.save()
 
-    # Calculate current total items in cart for the counter
-    cart_count = sum(item.get('quantity', 0) for item in cart.items.values())
-    success_message = f'{product.name} añadido al carrito'
+        # Calculate current total items in cart for the counter
+        cart_count = sum(item.get('quantity', 0) for item in cart.items.values())
+        success_message = f'{product.name} añadido al carrito'
 
-    if is_ajax:
-        return JsonResponse({
-            'success': True,
-            'message': success_message,
-            'cart_count': cart_count
-        })
-    else:
-        # Fallback for non-AJAX requests (e.g., if JS fails)
-        messages.success(request, success_message)
-        return redirect(request.META.get('HTTP_REFERER', 'floresvalentin_app:catalogo')) # Redirect back or to catalog
+        if is_ajax:
+            return JsonResponse({
+                'success': True,
+                'message': success_message,
+                'cart_count': cart_count
+            })
+        else:
+            # Fallback for non-AJAX requests (e.g., if JS fails)
+            messages.success(request, success_message)
+            return redirect(request.META.get('HTTP_REFERER', 'floresvalentin_app:catalogo')) # Redirect back or to catalog
+    except Exception as e:
+        logger.error(f"Error in cart_add view for product {product_id}: {e}", exc_info=True)
+        if is_ajax:
+            return JsonResponse({'success': False, 'error': 'Error adding item to cart.'}, status=500)
+        else:
+            messages.error(request, 'Error al añadir el producto al carrito.')
+            return redirect(request.META.get('HTTP_REFERER', 'floresvalentin_app:catalogo'))
+
 
 # Needs refactoring to use ShoppingCart.items JSONField
 def cart_update(request, item_id): # Changed parameter to item_id (which is product_id here)
@@ -240,19 +269,26 @@ def cart_update(request, item_id): # Changed parameter to item_id (which is prod
         return redirect('login')
 
     product_id_str = str(item_id) # item_id is the product UUID string
-    quantity = int(request.POST.get('quantity', 0))
+    try: # Added try block
+        quantity = int(request.POST.get('quantity', 0))
 
-    if product_id_str in cart.items:
-        if quantity > 0:
-            cart.items[product_id_str]['quantity'] = quantity
-            messages.success(request, 'Cantidad actualizada.')
+        if product_id_str in cart.items:
+            if quantity > 0:
+                cart.items[product_id_str]['quantity'] = quantity
+                messages.success(request, 'Cantidad actualizada.')
+            else:
+                # If quantity is 0 or less, remove the item
+                del cart.items[product_id_str]
+                messages.success(request, 'Producto eliminado del carrito.')
+            cart.save()
         else:
-            # If quantity is 0 or less, remove the item
-            del cart.items[product_id_str]
-            messages.success(request, 'Producto eliminado del carrito.')
-        cart.save()
-    else:
-         messages.error(request, 'Producto no encontrado en el carrito.')
+             messages.error(request, 'Producto no encontrado en el carrito.')
+    except ValueError:
+        messages.error(request, 'Cantidad inválida.')
+    except Exception as e:
+        logger.error(f"Error in cart_update view for item {item_id}: {e}", exc_info=True)
+        messages.error(request, 'Error al actualizar el carrito.')
+
 
     return redirect('floresvalentin_app:ver_carrito')
 
@@ -264,12 +300,16 @@ def cart_remove(request, item_id): # Changed parameter to item_id
 
     product_id_str = str(item_id) # item_id is the product UUID string
 
-    if product_id_str in cart.items:
-        del cart.items[product_id_str]
-        cart.save()
-        messages.success(request, 'Producto eliminado del carrito.')
-    else:
-        messages.error(request, 'Producto no encontrado en el carrito.')
+    try: # Added try block
+        if product_id_str in cart.items:
+            del cart.items[product_id_str]
+            cart.save()
+            messages.success(request, 'Producto eliminado del carrito.')
+        else:
+            messages.error(request, 'Producto no encontrado en el carrito.')
+    except Exception as e:
+        logger.error(f"Error in cart_remove view for item {item_id}: {e}", exc_info=True)
+        messages.error(request, 'Error al eliminar el producto del carrito.')
 
     return redirect('floresvalentin_app:ver_carrito')
 
@@ -344,59 +384,88 @@ def checkout_confirm(request):
                 messages.error(request, 'Error: Tu carrito está vacío.')
                 return redirect('floresvalentin_app:ver_carrito')
 
-            # Recalculate total for the order
-            cart_subtotal = 0
-            product_ids = cart.items.keys()
-            products = Product.objects.filter(id__in=product_ids)
-            products_dict = {str(p.id): p for p in products}
-            order_items_data = [] # To store data for OrderItem creation
+            try: # Added try block for order creation process
+                # Recalculate total for the order
+                cart_subtotal = 0
+                product_ids = cart.items.keys()
+                products = Product.objects.filter(id__in=product_ids)
+                products_dict = {str(p.id): p for p in products}
+                order_items_data = [] # To store data for OrderItem creation
 
-            for product_id, item_data in cart.items.items():
-                 product = products_dict.get(product_id)
-                 if product:
-                     quantity = item_data.get('quantity', 0)
-                     price = item_data.get('price', float(product.price))
-                     cart_subtotal += quantity * price
-                     order_items_data.append({
-                         'product': product,
-                         'quantity': quantity,
-                         'price': price
-                     })
+                for product_id, item_data in cart.items.items():
+                     product = products_dict.get(product_id)
+                     if product:
+                         quantity = item_data.get('quantity', 0)
+                         price = item_data.get('price', float(product.price))
+                         cart_subtotal += quantity * price
+                         order_items_data.append({
+                             'product': product,
+                             'quantity': quantity,
+                             'price': price
+                         })
 
-            cart_tax = cart_subtotal * 0.19 # Example tax
-            cart_total = cart_subtotal + cart_tax
+                cart_tax = cart_subtotal * 0.19 # Example tax
+                cart_total = cart_subtotal + cart_tax
 
-            # Crear orden
-            order = Order.objects.create(
-                user=request.user,
-                # Get data from the VALID form
-                # first_name=form.cleaned_data['first_name'], # Assuming these fields are in CheckoutForm
-                # last_name=form.cleaned_data['last_name'],
-                # email=form.cleaned_data['email'],
-                # address=form.cleaned_data['address'],
-                # postal_code=form.cleaned_data['postal_code'],
-                # city=form.cleaned_data['city'],
-                # phone=form.cleaned_data['phone'],
-                total_amount=cart_total, # Use calculated total
-                # coupon=cart.coupon # No coupon model/field yet
-            )
-
-            # Crear items de la orden from collected data
-            for item_data in order_items_data:
-                OrderItem.objects.create(
-                    order=order,
-                    product=item_data['product'],
-                    price=item_data['price'],
-                    quantity=item_data['quantity']
+                # Crear orden
+                order = Order.objects.create(
+                    user=request.user,
+                    # Get data from the VALID form
+                    # first_name=form.cleaned_data['first_name'], # Assuming these fields are in CheckoutForm
+                    # last_name=form.cleaned_data['last_name'],
+                    # email=form.cleaned_data['email'],
+                    # address=form.cleaned_data['address'],
+                    # postal_code=form.cleaned_data['postal_code'],
+                    # city=form.cleaned_data['city'],
+                    # phone=form.cleaned_data['phone'],
+                    total_amount=cart_total, # Use calculated total
+                    # coupon=cart.coupon # No coupon model/field yet
                 )
 
-            # Vaciar carrito (JSONField)
-            cart.items = {}
-            cart.save()
+                # Crear items de la orden from collected data
+                for item_data in order_items_data:
+                    OrderItem.objects.create(
+                        order=order,
+                        product=item_data['product'],
+                        price=item_data['price'],
+                        quantity=item_data['quantity']
+                    )
 
-            # TODO: Add payment processing logic here if needed
+                # Vaciar carrito (JSONField)
+                cart.items = {}
+                cart.save()
 
-            return redirect('floresvalentin_app:order_completed', order_id=order.id)
+                # TODO: Add payment processing logic here if needed
+
+                return redirect('floresvalentin_app:order_completed', order_id=order.id)
+
+            except Exception as e:
+                logger.error(f"Error during checkout confirmation for user {request.user.id}: {e}", exc_info=True)
+                messages.error(request, 'Ocurrió un error inesperado al procesar tu orden. Por favor, intenta de nuevo.')
+                # Redirect back to checkout page, keeping form data might be tricky here
+                # Re-rendering with the original form might be the simplest approach
+                # Need to recalculate totals again for the template
+                cart_subtotal = 0
+                if cart and cart.items:
+                    product_ids = cart.items.keys()
+                    products = Product.objects.filter(id__in=product_ids)
+                    products_dict = {str(p.id): p for p in products}
+                    for product_id, item_data in cart.items.items():
+                         product = products_dict.get(product_id)
+                         if product:
+                             quantity = item_data.get('quantity', 0)
+                             price = item_data.get('price', float(product.price))
+                             cart_subtotal += quantity * price
+                cart_tax = cart_subtotal * 0.19
+                cart_total = cart_subtotal + cart_tax
+                return render(request, 'floresvalentin_app/checkout.html', {
+                    'cart': cart,
+                    'form': form, # Pass the submitted form back
+                    'cart_subtotal': cart_subtotal,
+                    'cart_tax': cart_tax,
+                    'cart_total': cart_total,
+                })
+
         else:
              # Form is invalid, re-render checkout page with errors
              cart = get_or_create_cart(request) # Need cart context again
@@ -438,14 +507,23 @@ def special_order_create(request):
     if request.method == 'POST':
         form = SpecialOrderForm(request.POST, request.FILES)
         if form.is_valid():
-            special_order = form.save(commit=False)
-            if request.user.is_authenticated:
-                special_order.user = request.user
-            special_order.save()
-            return redirect('floresvalentin_app:special_order_thanks')
+            try: # Added try block
+                special_order = form.save(commit=False)
+                if request.user.is_authenticated: # Check again just in case
+                    special_order.user = request.user
+                special_order.save()
+                return redirect('floresvalentin_app:special_order_thanks')
+            except Exception as e:
+                logger.error(f"Error saving special order for user {request.user.id}: {e}", exc_info=True)
+                messages.error(request, 'Ocurrió un error al guardar tu pedido especial.')
+                # Re-render form with errors
+                return render(request, 'floresvalentin_app/special_order_form.html', {'form': form})
+        else:
+             # Form is invalid, re-render with errors
+             return render(request, 'floresvalentin_app/special_order_form.html', {'form': form})
     else:
         form = SpecialOrderForm()
-    
+
     return render(request, 'floresvalentin_app/special_order_form.html', {'form': form})
 
 def special_order_thanks(request):
@@ -458,16 +536,26 @@ def profile(request):
 
 @login_required
 def profile_edit(request):
+    # Ensure profile exists, create if not (should be handled by signal, but good practice)
+    profile, created = Profile.objects.get_or_create(user=request.user)
     if request.method == 'POST':
-        form = ProfileForm(request.POST, instance=request.user)
+        # We need to handle User form and Profile form separately if editing both
+        # Assuming ProfileForm only edits Profile fields for now
+        form = ProfileForm(request.POST, instance=profile) # Use profile instance
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Perfil actualizado correctamente')
-            return redirect('floresvalentin_app:profile')
+            try: # Added try block
+                form.save()
+                messages.success(request, 'Perfil actualizado correctamente')
+                return redirect('floresvalentin_app:profile')
+            except Exception as e:
+                 logger.error(f"Error updating profile for user {request.user.id}: {e}", exc_info=True)
+                 messages.error(request, 'Ocurrió un error al actualizar tu perfil.')
+        # No else needed, just re-render below if form invalid or error occurred
     else:
-        form = ProfileForm(instance=request.user)
-    
+        form = ProfileForm(instance=profile) # Use profile instance
+
     return render(request, 'floresvalentin_app/profile_edit.html', {'form': form})
+
 
 @login_required
 def my_orders(request):
@@ -484,24 +572,33 @@ def contact_view(request): # Renamed view for clarity
     if request.method == 'POST':
         form = ContactMessageForm(request.POST)
         if form.is_valid():
-            form.save() # Save the message to the database
-            messages.success(request, '¡Gracias por tu mensaje! Nos pondremos en contacto contigo pronto.')
-            # Redirect back to the index page (or wherever the form was)
-            # Assuming the form is on the index page based on previous context
-            return redirect(reverse('floresvalentin_app:index') + '#contacto')
+            try: # Added try block
+                form.save() # Save the message to the database
+                messages.success(request, '¡Gracias por tu mensaje! Nos pondremos en contacto contigo pronto.')
+                # Redirect back to the index page (or wherever the form was)
+                # Assuming the form is on the index page based on previous context
+                return redirect(reverse('floresvalentin_app:index') + '#contacto')
+            except Exception as e:
+                logger.error(f"Error saving contact message: {e}", exc_info=True)
+                messages.error(request, 'Ocurrió un error al enviar tu mensaje.')
+                # Re-render index page with the form containing errors
+                # Need to fetch index context again
+                featured_products = Product.objects.filter(available=True).order_by('-created_at')[:6]
+                return render(request, 'floresvalentin_app/index.html', {
+                    'featured_products': featured_products,
+                    'contact_form': form, # Pass the invalid form back
+                })
         else:
             # If form is invalid, add an error message
             # We will render the index page again, passing the invalid form
             # This requires modifying the index view slightly to handle this
             messages.error(request, 'Hubo un error en el formulario. Por favor, revisa los campos.')
-            # We'll handle rendering the form with errors in the index view
-            # Store the invalid form in the session to pass it back? Or modify index view.
-            # Let's modify index view for simplicity for now.
-            # We'll pass the invalid form back through the redirect/session or re-render index here.
-            # Re-rendering index here is complex as we need all its context.
-            # Best approach: Redirect back to index and let index view handle displaying errors.
-            # For now, just redirecting back to the section. Error display needs index view update.
-            return redirect(reverse('floresvalentin_app:index') + '#contacto-error') # Redirect to an error anchor maybe? Or just index.
+            # Re-render index page with the form containing errors
+            featured_products = Product.objects.filter(available=True).order_by('-created_at')[:6]
+            return render(request, 'floresvalentin_app/index.html', {
+                'featured_products': featured_products,
+                'contact_form': form, # Pass the invalid form back
+            })
     else:
         # If GET request, redirect to index page where the form is displayed
         return redirect(reverse('floresvalentin_app:index') + '#contacto')
@@ -536,6 +633,7 @@ def login_view(request): # Renamed from login_register_view
                 login(request, user)
                 messages.success(request, f'Bienvenido de nuevo, {user.username}!')
                 next_url = request.POST.get('next', request.GET.get('next', ''))
+                # Basic security check for next_url
                 if next_url and not next_url.startswith('/'):
                     next_url = reverse('floresvalentin_app:index')
                 return redirect(next_url or 'floresvalentin_app:index')
@@ -544,7 +642,7 @@ def login_view(request): # Renamed from login_register_view
                 # Fall through to render the page again with the login_form containing errors
         else:
             # Login form is not valid
-            if '__all__' not in login_form.errors:
+            if '__all__' not in login_form.errors: # Avoid double messaging if form has general errors
                  messages.error(request, 'Por favor corrige los errores en el formulario.')
             # Fall through to render the page again with the login_form containing errors
     else: # GET request
@@ -569,26 +667,36 @@ def register_view(request): # Renamed from register
 
         # Validate both forms
         if user_form.is_valid() and profile_form.is_valid():
-            # Save the User form first (commit=True is default and fine here)
-            user = user_form.save()
+            try: # Added try block for user/profile creation
+                # Save the User form first (commit=True is default and fine here)
+                user = user_form.save()
 
-            # Save the Profile form, associating it with the new user
-            # The Profile is created automatically by the signal, so we update it.
-            profile = user.profile # Get the auto-created profile
-            # Update profile fields from the profile_form
-            profile.phone = profile_form.cleaned_data['phone']
-            profile.country = profile_form.cleaned_data['country']
-            profile.city = profile_form.cleaned_data['city']
-            profile.neighborhood = profile_form.cleaned_data['neighborhood']
-            profile.address = profile_form.cleaned_data['address']
-            profile.postal_code = profile_form.cleaned_data['postal_code']
-            profile.preferences = profile_form.cleaned_data['preferences']
-            profile.newsletter = profile_form.cleaned_data['newsletter']
-            profile.save() # Save the updated profile
+                # Save the Profile form, associating it with the new user
+                # The Profile is created automatically by the signal, so we update it.
+                profile = user.profile # Get the auto-created profile
+                # Update profile fields from the profile_form
+                profile.phone = profile_form.cleaned_data['phone']
+                profile.country = profile_form.cleaned_data['country']
+                profile.city = profile_form.cleaned_data['city']
+                profile.neighborhood = profile_form.cleaned_data['neighborhood']
+                profile.address = profile_form.cleaned_data['address']
+                profile.postal_code = profile_form.cleaned_data['postal_code']
+                profile.preferences = profile_form.cleaned_data['preferences']
+                profile.newsletter = profile_form.cleaned_data['newsletter']
+                profile.save() # Save the updated profile
 
-            login(request, user) # Log the user in directly
-            messages.success(request, 'Registro exitoso. ¡Bienvenido!')
-            return redirect('floresvalentin_app:index') # Redirect to home page
+                login(request, user) # Log the user in directly
+                messages.success(request, 'Registro exitoso. ¡Bienvenido!')
+                return redirect('floresvalentin_app:index') # Redirect to home page
+            except Exception as e:
+                logger.error(f"Error during registration for user {user_form.cleaned_data.get('username')}: {e}", exc_info=True)
+                messages.error(request, 'Ocurrió un error durante el registro. Por favor, intenta de nuevo.')
+                # Re-render with forms containing original data and potential errors
+                context = {
+                    'user_form': user_form,
+                    'profile_form': profile_form
+                }
+                return render(request, 'registration/register.html', context)
         else:
             # One or both forms are invalid. Re-render with errors.
             # The template needs to display errors from both forms.

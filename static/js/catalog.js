@@ -73,7 +73,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Construir URL con parámetros de consulta
         // **IMPORTANTE**: Debes crear una URL en Django (ej. 'floresvalentin_app:catalogo_api')
         // que apunte a una vista que devuelva JSON.
-        const url = new URL(window.location.origin + '/floresvalentin_app/catalogo/api/'); // Ajusta esta URL base
+        // Corrected URL based on main urls.py include
+        const url = new URL(window.location.origin + '/catalogo/api/');
         url.searchParams.append('page', page);
         if (searchTerm) url.searchParams.append('search', searchTerm);
         if (selectedCategory) url.searchParams.append('category', selectedCategory);
@@ -358,5 +359,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Intenta obtener el contador inicial de otra manera si es necesario
          updateCartCounter(0); // Default a 0 si no hay info inicial
      }
-
-});
+ 
+     // --- CARGA INICIAL DE PRODUCTOS ---
+     fetchProducts(1); // Llama a fetchProducts para cargar la página 1 al inicio
+ 
+ });

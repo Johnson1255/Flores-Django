@@ -6,16 +6,18 @@
     <div class="col-md-4 mb-4 product-grid-item">
         {# Add data-* attributes if needed by quick view JS (Option 1) #}
         <div class="card product-card h-100" data-id="{{ product.id }}">
-            <a href="{{ product.get_absolute_url }}"> {# Assuming you have get_absolute_url on Product model #}
+            {# Safely attempt to get URL, fallback to '#' #}
+            {% url 'floresvalentin_app:product_detail' product_id=product.id as product_url %}
+            <a href="{{ product_url | default:'#' }}">
                 <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'images/default-flower.jpg' %}{% endif %}" class="card-img-top" alt="{{ product.name }}">
             </a>
             <div class="card-body d-flex flex-column">
-                <h5 class="card-title">
-                     <a href="{{ product.get_absolute_url }}" class="text-decoration-none text-dark">{{ product.name }}</a>
-                </h5>
-                <p class="card-text text-muted small">{{ product.category.name }}</p>
-                <p class="card-text flex-grow-1">{{ product.description|truncatewords:15 }}</p> {# Short description #}
-                <div class="d-flex justify-content-between align-items-center mt-auto">
+                 <h5 class="card-title">
+                      <a href="{{ product_url | default:'#' }}" class="text-decoration-none text-dark">{{ product.name }}</a>
+                 </h5>
+                 <p class="card-text text-muted small">{% if product.category %}{{ product.category.name }}{% else %}{% trans "Sin categoría" %}{% endif %}</p> {# Handle null category #}
+                 <p class="card-text flex-grow-1">{{ product.description|truncatewords:15 }}</p> {# Short description #}
+                 <div class="d-flex justify-content-between align-items-center mt-auto">
                     <span class="fw-bold text-primary">${{ product.price|floatformat:0 }}</span>
                     <div>
                         {# Add to cart button #}
@@ -37,16 +39,18 @@
          <div class="card product-card-list">
              <div class="row g-0">
                  <div class="col-md-3">
-                     <a href="{{ product.get_absolute_url }}">
+                     {# Safely attempt to get URL, fallback to '#' #}
+                     {% url 'floresvalentin_app:product_detail' product_id=product.id as product_url_list %}
+                     <a href="{{ product_url_list | default:'#' }}">
                         <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'images/default-flower.jpg' %}{% endif %}" class="img-fluid rounded-start" alt="{{ product.name }}">
                      </a>
                  </div>
                  <div class="col-md-9">
                      <div class="card-body">
                          <h5 class="card-title">
-                            <a href="{{ product.get_absolute_url }}" class="text-decoration-none text-dark">{{ product.name }}</a>
+                             <a href="{{ product_url_list | default:'#' }}" class="text-decoration-none text-dark">{{ product.name }}</a>
                          </h5>
-                         <p class="card-text text-muted small">{{ product.category.name }}</p>
+                         <p class="card-text text-muted small">{% if product.category %}{{ product.category.name }}{% else %}{% trans "Sin categoría" %}{% endif %}</p> {# Handle null category #}
                          <p class="card-text">{{ product.description|truncatewords:30 }}</p> {# Longer description #}
                          <div class="d-flex justify-content-between align-items-center">
                              <span class="fw-bold text-primary">${{ product.price|floatformat:0 }}</span>

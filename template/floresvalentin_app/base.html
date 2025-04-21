@@ -28,6 +28,7 @@
     <link rel="stylesheet" href="{% static 'css/shoppingCart.css' %}">
     <link rel="stylesheet" href="{% static 'css/catalog.css' %}">
     <link rel="stylesheet" href="{% static 'css/special.css' %}">
+    <link rel="stylesheet" href="{% static 'css/splash.css' %}"> {# <-- Splash Screen CSS #}
 
 
     {# Leaflet CSS (Considera cargarlo solo en páginas que usan mapa con {% block extra_head %}) #}
@@ -37,6 +38,15 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body>
+    {# --- SPLASH SCREEN --- #}
+    <div id="splash-screen">
+        <div class="splash-content">
+            <img src="{% static 'images/logo.svg' %}" alt="{% trans 'Logo Flores Valentín' %}" class="logo">
+            <div class="spinner"></div>
+            <p class="welcome-message">{% trans "Bienvenido a Flores Valentín" %}</p>
+        </div>
+    </div>
+
     {# --- CONTROL DE MÚSICA (Si es global) --- #}
     <div class="music-control">
         <button id="musicToggle" class="music-button">
@@ -184,12 +194,14 @@
         </div>
     </nav>
 
-    {# --- ÁREA DE CONTENIDO PRINCIPAL (Aquí se insertará el contenido de las páginas hijas) --- #}
-    <main class="main-content">
-        {% block content %}
+    {# --- ÁREA DE CONTENIDO PRINCIPAL (Envuelto para control de visibilidad con splash) --- #}
+    <div id="main-content"> {# <-- Wrapper for splash screen visibility control #}
+        <main class="main-content">
+            {% block content %}
         {# El contenido específico de cada página irá aquí #}
         {% endblock %}
-    </main>
+        </main>
+    </div> {# <-- Closing wrapper div #}
 
     {# --- FOOTER --- #}
     <footer class="main-footer">
@@ -251,6 +263,7 @@
     <script type="module" src="{% static 'js/main.js' %}"></script>
     <script type="module" src="{% static 'js/music.js' %}"></script> {# Si la música es global #}
     <script type="module" src="{% static 'js/theme.js' %}"></script> {# Si el tema es global #}
+    <script type="module" src="{% static 'js/splash.js' %}"></script> {# <-- Splash Screen JS #}
 
     {# --- BLOQUE PARA SCRIPTS EXTRA (JS específicos de página) --- #}
     {% block extra_js %}{% endblock %}

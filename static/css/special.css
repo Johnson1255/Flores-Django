@@ -81,8 +81,19 @@ h4 {
 }
 
 /* Estilos para los checkboxes y radio buttons */
-.form-check-input {
+#special-order-form .form-check-input { /* Scope to the form */
     border: 1px solid var(--border-color);
+    vertical-align: middle; /* Align input vertically */
+    margin-top: 0; /* Reset margin */
+    float: none; /* Ensure no float */
+    position: static; /* Ensure no absolute positioning */
+}
+
+#special-order-form .form-check-label { /* Style the label */
+    display: inline-block; /* Treat label as inline block */
+    vertical-align: middle; /* Align label vertically */
+    margin-left: 0.5em; /* Add space next to checkbox */
+    padding-top: 0.1em; /* Slight adjustment if needed */
 }
 
 .form-check-input:checked {
@@ -245,6 +256,8 @@ label[for="special-instructions"]:after {
 .form-text {
     font-style: italic;
 }
+
+/* Removed previous flexbox alignment rules and group padding rule */
 
 /* Estilo para el botón de envío */
 .btn-lg {

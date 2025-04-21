@@ -4,8 +4,7 @@
 {% block title %}{% trans "Pedido Especial" %} - Flores Valentín{% endblock %}
 
 {% block extra_head %}
-    {# Load special order form specific CSS #}
-    <link rel="stylesheet" href="{% static 'css/special.css' %}">
+    {# special.css is loaded globally in base.html, no need to load again here #}
 {% endblock %}
 
 {% block content %}
@@ -129,7 +128,7 @@
                                     {{ form.include_flowers.errors }} {# Show errors first #}
                                     {{ form.include_flowers }} {# Render the input checkbox #}
                                     <label class="form-check-label" for="{{ form.include_flowers.id_for_label }}">
-                                        {{ form.include_flowers.label }}
+                                        <span>{{ form.include_flowers.label }}</span>
                                     </label>
                                 </div>
                                 {% endif %}
@@ -138,7 +137,7 @@
                                     {{ form.include_chocolates.errors }} {# Show errors first #}
                                     {{ form.include_chocolates }} {# Render the input checkbox #}
                                     <label class="form-check-label" for="{{ form.include_chocolates.id_for_label }}">
-                                        {{ form.include_chocolates.label }}
+                                        <span>{{ form.include_chocolates.label }}</span>
                                     </label>
                                 </div>
                                 {% endif %}
@@ -147,7 +146,7 @@
                                     {{ form.include_plushies.errors }} {# Show errors first #}
                                     {{ form.include_plushies }} {# Render the input checkbox #}
                                     <label class="form-check-label" for="{{ form.include_plushies.id_for_label }}">
-                                        {{ form.include_plushies.label }}
+                                        <span>{{ form.include_plushies.label }}</span>
                                     </label>
                                 </div>
                                 {% endif %}

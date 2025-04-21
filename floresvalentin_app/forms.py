@@ -5,35 +5,85 @@ from django.contrib.auth.models import User
 # Import gettext_lazy for translations in forms/models
 from django.utils.translation import gettext_lazy as _
 # Import the new ContactMessage model
+import json # Import json for handling the JSONField
 from .models import SpecialOrder, Profile, ContactMessage
 
 class SpecialOrderForm(forms.ModelForm):
+    # Define fields for product types - these are not directly in the model
+    include_flowers = forms.BooleanField(
+        label=_("Incluir Flores"),
+        required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+    include_chocolates = forms.BooleanField(
+        label=_("Incluir Chocolates"),
+        required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+    include_plushies = forms.BooleanField(
+        label=_("Incluir Peluches"),
+        required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+    other_items = forms.CharField(
+        label=_("Otros artículos o detalles"),
+        required=False,
+        widget=forms.Textarea(attrs={'rows': 3, 'class': 'form-control', 'placeholder': _('Especifique otros artículos o detalles aquí...')})
+    )
+
     class Meta:
         model = SpecialOrder
-        # Include fields relevant to the form, exclude user and status initially
-        exclude = ['user', 'status', 'created_at', 'updated_at']
-        # Add widgets if needed for styling or date pickers, etc.
+        # Exclude the original 'products' field as we handle it manually
+        exclude = ['user', 'status', 'created_at', 'updated_at', 'products']
         widgets = {
-            # Add Bootstrap classes for proper styling and alignment
-            'occasion': forms.Select(attrs={'class': 'form-select'}), # Changed to Select to use model choices
-            'budget': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}), # Changed to NumberInput for DecimalField
-            'delivery_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'delivery_time': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ej: Mañana, Tarde, 14:00-16:00'}), # Added placeholder from image
-            'message': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
-            'special_instructions': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
-            # Add widgets for other fields if needed, e.g., recipient fields
+            # Basic Bootstrap classes
             'recipient_name': forms.TextInput(attrs={'class': 'form-control'}),
             'recipient_phone': forms.TextInput(attrs={'class': 'form-control'}),
             'delivery_address': forms.TextInput(attrs={'class': 'form-control'}),
             'delivery_city': forms.TextInput(attrs={'class': 'form-control'}),
             'delivery_postal_code': forms.TextInput(attrs={'class': 'form-control'}),
-            # Widgets for product inclusion options (adjust if using different field types)
-            'flower_types': forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}), # Example, adjust class if needed
-            'flower_colors': forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}), # Example
-            'chocolate_types': forms.CheckboxSelectMultiple(attrs={'class': 'form-check-input'}), # Example
-            'plushie_type': forms.RadioSelect(attrs={'class': 'form-check-input'}), # Example
-            'other_gifts': forms.Textarea(attrs={'rows': 2, 'class': 'form-control'}), # Example
+            'occasion': forms.Select(attrs={'class': 'form-select'}),
+            'delivery_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'delivery_time': forms.TextInput(attrs={'class': 'form-control', 'placeholder': _('Ej: Mañana, Tarde, 14:00-16:00')}),
+            'budget': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'message': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+            'special_instructions': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
         }
+        # Add labels if needed, using gettext_lazy for translation
+        labels = {
+            'recipient_name': _("Nombre del destinatario"),
+            'recipient_phone': _("Teléfono del destinatario"),
+            'delivery_address': _("Dirección de entrega"),
+            'delivery_city': _("Ciudad de entrega"),
+            'delivery_postal_code': _("Código postal de entrega"),
+            'occasion': _("Ocasión"),
+            'delivery_date': _("Fecha de entrega"),
+            'delivery_time': _("Hora de entrega"),
+            'budget': _("Presupuesto"),
+            'message': _("Mensaje para la tarjeta"),
+            'special_instructions': _("Instrucciones especiales"),
+        }
+
+    def save(self, commit=True):
+        # Get the instance but don't save it to DB yet (commit=False)
+        instance = super().save(commit=False)
+
+        # Prepare the data for the 'products' JSONField
+        products_data = {
+            'include_flowers': self.cleaned_data.get('include_flowers', False),
+            'include_chocolates': self.cleaned_data.get('include_chocolates', False),
+            'include_plushies': self.cleaned_data.get('include_plushies', False),
+            'other_items': self.cleaned_data.get('other_items', '').strip(),
+        }
+
+        # Assign the dictionary (which will be serialized to JSON) to the instance's field
+        instance.products = products_data # Django handles JSON serialization
+
+        # Save the instance to the database if commit is True
+        if commit:
+            instance.save()
+        return instance
+
 
 # Replace the old ContactForm with a ModelForm for ContactMessage
 class ContactMessageForm(forms.ModelForm):

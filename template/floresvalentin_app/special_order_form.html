@@ -121,59 +121,44 @@
                             </div>
                             {% endif %}
 
-                            {# Render product inclusion fields - Adapt based on actual form fields #}
-                            <h4 class="mb-3">{% trans "Productos para incluir" %}</h4>
-                            {% if form.include_flowers %}
-                            <div class="form-check form-switch mb-2">
-                                {{ form.include_flowers }}
-                                <label class="form-check-label fw-bold" for="{{ form.include_flowers.id_for_label }}">{{ form.include_flowers.label }}</label>
-                            </div>
-                            <div id="flowers-options" class="ms-4 mb-3 {% if not form.include_flowers.value %}d-none{% endif %}">
-                                {% if form.flower_types %}
-                                <label class="form-label">{{ form.flower_types.label }}</label>
-                                {{ form.flower_types }} {# Assuming CheckboxSelectMultiple widget #}
+                            {# Render product inclusion fields using the new form fields #}
+                            <h4 class="mb-3">{% trans "Productos para incluir (Opcional)" %}</h4>
+                            <div class="mb-3">
+                                {% if form.include_flowers %}
+                                <div class="form-check mb-2">
+                                    {{ form.include_flowers.errors }} {# Show errors first #}
+                                    {{ form.include_flowers }} {# Render the input checkbox #}
+                                    <label class="form-check-label" for="{{ form.include_flowers.id_for_label }}">
+                                        {{ form.include_flowers.label }}
+                                    </label>
+                                </div>
                                 {% endif %}
-                                {% if form.flower_colors %}
-                                <label class="form-label mt-3">{{ form.flower_colors.label }}</label>
-                                {{ form.flower_colors }} {# Assuming CheckboxSelectMultiple widget #}
+                                {% if form.include_chocolates %}
+                                <div class="form-check mb-2">
+                                    {{ form.include_chocolates.errors }} {# Show errors first #}
+                                    {{ form.include_chocolates }} {# Render the input checkbox #}
+                                    <label class="form-check-label" for="{{ form.include_chocolates.id_for_label }}">
+                                        {{ form.include_chocolates.label }}
+                                    </label>
+                                </div>
                                 {% endif %}
-                            </div>
-                            {% endif %}
-                            {# Repeat similar structure for chocolates, plushies, gifts if they exist in the form #}
-                            {% if form.include_chocolates %}
-                             <div class="form-check form-switch mb-2">
-                                {{ form.include_chocolates }}
-                                <label class="form-check-label fw-bold" for="{{ form.include_chocolates.id_for_label }}">{{ form.include_chocolates.label }}</label>
-                            </div>
-                             <div id="chocolates-options" class="ms-4 mb-3 {% if not form.include_chocolates.value %}d-none{% endif %}">
-                                {% if form.chocolate_types %}
-                                <label class="form-label">{{ form.chocolate_types.label }}</label>
-                                {{ form.chocolate_types }}
-                                {% endif %}
-                            </div>
-                            {% endif %}
-                            {% if form.include_plushies %}
-                             <div class="form-check form-switch mb-2">
-                                {{ form.include_plushies }}
-                                <label class="form-check-label fw-bold" for="{{ form.include_plushies.id_for_label }}">{{ form.include_plushies.label }}</label>
-                            </div>
-                             <div id="plushies-options" class="ms-4 mb-3 {% if not form.include_plushies.value %}d-none{% endif %}">
-                                {% if form.plushie_type %}
-                                <label class="form-label">{{ form.plushie_type.label }}</label>
-                                {{ form.plushie_type }} {# Assuming RadioSelect widget #}
+                                {% if form.include_plushies %}
+                                <div class="form-check mb-3"> {# Added mb-3 for spacing before next field #}
+                                    {{ form.include_plushies.errors }} {# Show errors first #}
+                                    {{ form.include_plushies }} {# Render the input checkbox #}
+                                    <label class="form-check-label" for="{{ form.include_plushies.id_for_label }}">
+                                        {{ form.include_plushies.label }}
+                                    </label>
+                                </div>
                                 {% endif %}
                             </div>
-                            {% endif %}
-                             {% if form.include_gifts %}
-                             <div class="form-check form-switch mb-2">
-                                {{ form.include_gifts }}
-                                <label class="form-check-label fw-bold" for="{{ form.include_gifts.id_for_label }}">{{ form.include_gifts.label }}</label>
-                            </div>
-                             <div id="gifts-options" class="ms-4 mb-3 {% if not form.include_gifts.value %}d-none{% endif %}">
-                                {% if form.other_gifts %}
-                                <label class="form-label">{{ form.other_gifts.label }}</label>
-                                {{ form.other_gifts }}
-                                {% endif %}
+
+                            {% if form.other_items %}
+                            <div class="mb-3">
+                                <label for="{{ form.other_items.id_for_label }}" class="form-label">{{ form.other_items.label }}{% if form.other_items.field.required %}*{% endif %}</label>
+                                {{ form.other_items }}
+                                {% if form.other_items.help_text %}<div class="form-text">{{ form.other_items.help_text }}</div>{% endif %}
+                                {% for error in form.other_items.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
                             </div>
                             {% endif %}
 

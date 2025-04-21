@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-21 17:30+0000\n"
+"POT-Creation-Date: 2025-04-21 17:56+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,99 +19,167 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? "
 "1 : 2;\n"
 
-#: floresvalentin_app/forms.py:44
+#: floresvalentin_app/forms.py:14
+msgid "Incluir Flores"
+msgstr "Incluir Flores"
+
+#: floresvalentin_app/forms.py:19
+msgid "Incluir Chocolates"
+msgstr "Incluir Chocolates"
+
+#: floresvalentin_app/forms.py:24
+msgid "Incluir Peluches"
+msgstr "Incluir Peluches"
+
+#: floresvalentin_app/forms.py:29
+msgid "Otros artículos o detalles"
+msgstr "Otros artículos o detalles"
+
+#: floresvalentin_app/forms.py:31
+msgid "Especifique otros artículos o detalles aquí..."
+msgstr "Especifique otros artículos o detalles aquí..."
+
+#: floresvalentin_app/forms.py:47
+msgid "Ej: Mañana, Tarde, 14:00-16:00"
+msgstr ""
+
+#: floresvalentin_app/forms.py:54 floresvalentin_app/models.py:164
+msgid "Nombre del destinatario"
+msgstr "Nombre del destinatario"
+
+#: floresvalentin_app/forms.py:55 floresvalentin_app/models.py:165
+msgid "Teléfono del destinatario"
+msgstr "Teléfono del destinatario"
+
+#: floresvalentin_app/forms.py:56 floresvalentin_app/models.py:166
+msgid "Dirección de entrega"
+msgstr "Dirección de entrega"
+
+#: floresvalentin_app/forms.py:57 floresvalentin_app/models.py:167
+msgid "Ciudad de entrega"
+msgstr "Ciudad de entrega"
+
+#: floresvalentin_app/forms.py:58 floresvalentin_app/models.py:168
+msgid "Código postal de entrega"
+msgstr "Código postal de entrega"
+
+#: floresvalentin_app/forms.py:59 floresvalentin_app/models.py:169
+msgid "Ocasión"
+msgstr "Ocasión"
+
+#: floresvalentin_app/forms.py:60 floresvalentin_app/models.py:170
+msgid "Fecha de entrega"
+msgstr "Fecha de entrega"
+
+#: floresvalentin_app/forms.py:61 floresvalentin_app/models.py:171
+msgid "Hora de entrega"
+msgstr "Hora de entrega"
+
+#: floresvalentin_app/forms.py:62 floresvalentin_app/models.py:172
+msgid "Presupuesto"
+msgstr "Presupuesto"
+
+#: floresvalentin_app/forms.py:63 floresvalentin_app/models.py:173
+msgid "Mensaje para la tarjeta"
+msgstr "Mensaje para la tarjeta"
+
+#: floresvalentin_app/forms.py:64 floresvalentin_app/models.py:174
+msgid "Instrucciones especiales"
+msgstr "Instrucciones especiales"
+
+#: floresvalentin_app/forms.py:94
 msgid "Tu nombre completo"
 msgstr "Tu nombre completo"
 
-#: floresvalentin_app/forms.py:45 floresvalentin_app/forms.py:122
+#: floresvalentin_app/forms.py:95 floresvalentin_app/forms.py:172
 msgid "tu@correo.com"
 msgstr "tu@correo.com"
 
-#: floresvalentin_app/forms.py:46
+#: floresvalentin_app/forms.py:96
 msgid "Escribe tu mensaje aquí..."
 msgstr "Escribe tu mensaje aquí..."
 
-#: floresvalentin_app/forms.py:49 floresvalentin_app/forms.py:113
+#: floresvalentin_app/forms.py:99 floresvalentin_app/forms.py:163
 msgid "Nombre"
 msgstr "Nombre"
 
-#: floresvalentin_app/forms.py:50 floresvalentin_app/forms.py:121
+#: floresvalentin_app/forms.py:100 floresvalentin_app/forms.py:171
 msgid "Correo Electrónico"
 msgstr "Correo Electrónico"
 
-#: floresvalentin_app/forms.py:51
+#: floresvalentin_app/forms.py:101
 msgid "Mensaje"
 msgstr "Mensaje"
 
-#: floresvalentin_app/forms.py:58 floresvalentin_app/models.py:154
+#: floresvalentin_app/forms.py:108 floresvalentin_app/models.py:154
 msgid "Cumpleaños"
 msgstr "Cumpleaños"
 
-#: floresvalentin_app/forms.py:59
+#: floresvalentin_app/forms.py:109
 msgid "Aniversarios"
 msgstr "Aniversarios"
 
-#: floresvalentin_app/forms.py:60
+#: floresvalentin_app/forms.py:110
 msgid "Bodas"
 msgstr "Bodas"
 
-#: floresvalentin_app/forms.py:61 floresvalentin_app/models.py:157
+#: floresvalentin_app/forms.py:111 floresvalentin_app/models.py:157
 msgid "Condolencias"
 msgstr "Condolencias"
 
-#: floresvalentin_app/forms.py:67
+#: floresvalentin_app/forms.py:117
 msgid "Ocasiones de interés (opcional)"
 msgstr "Ocasiones de interés (opcional)"
 
-#: floresvalentin_app/forms.py:75
+#: floresvalentin_app/forms.py:125
 msgid "Tu número de teléfono"
 msgstr "Tu número de teléfono"
 
-#: floresvalentin_app/forms.py:84
+#: floresvalentin_app/forms.py:134
 msgid "Teléfono"
 msgstr "Teléfono"
 
-#: floresvalentin_app/forms.py:85
+#: floresvalentin_app/forms.py:135
 msgid "País"
 msgstr "País"
 
-#: floresvalentin_app/forms.py:86
+#: floresvalentin_app/forms.py:136
 msgid "Ciudad"
 msgstr "Ciudad"
 
-#: floresvalentin_app/forms.py:87
+#: floresvalentin_app/forms.py:137
 msgid "Barrio"
 msgstr "Barrio"
 
-#: floresvalentin_app/forms.py:88
+#: floresvalentin_app/forms.py:138
 msgid "Dirección de Entrega"
 msgstr "Dirección de Entrega"
 
-#: floresvalentin_app/forms.py:89
+#: floresvalentin_app/forms.py:139
 msgid "Código Postal"
 msgstr "Código Postal"
 
-#: floresvalentin_app/forms.py:90
+#: floresvalentin_app/forms.py:140
 msgid "Deseo recibir ofertas y novedades por correo electrónico"
 msgstr "Deseo recibir ofertas y novedades por correo electrónico"
 
-#: floresvalentin_app/forms.py:114
+#: floresvalentin_app/forms.py:164
 msgid "Tu nombre"
 msgstr "Tu nombre"
 
-#: floresvalentin_app/forms.py:117
+#: floresvalentin_app/forms.py:167
 msgid "Apellidos"
 msgstr "Apellidos"
 
-#: floresvalentin_app/forms.py:118
+#: floresvalentin_app/forms.py:168
 msgid "Tus apellidos"
 msgstr "Tus apellidos"
 
-#: floresvalentin_app/forms.py:138
+#: floresvalentin_app/forms.py:188
 msgid "Acepto los términos y condiciones y la política de privacidad*"
 msgstr "Acepto los términos y condiciones y la política de privacidad*"
 
-#: floresvalentin_app/forms.py:139
+#: floresvalentin_app/forms.py:189
 #, fuzzy
 #| msgid "Acepto los términos y condiciones y la política de privacidad*"
 msgid "Debes aceptar los términos y condiciones."
@@ -122,17 +190,14 @@ msgid "En Progreso"
 msgstr "En Progreso"
 
 #: floresvalentin_app/models.py:150
-#| msgid "Cumpleaños"
 msgid "Completado"
 msgstr "Completado"
 
 #: floresvalentin_app/models.py:155
-#| msgid "Aniversarios"
 msgid "Aniversario"
 msgstr "Aniversario"
 
 #: floresvalentin_app/models.py:156
-#| msgid "Bodas"
 msgid "Boda"
 msgstr "Boda"
 
@@ -151,55 +216,6 @@ msgstr "Otro"
 #: floresvalentin_app/models.py:163
 msgid "Usuario"
 msgstr "Usuario"
-
-#: floresvalentin_app/models.py:164
-msgid "Nombre del destinatario"
-msgstr "Nombre del destinatario"
-
-#: floresvalentin_app/models.py:165
-msgid "Teléfono del destinatario"
-msgstr "Teléfono del destinatario"
-
-#: floresvalentin_app/models.py:166
-#| msgid "Dirección de Entrega"
-msgid "Dirección de entrega"
-msgstr "Dirección de entrega"
-
-#: floresvalentin_app/models.py:167
-msgid "Ciudad de entrega"
-msgstr "Ciudad de entrega"
-
-#: floresvalentin_app/models.py:168
-#| msgid "Código Postal"
-msgid "Código postal de entrega"
-msgstr "Código postal de entrega"
-
-#: floresvalentin_app/models.py:169
-#| msgid "Iniciar Sesión"
-msgid "Ocasión"
-msgstr "Ocasión"
-
-#: floresvalentin_app/models.py:170
-#| msgid "Dirección de Entrega"
-msgid "Fecha de entrega"
-msgstr "Fecha de entrega"
-
-#: floresvalentin_app/models.py:171
-#| msgid "Dirección de Entrega"
-msgid "Hora de entrega"
-msgstr "Hora de entrega"
-
-#: floresvalentin_app/models.py:172
-msgid "Presupuesto"
-msgstr "Presupuesto"
-
-#: floresvalentin_app/models.py:173
-msgid "Mensaje para la tarjeta"
-msgstr "Mensaje para la tarjeta"
-
-#: floresvalentin_app/models.py:174
-msgid "Instrucciones especiales"
-msgstr "Instrucciones especiales"
 
 #: floresvalentin_app/models.py:176
 msgid "Productos deseados"
@@ -523,20 +539,20 @@ msgid "Detalles del pedido"
 msgstr ""
 
 #: template/floresvalentin_app/special_order_form.html:125
-msgid "Productos para incluir"
+msgid "Productos para incluir (Opcional)"
 msgstr ""
 
-#: template/floresvalentin_app/special_order_form.html:199
+#: template/floresvalentin_app/special_order_form.html:184
 msgid "Error: El formulario no está disponible."
 msgstr ""
 
-#: template/floresvalentin_app/special_order_form.html:203
+#: template/floresvalentin_app/special_order_form.html:188
 msgid ""
 "Nos comunicaremos contigo dentro de las próximas 24 horas para confirmar los "
 "detalles y el precio final de tu pedido especial."
 msgstr ""
 
-#: template/floresvalentin_app/special_order_form.html:208
+#: template/floresvalentin_app/special_order_form.html:193
 msgid "Enviar Pedido Especial"
 msgstr ""
 

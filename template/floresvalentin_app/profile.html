@@ -4,23 +4,69 @@
 {% block title %}{% trans "User Profile" %}{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1>{% trans "User Profile" %}</h1>
-    <hr>
+<div class="container mt-5 mb-5">
+    <h1 class="mb-4">{% trans "User Profile" %}</h1>
 
     {% if user.is_authenticated %}
-        <p><strong>{% trans "Username" %}:</strong> {{ user.username }}</p>
-        <p><strong>{% trans "Email" %}:</strong> {{ user.email }}</p>
-        <p><strong>{% trans "First Name" %}:</strong> {{ user.first_name|default:"N/A" }}</p>
-        <p><strong>{% trans "Last Name" %}:</strong> {{ user.last_name|default:"N/A" }}</p>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>{% trans "Account Information" %}</h4>
+                </div>
+                <div class="card-body">
+                    <p><strong>{% trans "Username" %}:</strong> {{ user.username }}</p>
+                    <p><strong>{% trans "Email" %}:</strong> {{ user.email }}</p>
+                    <p><strong>{% trans "First Name" %}:</strong> {{ user.first_name|default:_("Not provided") }}</p>
+                    <p><strong>{% trans "Last Name" %}:</strong> {{ user.last_name|default:_("Not provided") }}</p>
+                </div>
+            </div>
 
-        {# Add more profile details or actions here as needed #}
-        {# For example, a link to edit profile or view order history #}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>{% trans "Contact & Address Information" %}</h4>
+                </div>
+                <div class="card-body">
+                    {% with profile=user.profile %} {# Access profile via user.profile #}
+                        <p><strong>{% trans "Phone" %}:</strong> {{ profile.phone|default:_("Not provided") }}</p>
+                        <p><strong>{% trans "Address" %}:</strong> {{ profile.address|default:_("Not provided") }}</p>
+                        <p><strong>{% trans "Neighborhood" %}:</strong> {{ profile.neighborhood|default:_("Not provided") }}</p>
+                        <p><strong>{% trans "City" %}:</strong> {{ profile.city|default:_("Not provided") }}</p>
+                        <p><strong>{% trans "Country" %}:</strong> {{ profile.country|default:_("Not provided") }}</p>
+                        <p><strong>{% trans "Postal Code" %}:</strong> {{ profile.postal_code|default:_("Not provided") }}</p>
+                        <p><strong>{% trans "Newsletter Subscription" %}:</strong> {% if profile.newsletter %}{% trans "Yes" %}{% else %}{% trans "No" %}{% endif %}</p>
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
 
-        <a href="{% url 'logout' %}" class="btn btn-danger">{% trans "Logout" %}</a>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h4>{% trans "Actions" %}</h4>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'floresvalentin_app:profile_edit' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-user-edit me-2"></i>{% trans "Edit Profile" %}
+                    </a>
+                    <a href="{% url 'floresvalentin_app:my_orders' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-history me-2"></i>{% trans "My Orders" %}
+                    </a>
+                    {# Add link to change password if you have that view #}
+                    {# <a href="{% url 'password_change' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-key me-2"></i>{% trans "Change Password" %}
+                    </a> #}
+                    <a href="{% url 'logout' %}" class="list-group-item list-group-item-action text-danger">
+                        <i class="fas fa-sign-out-alt me-2"></i>{% trans "Logout" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
     {% else %}
-        <p>{% trans "You are not logged in." %}</p>
-        <a href="{% url 'login' %}" class="btn btn-primary">{% trans "Login" %}</a>
+        <div class="alert alert-warning" role="alert">
+            {% trans "You are not logged in." %} <a href="{% url 'login' %}" class="alert-link">{% trans "Login here" %}</a>.
+        </div>
     {% endif %}
 </div>
 {% endblock %}

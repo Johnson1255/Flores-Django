@@ -1,0 +1,26 @@
+{% extends 'floresvalentin_app/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "User Profile" %}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>{% trans "User Profile" %}</h1>
+    <hr>
+
+    {% if user.is_authenticated %}
+        <p><strong>{% trans "Username" %}:</strong> {{ user.username }}</p>
+        <p><strong>{% trans "Email" %}:</strong> {{ user.email }}</p>
+        <p><strong>{% trans "First Name" %}:</strong> {{ user.first_name|default:"N/A" }}</p>
+        <p><strong>{% trans "Last Name" %}:</strong> {{ user.last_name|default:"N/A" }}</p>
+
+        {# Add more profile details or actions here as needed #}
+        {# For example, a link to edit profile or view order history #}
+
+        <a href="{% url 'logout' %}" class="btn btn-danger">{% trans "Logout" %}</a>
+    {% else %}
+        <p>{% trans "You are not logged in." %}</p>
+        <a href="{% url 'login' %}" class="btn btn-primary">{% trans "Login" %}</a>
+    {% endif %}
+</div>
+{% endblock %}

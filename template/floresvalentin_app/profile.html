@@ -52,10 +52,9 @@
                     <a href="{% url 'floresvalentin_app:my_orders' %}" class="list-group-item list-group-item-action">
                         <i class="fas fa-history me-2"></i>{% trans "My Orders" %}
                     </a>
-                    {# Add link to change password if you have that view #}
-                    {# <a href="{% url 'password_change' %}" class="list-group-item list-group-item-action">
+                    <a href="{% url 'password_change' %}" class="list-group-item list-group-item-action">
                         <i class="fas fa-key me-2"></i>{% trans "Change Password" %}
-                    </a> #}
+                    </a>
                     <a href="{% url 'logout' %}" class="list-group-item list-group-item-action text-danger">
                         <i class="fas fa-sign-out-alt me-2"></i>{% trans "Logout" %}
                     </a>

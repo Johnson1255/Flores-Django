@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-04-21 17:56+0000\n"
+"POT-Creation-Date: 2025-04-22 18:23+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -235,7 +235,7 @@ msgstr "Fecha de creación"
 
 #: floresvalentin_app/models.py:186 template/floresvalentin_app/base.html:135
 #: template/floresvalentin_app/special_order_form.html:4
-#: template/floresvalentin_app/special_order_form.html:17
+#: template/floresvalentin_app/special_order_form.html:16
 msgid "Pedido Especial"
 msgstr "Pedido Especial"
 
@@ -524,35 +524,141 @@ msgstr ""
 msgid "No se encontraron productos que coincidan con tus criterios."
 msgstr ""
 
-#: template/floresvalentin_app/special_order_form.html:20
+#: template/floresvalentin_app/profile.html:4
+#: template/floresvalentin_app/profile.html:8
+msgid "User Profile"
+msgstr "Perfil de Usuario"
+
+#: template/floresvalentin_app/profile.html:15
+msgid "Account Information"
+msgstr "Información de la Cuenta"
+
+#: template/floresvalentin_app/profile.html:18
+msgid "Username"
+msgstr "Nombre de Usuario"
+
+#: template/floresvalentin_app/profile.html:19
+msgid "Email"
+msgstr "Correo Electrónico"
+
+#: template/floresvalentin_app/profile.html:20
+msgid "First Name"
+msgstr "Nombre"
+
+#: template/floresvalentin_app/profile.html:20
+#: template/floresvalentin_app/profile.html:21
+#: template/floresvalentin_app/profile.html:31
+#: template/floresvalentin_app/profile.html:32
+#: template/floresvalentin_app/profile.html:33
+#: template/floresvalentin_app/profile.html:34
+#: template/floresvalentin_app/profile.html:35
+#: template/floresvalentin_app/profile.html:36
+msgid "Not provided"
+msgstr "No proporcionado"
+
+#: template/floresvalentin_app/profile.html:21
+msgid "Last Name"
+msgstr "Apellido"
+
+#: template/floresvalentin_app/profile.html:27
+msgid "Contact & Address Information"
+msgstr "Información de Contacto y Dirección"
+
+#: template/floresvalentin_app/profile.html:31
+msgid "Phone"
+msgstr "Teléfono"
+
+#: template/floresvalentin_app/profile.html:32
+msgid "Address"
+msgstr "Dirección"
+
+#: template/floresvalentin_app/profile.html:33
+msgid "Neighborhood"
+msgstr "Barrio"
+
+#: template/floresvalentin_app/profile.html:34
+msgid "City"
+msgstr "Ciudad"
+
+#: template/floresvalentin_app/profile.html:35
+msgid "Country"
+msgstr "País"
+
+#: template/floresvalentin_app/profile.html:36
+msgid "Postal Code"
+msgstr "Código Postal"
+
+#: template/floresvalentin_app/profile.html:37
+msgid "Newsletter Subscription"
+msgstr "Suscripción al Boletín"
+
+#: template/floresvalentin_app/profile.html:37
+#: venv/lib/python3.13/site-packages/django/forms/widgets.py:801
+msgid "Yes"
+msgstr "Sí"
+
+#: template/floresvalentin_app/profile.html:37
+#: venv/lib/python3.13/site-packages/django/forms/widgets.py:802
+msgid "No"
+msgstr "No"
+
+#: template/floresvalentin_app/profile.html:46
+msgid "Actions"
+msgstr "Acciones"
+
+#: template/floresvalentin_app/profile.html:50
+msgid "Edit Profile"
+msgstr "Editar Perfil"
+
+#: template/floresvalentin_app/profile.html:53
+msgid "My Orders"
+msgstr "Mis Pedidos"
+
+#: template/floresvalentin_app/profile.html:57
+msgid "Change Password"
+msgstr "Cambiar Contraseña"
+
+#: template/floresvalentin_app/profile.html:60
+msgid "Logout"
+msgstr "Cerrar Sesión"
+
+#: template/floresvalentin_app/profile.html:68
+msgid "You are not logged in."
+msgstr "No has iniciado sesión."
+
+#: template/floresvalentin_app/profile.html:68
+msgid "Login here"
+msgstr "Inicia sesión aquí"
+
+#: template/floresvalentin_app/special_order_form.html:19
 msgid ""
 "Cuéntanos sobre tu ocasión especial y crearemos un arreglo floral único para "
 "ti."
 msgstr ""
 
-#: template/floresvalentin_app/special_order_form.html:28
+#: template/floresvalentin_app/special_order_form.html:27
 msgid "Información del destinatario"
 msgstr ""
 
-#: template/floresvalentin_app/special_order_form.html:81
+#: template/floresvalentin_app/special_order_form.html:80
 msgid "Detalles del pedido"
 msgstr ""
 
-#: template/floresvalentin_app/special_order_form.html:125
+#: template/floresvalentin_app/special_order_form.html:124
 msgid "Productos para incluir (Opcional)"
 msgstr ""
 
-#: template/floresvalentin_app/special_order_form.html:184
+#: template/floresvalentin_app/special_order_form.html:183
 msgid "Error: El formulario no está disponible."
 msgstr ""
 
-#: template/floresvalentin_app/special_order_form.html:188
+#: template/floresvalentin_app/special_order_form.html:187
 msgid ""
 "Nos comunicaremos contigo dentro de las próximas 24 horas para confirmar los "
 "detalles y el precio final de tu pedido especial."
 msgstr ""
 
-#: template/floresvalentin_app/special_order_form.html:193
+#: template/floresvalentin_app/special_order_form.html:192
 msgid "Enviar Pedido Especial"
 msgstr ""
 
@@ -1301,14 +1407,6 @@ msgstr ""
 
 #: venv/lib/python3.13/site-packages/django/forms/widgets.py:800
 msgid "Unknown"
-msgstr ""
-
-#: venv/lib/python3.13/site-packages/django/forms/widgets.py:801
-msgid "Yes"
-msgstr ""
-
-#: venv/lib/python3.13/site-packages/django/forms/widgets.py:802
-msgid "No"
 msgstr ""
 
 #. Translators: Please do not add spaces around commas.

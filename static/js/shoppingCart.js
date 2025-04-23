@@ -70,6 +70,7 @@ class CarritoCompras {
 
             // --- Logic for Quantity Buttons ---
             if (actionButton.classList.contains('quantity-decrease') || actionButton.classList.contains('quantity-increase')) {
+                e.preventDefault(); // *** ADD: Prevent default button action ***
                 const quantityInput = cartItem.querySelector('input[type="number"].quantity-input');
                 if (!quantityInput) return;
 
@@ -84,140 +85,173 @@ class CarritoCompras {
 
                 if (newQuantity !== currentQuantity) {
                     // Update the input visually immediately for responsiveness
-                    quantityInput.value = newQuantity;
-                    // Find the hidden submit button within the same form and click it
-                    const updateForm = actionButton.closest('.update-cart-form');
-                    const submitButton = updateForm?.querySelector('.update-submit-btn');
-                    submitButton?.click(); // Trigger the form submission
-                    // Note: We are now using the form submission defined in HTML,
-                    // so the `actualizarCantidad` AJAX function below might not be used
-                    // unless called from elsewhere. Consider removing it if unused.
+                    // quantityInput.value = newQuantity; // Update happens on success now
+                    // *** CHANGE: Call the AJAX update function instead of submitting form ***
+                    await this.actualizarCantidad(itemId, newQuantity, cartItem);
                 }
             // --- Logic for Remove Button ---
             } else if (actionButton.classList.contains('remove-item')) {
-                // The remove button is already type="submit" in its own form.
-                // We can let the form submit naturally.
-                // If we want confirmation, we can prevent default and then submit the form.
-                if (!confirm('¿Estás seguro de que deseas eliminar este producto?')) {
-                    e.preventDefault(); // Prevent submission only if user cancels
-                }
-                // If confirmed, the form submission proceeds as defined in the HTML.
-                // The `eliminarProducto` AJAX function below might not be used
-                // unless called from elsewhere. Consider removing it if unused.
+                e.preventDefault(); // *** ADD: Prevent default form submission ***
+                 if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+                    // *** CHANGE: Call the AJAX remove function ***
+                    await this.eliminarProducto(itemId, cartItem);
+                 }
             }
         });
     }
 
-    // Llama a la vista Django para actualizar cantidad (MAYBE UNUSED if form submission is used)
-    async actualizarCantidad(itemId, quantity, cartItemElement) { // *** FIX: Use itemId ***
-        // *** FIX: Construct URL based on the form action or a data attribute if needed ***
-        // This assumes the URL pattern is like /carrito/actualizar/<item_id>/
-        // Let's get the URL from the form action attribute for robustness
+    // Llama a la vista Django para actualizar cantidad (NOW USED for AJAX)
+    async actualizarCantidad(itemId, quantity, cartItemElement) {
         const updateForm = cartItemElement?.querySelector('.update-cart-form');
-        const url = updateForm?.action;
+        const url = updateForm?.action; // Get URL from form action
         if (!url) {
             console.error("Could not find update form action URL for item:", itemId);
             this.showToast('Error: No se pudo encontrar la URL para actualizar.', 'error');
             return;
         }
+        // Store current quantity in case of error
+        const quantityInput = cartItemElement.querySelector('.quantity-input');
+        const currentQuantity = quantityInput ? parseInt(quantityInput.value) : null;
+
         this.showLoadingFeedback(cartItemElement);
 
         try {
+            // *** Use fetch for AJAX POST ***
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'X-CSRFToken': csrftoken,
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json', // *** Ensure Content-Type is application/json ***
                     'X-Requested-With': 'XMLHttpRequest'
                 },
-                body: JSON.stringify({ quantity: quantity })
+                body: JSON.stringify({ quantity: quantity }) // *** Send quantity as JSON ***
             });
 
+            // Get response data regardless of ok status first
+            const data = await response.json().catch(() => ({ // Default empty object on JSON parse error
+                success: false,
+                error: 'Respuesta inválida del servidor.'
+            }));
+
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.error || `Error ${response.status}`);
+                // Throw error using message from JSON if available
+                throw new Error(data.error || `Error ${response.status}`);
             }
 
-            const data = await response.json(); // Espera { success: true, item_html: "...", summary_html: "..." }
-
+            // At this point, response was ok (status 2xx)
             if (data.success) {
-                // Opción 1: Reemplazar solo el item afectado
+                // Option 1: Replace only the affected item (if item_html is provided)
                  const newItemHtml = data.item_html;
                  if (newItemHtml) {
                      const tempDiv = document.createElement('div');
-                     tempDiv.innerHTML = newItemHtml;
-                     cartItemElement.replaceWith(tempDiv.firstChild);
+                     tempDiv.innerHTML = newItemHtml.trim(); // Trim whitespace
+                     const newItemElement = tempDiv.firstChild;
+                     if (newItemElement) {
+                        // Ensure the new element doesn't have the loading class
+                        newItemElement.classList.remove('loading-item');
+                        cartItemElement.replaceWith(newItemElement);
+                        // Update reference to the element for hiding feedback later
+                        cartItemElement = newItemElement;
+                     } else {
+                         console.error("Failed to create new item element from HTML:", newItemHtml);
+                         // Fallback: Update values directly if replacement failed
+                         if(quantityInput) quantityInput.value = data.quantity;
+                         const itemSubtotalSpan = cartItemElement.querySelector('.item-subtotal-price');
+                         if(itemSubtotalSpan && data.item_subtotal) itemSubtotalSpan.textContent = `$${parseFloat(data.item_subtotal).toFixed(2)}`;
+                     }
                  } else {
-                     // Fallback si no viene HTML específico: Recargar sección del carrito
-                     this.recargarSeccionCarrito();
+                     // Fallback if no specific item HTML: Update values directly
+                     if(quantityInput) quantityInput.value = data.quantity; // Update quantity if returned
+                     const itemSubtotalSpan = cartItemElement.querySelector('.item-subtotal-price');
+                     if(itemSubtotalSpan && data.item_subtotal) itemSubtotalSpan.textContent = `$${parseFloat(data.item_subtotal).toFixed(2)}`; // Update item subtotal if returned
                  }
-                // Opción 2: Reemplazar todo el resumen del pedido
+                // Option 2: Replace the entire order summary
                 this.actualizarResumenPedido(data.summary_html);
-                 // Actualizar contador general
+                 // Update general counter
                  this.actualizarContadorHeader(data.cart_count);
+                 this.showToast(data.message || 'Cantidad actualizada.'); // Show success message
 
             } else {
+                // Response was ok, but backend indicated failure
                 throw new Error(data.error || 'Error al actualizar cantidad.');
             }
 
         } catch (error) {
             console.error('Error al actualizar cantidad:', error);
             this.showToast(`Error: ${error.message}`, 'error');
+            // *** Revert quantity input on error ***
+            if (quantityInput && currentQuantity !== null) {
+                quantityInput.value = currentQuantity;
+            }
         } finally {
+            // Ensure loading feedback is hidden
+            // Use the potentially updated cartItemElement reference
             this.hideLoadingFeedback(cartItemElement);
         }
     }
 
-    // Llama a la vista Django para eliminar producto (MAYBE UNUSED if form submission is used)
-    async eliminarProducto(itemId, cartItemElement) { // *** FIX: Use itemId ***
-        // *** FIX: Construct URL based on the form action or a data attribute if needed ***
-        // This assumes the URL pattern is like /carrito/eliminar/<item_id>/
-        // Let's get the URL from the form action attribute for robustness
+    // Llama a la vista Django para eliminar producto (NOW USED for AJAX)
+    async eliminarProducto(itemId, cartItemElement) {
         const removeForm = cartItemElement?.querySelector('.remove-cart-form');
-        const url = removeForm?.action;
+        const url = removeForm?.action; // Get URL from form action
          if (!url) {
             console.error("Could not find remove form action URL for item:", itemId);
             this.showToast('Error: No se pudo encontrar la URL para eliminar.', 'error');
             return;
         }
-        // No need for loading feedback here if the form submits and reloads the page,
-        // but keep it if we switch back to full AJAX later.
-        // this.showLoadingFeedback(cartItemElement);
+        // Optional: Add loading feedback visually
+        this.showLoadingFeedback(cartItemElement);
 
         try {
+            // *** Use fetch for AJAX POST ***
             const response = await fetch(url, {
-                method: 'POST', // O DELETE si tu vista lo soporta
+                method: 'POST', // Or 'DELETE' if your backend view supports it
                 headers: {
                     'X-CSRFToken': csrftoken,
                     'X-Requested-With': 'XMLHttpRequest'
+                    // No 'Content-Type' needed if not sending a body
                 }
+                // No body needed for simple removal by ID in URL
             });
 
+            // Get response data regardless of ok status first
+            const data = await response.json().catch(() => ({ // Default empty object on JSON parse error
+                success: false,
+                error: 'Respuesta inválida del servidor.'
+            }));
+
              if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.error || `Error ${response.status}`);
+                // Throw error using message from JSON if available
+                throw new Error(data.error || `Error ${response.status}`);
             }
 
-            const data = await response.json(); // Espera { success: true, summary_html: "...", cart_count: X, message: "..." }
-
+            // At this point, response was ok (status 2xx)
             if (data.success) {
+                // Remove element smoothly (e.g., fade out then remove)
+                cartItemElement.style.transition = 'opacity 0.3s ease-out';
+                cartItemElement.style.opacity = '0';
+                await new Promise(resolve => setTimeout(resolve, 300)); // Wait for fade out
                 cartItemElement.remove(); // Eliminar del DOM
+
                 this.actualizarResumenPedido(data.summary_html);
                 this.actualizarContadorHeader(data.cart_count);
-                 // Verificar si el carrito quedó vacío
+                 // Verificar si el carrito quedó vacío AFTER removal
                  if (this.contenedorProductos?.childElementCount === 0) {
                      this.mostrarMensajeCarritoVacio();
                  }
                 this.showToast(data.message || 'Producto eliminado.');
             } else {
+                 // Response was ok, but backend indicated failure
                  throw new Error(data.error || 'Error al eliminar producto.');
             }
 
         } catch (error) {
             console.error('Error al eliminar producto:', error);
             this.showToast(`Error: ${error.message}`, 'error');
+            // If removal failed, ensure loading feedback is removed
+            this.hideLoadingFeedback(cartItemElement);
         } finally {
-             // No necesitamos ocultar feedback porque el elemento se elimina
+             // Feedback is handled within try/catch based on outcome
         }
     }
 

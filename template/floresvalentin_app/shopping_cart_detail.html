@@ -62,31 +62,9 @@
             <!-- Columna derecha: Resumen y cupón -->
             <div class="col-lg-4">
                 <div class="cart-sidebar">
-                    <!-- Resumen del carrito -->
+                    <!-- Resumen del carrito (Rendered via partial) -->
                     <div class="cart-summary">
-                        <h4>Resumen del pedido</h4>
-                        <div class="summary-item">
-                            <span>Subtotal</span>
-                            <span id="subtotal">${{ cart_subtotal|floatformat:2|default:'0.00' }}</span>
-                        </div>
-                        <div class="summary-item">
-                            <span>Envío</span>
-                            {# TODO: Calculate shipping dynamically #}
-                            <span id="shipping">$0.00</span>
-                        </div>
-                        <div class="summary-item">
-                            <span>IVA (19%)</span> {# Assuming 19% tax #}
-                            <span id="tax">${{ cart_tax|floatformat:2|default:'0.00' }}</span>
-                        </div>
-                        <hr>
-                        <div class="summary-item total">
-                            <strong>Total</strong>
-                            <strong id="total">${{ cart_total|floatformat:2|default:'0.00' }}</strong>
-                        </div>
-                        {# TODO: Link to actual checkout view #}
-                        <a href="#" class="btn btn-primary checkout-button w-100">
-                            Proceder al pago
-                        </a>
+                        {% include 'floresvalentin_app/partials/_cart_summary.html' %}
                     </div>
 
                     <!-- Cupón de descuento -->

@@ -1,0 +1,25 @@
+{% comment %} Partial template for rendering the cart summary section {% endcomment %}
+<h4>Resumen del pedido</h4>
+<div class="summary-item">
+    <span>Subtotal</span>
+    {# Use the context variables passed from the view helper #}
+    <span id="subtotal">${{ cart_subtotal|floatformat:2|default:'0.00' }}</span>
+</div>
+<div class="summary-item">
+    <span>Envío</span>
+    {# TODO: Calculate shipping dynamically #}
+    <span id="shipping">$0.00</span> {# Keep static for now, or pass from context if calculated #}
+</div>
+<div class="summary-item">
+    <span>IVA (19%)</span> {# Assuming 19% tax #}
+    <span id="tax">${{ cart_tax|floatformat:2|default:'0.00' }}</span>
+</div>
+<hr>
+<div class="summary-item total">
+    <strong>Total</strong>
+    <strong id="total">${{ cart_total|floatformat:2|default:'0.00' }}</strong>
+</div>
+{# TODO: Link to actual checkout view #}
+<a href="{% url 'floresvalentin_app:checkout' %}" class="btn btn-primary checkout-button w-100 {% if not cart_items %}disabled{% endif %}"> {# Disable if cart is empty #}
+    Proceder al pago
+</a>

@@ -1,7 +1,8 @@
 import uuid
-import logging # Added for logging errors
+import json # *** ADD: Import json for parsing request body ***
+import logging
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseBadRequest # *** ADD: HttpResponseBadRequest ***
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import AuthenticationForm # Restore AuthenticationForm
@@ -275,56 +276,204 @@ def cart_add(request, product_id):
             return redirect(request.META.get('HTTP_REFERER', 'floresvalentin_app:catalogo'))
 
 
-# Needs refactoring to use ShoppingCart.items JSONField
-def cart_update(request, product_id): # *** FIX: Changed parameter to product_id ***
+# *** ADD Helper function to get cart context data ***
+def _get_cart_context(cart):
+    """Calculates totals and prepares item context for rendering."""
+    cart_items_context = []
+    cart_subtotal = 0
+    cart_count = 0
+    if cart and cart.items:
+        product_ids = cart.items.keys()
+        products = Product.objects.filter(id__in=product_ids)
+        products_dict = {str(p.id): p for p in products}
+
+        for product_id, item_data in cart.items.items():
+            product = products_dict.get(product_id)
+            if product:
+                quantity = item_data.get('quantity', 0)
+                price = item_data.get('price', float(product.price)) # Use stored price or current
+                total_price = quantity * price
+                cart_items_context.append({
+                    'product': product,
+                    'quantity': quantity,
+                    'price': price,
+                    'total_price': total_price,
+                    'id': product_id # Pass ID for update/remove forms
+                })
+                cart_subtotal += total_price
+                cart_count += quantity
+
+    cart_tax = cart_subtotal * 0.19 # Example tax
+    cart_total = cart_subtotal + cart_tax
+    return {
+        'cart_items': cart_items_context,
+        'cart_subtotal': cart_subtotal,
+        'cart_tax': cart_tax,
+        'cart_total': cart_total,
+        'cart_count': cart_count,
+    }
+
+# *** ADD Helper function to render summary partial ***
+def _render_cart_summary(cart):
+    """Renders the cart summary partial template."""
+    context = _get_cart_context(cart)
+    # Assuming a partial template exists at this path
+    return render_to_string('floresvalentin_app/partials/_cart_summary.html', context)
+
+# *** ADD Helper function to render item partial ***
+def _render_cart_item(product_id, cart):
+    """Renders a single cart item partial template."""
+    context = _get_cart_context(cart)
+    # Find the specific item in the context
+    item_context = next((item for item in context['cart_items'] if item['id'] == product_id), None)
+    if item_context:
+        # Assuming a partial template exists at this path
+        return render_to_string('floresvalentin_app/partials/_cart_item.html', {'item': item_context})
+    return None
+
+
+# *** REVISED cart_update to handle AJAX ***
+@login_required # Ensure user is logged in
+def cart_update(request, product_id):
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     cart = get_or_create_cart(request)
+
     if not cart:
-        return redirect('login')
+        message = "Carrito no encontrado o usuario no autenticado."
+        if is_ajax:
+            return JsonResponse({'success': False, 'error': message, 'login_required': True}, status=401)
+        else:
+            messages.error(request, message)
+            return redirect('login')
 
-    product_id_str = str(product_id) # *** FIX: Use product_id directly ***
-    try: # Added try block
-        quantity = int(request.POST.get('quantity', 0))
+    product_id_str = str(product_id)
+    new_quantity = 0 # Initialize
 
-        if product_id_str in cart.items:
-            if quantity > 0:
-                cart.items[product_id_str]['quantity'] = quantity
-                messages.success(request, 'Cantidad actualizada.')
+    if request.method == 'POST':
+        try:
+            if is_ajax:
+                # Parse quantity from JSON body for AJAX
+                data = json.loads(request.body)
+                new_quantity = int(data.get('quantity', 0))
             else:
-                # If quantity is 0 or less, remove the item
-                del cart.items[product_id_str]
-                messages.success(request, 'Producto eliminado del carrito.')
-            cart.save()
+                # Parse quantity from form data for non-AJAX (fallback)
+                new_quantity = int(request.POST.get('quantity', 0))
+
+            if product_id_str in cart.items:
+                if new_quantity > 0:
+                    cart.items[product_id_str]['quantity'] = new_quantity
+                    message = 'Cantidad actualizada.'
+                else:
+                    # If quantity is 0 or less, remove the item
+                    del cart.items[product_id_str]
+                    message = 'Producto eliminado del carrito.'
+                cart.save()
+
+                if is_ajax:
+                    # Prepare data for JSON response
+                    context_data = _get_cart_context(cart)
+                    item_context = next((item for item in context_data['cart_items'] if item['id'] == product_id_str), None)
+                    item_subtotal = item_context['total_price'] if item_context else 0
+
+                    return JsonResponse({
+                        'success': True,
+                        'message': message,
+                        'cart_count': context_data['cart_count'],
+                        'summary_html': _render_cart_summary(cart),
+                        # Optionally render and return the specific item's HTML
+                        # 'item_html': _render_cart_item(product_id_str, cart),
+                        'item_subtotal': item_subtotal, # Send updated item subtotal
+                        'quantity': new_quantity if new_quantity > 0 else 0 # Send final quantity
+                    })
+                else:
+                    messages.success(request, message)
+                    return redirect('floresvalentin_app:ver_carrito')
+            else:
+                 message = 'Producto no encontrado en el carrito.'
+                 if is_ajax:
+                     return JsonResponse({'success': False, 'error': message}, status=404)
+                 else:
+                     messages.error(request, message)
+                     return redirect('floresvalentin_app:ver_carrito')
+
+        except (ValueError, json.JSONDecodeError):
+            message = 'Datos inválidos.'
+            if is_ajax:
+                return JsonResponse({'success': False, 'error': message}, status=400) # Bad Request
+            else:
+                messages.error(request, message)
+                return redirect('floresvalentin_app:ver_carrito')
+        except Exception as e:
+            logger.error(f"Error in cart_update view for product {product_id}: {e}", exc_info=True)
+            message = 'Error al actualizar el carrito.'
+            if is_ajax:
+                return JsonResponse({'success': False, 'error': message}, status=500) # Internal Server Error
+            else:
+                messages.error(request, message)
+                return redirect('floresvalentin_app:ver_carrito')
+    else:
+        # Handle non-POST requests (e.g., GET) if necessary, maybe redirect or return error
+        if is_ajax:
+            return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
         else:
-             messages.error(request, 'Producto no encontrado en el carrito.')
-    except ValueError:
-        messages.error(request, 'Cantidad inválida.')
-    except Exception as e:
-        logger.error(f"Error in cart_update view for product {product_id}: {e}", exc_info=True) # *** FIX: Log product_id ***
-        messages.error(request, 'Error al actualizar el carrito.')
+            return redirect('floresvalentin_app:ver_carrito')
 
 
-    return redirect('floresvalentin_app:ver_carrito')
-
-# Needs refactoring to use ShoppingCart.items JSONField
-def cart_remove(request, product_id): # *** FIX: Changed parameter to product_id ***
+# *** REVISED cart_remove to handle AJAX ***
+@login_required # Ensure user is logged in
+def cart_remove(request, product_id):
+    is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
     cart = get_or_create_cart(request)
+
     if not cart:
-        return redirect('login')
-
-    product_id_str = str(product_id) # *** FIX: Use product_id directly ***
-
-    try: # Added try block
-        if product_id_str in cart.items:
-            del cart.items[product_id_str]
-            cart.save()
-            messages.success(request, 'Producto eliminado del carrito.')
+        message = "Carrito no encontrado o usuario no autenticado."
+        if is_ajax:
+            return JsonResponse({'success': False, 'error': message, 'login_required': True}, status=401)
         else:
-            messages.error(request, 'Producto no encontrado en el carrito.')
-    except Exception as e:
-        logger.error(f"Error in cart_remove view for product {product_id}: {e}", exc_info=True) # *** FIX: Log product_id ***
-        messages.error(request, 'Error al eliminar el producto del carrito.')
+            messages.error(request, message)
+            return redirect('login')
 
-    return redirect('floresvalentin_app:ver_carrito')
+    product_id_str = str(product_id)
+
+    if request.method == 'POST': # Should be POST or DELETE
+        try:
+            if product_id_str in cart.items:
+                del cart.items[product_id_str]
+                cart.save()
+                message = 'Producto eliminado del carrito.'
+
+                if is_ajax:
+                    context_data = _get_cart_context(cart)
+                    return JsonResponse({
+                        'success': True,
+                        'message': message,
+                        'cart_count': context_data['cart_count'],
+                        'summary_html': _render_cart_summary(cart)
+                    })
+                else:
+                    messages.success(request, message)
+                    return redirect('floresvalentin_app:ver_carrito')
+            else:
+                message = 'Producto no encontrado en el carrito.'
+                if is_ajax:
+                    return JsonResponse({'success': False, 'error': message}, status=404)
+                else:
+                    messages.error(request, message)
+                    return redirect('floresvalentin_app:ver_carrito')
+        except Exception as e:
+            logger.error(f"Error in cart_remove view for product {product_id}: {e}", exc_info=True)
+            message = 'Error al eliminar el producto del carrito.'
+            if is_ajax:
+                return JsonResponse({'success': False, 'error': message}, status=500)
+            else:
+                messages.error(request, message)
+                return redirect('floresvalentin_app:ver_carrito')
+    else:
+        # Handle non-POST requests
+        if is_ajax:
+            return JsonResponse({'success': False, 'error': 'Método no permitido'}, status=405)
+        else:
+            return redirect('floresvalentin_app:ver_carrito')
 
 # Needs refactoring - No Coupon model exists currently
 def apply_coupon(request):

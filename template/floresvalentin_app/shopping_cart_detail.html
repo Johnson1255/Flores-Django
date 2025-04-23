@@ -67,6 +67,15 @@
                         {% include 'floresvalentin_app/partials/_cart_summary.html' %}
                     </div>
 
+                    {% if cart_items %}
+                    <!-- Botón de Checkout -->
+                    <div class="d-grid gap-2 mt-3">
+                        <a href="{% url 'floresvalentin_app:checkout' %}" class="btn btn-primary btn-lg">
+                            Proceder al Pago <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                    {% endif %}
+
                     <!-- Cupón de descuento -->
                     {# TODO: Implement coupon logic if needed #}
                     <div class="coupon-card mt-3">

@@ -49,8 +49,8 @@ urlpatterns = [
     # The default 'accounts/login/' from this include won't be used because we defined 'login/' above.
     path('accounts/', include('django.contrib.auth.urls')),
 
-    # Include app-specific URLs (ensure this doesn't conflict with above)
-    path('', include('floresvalentin_app.urls')), # Includes index, catalog, cart, etc.
+    # Include app-specific URLs under the 'floresvalentin_app/' prefix
+    path('floresvalentin_app/', include('floresvalentin_app.urls')), # Includes index, catalog, cart, etc.
 ]
 
 # Configuración para servir archivos multimedia en desarrollo

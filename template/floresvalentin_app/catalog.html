@@ -10,7 +10,8 @@
 {% endblock %}
 
 {% block content %}
-<div class="container py-4">
+{# Add data attribute to hold the placeholder image URL processed by Django #}
+<div class="container py-4" data-placeholder-image-url="{% static 'images/default-flower.jpg' %}">
     <header class="pb-3 mb-4 border-bottom">
         <div class="d-flex justify-content-between align-items-center">
             <h1>Catálogo de Flores Valentin</h1>

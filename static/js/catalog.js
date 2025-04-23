@@ -29,6 +29,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const viewGridBtn = document.getElementById('view-grid');
     const viewListBtn = document.getElementById('view-list');
     const paginationContainer = document.getElementById('pagination'); // Contenedor UL
+    // Get placeholder image URL from data attribute in catalog.html
+    const placeholderImageUrl = document.querySelector('.container[data-placeholder-image-url]')?.dataset.placeholderImageUrl || '';
 
     // Variables de estado (Simplificado - currentPage y currentView son las principales)
     let currentView = localStorage.getItem('viewMode') || 'grid'; // 'grid' o 'list'
@@ -200,7 +202,8 @@ document.addEventListener('DOMContentLoaded', () => {
             modal.querySelector('#quickViewCategory').textContent = product.category_name || product.category || ''; // Asumiendo que la API devuelve category_name
             modal.querySelector('#quickViewPrice').textContent = '$' + parseFloat(product.price || 0).toLocaleString();
             modal.querySelector('#quickViewStock').textContent = product.stock !== undefined ? product.stock : 'N/A';
-            modal.querySelector('#quickViewImage').src = product.image_url || '{% static "images/placeholder.png" %}'; // Usa placeholder si no hay imagen
+            // Use the placeholderImageUrl variable read from the data attribute
+            modal.querySelector('#quickViewImage').src = product.image_url || placeholderImageUrl;
             // Asegúrate que el botón de añadir al carrito en el modal también tenga el data-id
             const modalAddToCartBtn = modal.querySelector('.add-to-cart');
              if (modalAddToCartBtn) {
@@ -219,10 +222,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         console.error("ID de producto no encontrado en el botón del modal.");
                         showToast("Error: No se pudo identificar el producto.", "error");
                     }
-                });
+                 });
              }
 
-            const bsModal = new bootstrap.Modal(modal);
+            // Use getOrCreateInstance to potentially avoid issues with multiple instances/backdrops
+            const bsModal = bootstrap.Modal.getOrCreateInstance(modal);
             bsModal.show();
 
         } catch (error) {

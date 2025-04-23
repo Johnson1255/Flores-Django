@@ -21,7 +21,7 @@
                     {% if cart_items %}
                         {% for item in cart_items %}
                             <div class="cart-item" data-item-id="{{ item.id }}"> {# Added data-item-id for JS #}
-                                <img src="{{ item.product.image.url|default:'#' }}" alt="{{ item.product.name }}" class="cart-item-image"> {# Added default #}
+                                <img src="{% if item.product.image %}{{ item.product.image.url }}{% else %}{% static 'images/default-flower.jpg' %}{% endif %}" alt="{{ item.product.name }}" class="cart-item-image"> {# Check if image exists before getting URL #}
                                 <div class="cart-item-details">
                                     <h5>{{ item.product.name }}</h5>
                                     <p class="cart-item-price">Precio: ${{ item.price|floatformat:2 }}</p> {# Precio unitario al añadir #}

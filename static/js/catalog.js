@@ -181,10 +181,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // }
 
         // **Opción 2: Fetch detalles desde una API de Django**
-        const url = `/floresvalentin_app/producto/${productId}/api/`; // URL de API para detalles
+        // Corregido: Eliminar el prefijo /floresvalentin_app/ ya que las URLs de la app se incluyen en la raíz
+        const url = `/producto/${productId}/api/`; // URL de API para detalles
         try {
             const response = await fetch(url);
-            if (!response.ok) throw new Error('Producto no encontrado');
+            // Mejorar manejo de errores: verificar si la respuesta es 404 específicamente
+            if (response.status === 404) throw new Error('Producto no encontrado (404)');
+            if (!response.ok) throw new Error(`Error HTTP ${response.status}`);
             const product = await response.json();
 
             // Llenar modal (Asegúrate que los IDs del modal sean correctos)
@@ -201,17 +204,31 @@ document.addEventListener('DOMContentLoaded', () => {
             // Asegúrate que el botón de añadir al carrito en el modal también tenga el data-id
             const modalAddToCartBtn = modal.querySelector('.add-to-cart');
              if (modalAddToCartBtn) {
-                modalAddToCartBtn.dataset.id = product.id;
-                 // Re-vincular evento si es necesario, o usar delegación de eventos en el modal
-             }
+                modalAddToCartBtn.dataset.id = product.id; // Asegurarse que product.id existe
+                // Añadir listener específico para el botón del modal para evitar problemas de scope/timing
+                // Clonar y reemplazar para remover listeners previos si existieran
+                const newBtn = modalAddToCartBtn.cloneNode(true);
+                modalAddToCartBtn.parentNode.replaceChild(newBtn, modalAddToCartBtn);
 
+                newBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const currentProductId = newBtn.dataset.id; // Obtener ID directamente del botón del modal
+                    if (currentProductId) {
+                        addToCart(currentProductId, newBtn); // Llamar a addToCart con el ID y el botón correctos
+                    } else {
+                        console.error("ID de producto no encontrado en el botón del modal.");
+                        showToast("Error: No se pudo identificar el producto.", "error");
+                    }
+                });
+             }
 
             const bsModal = new bootstrap.Modal(modal);
             bsModal.show();
 
         } catch (error) {
             console.error('Error al obtener detalles para vista rápida:', error);
-            alert('No se pudieron cargar los detalles del producto.');
+            // Reemplazar alert con showToast para una mejor UX
+            showToast(`Error al cargar detalles: ${error.message || 'Error desconocido'}`, 'error');
         }
     };
 

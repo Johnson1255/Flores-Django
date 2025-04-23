@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // **IMPORTANTE**: Debes crear una URL en Django (ej. 'floresvalentin_app:catalogo_api')
         // que apunte a una vista que devuelva JSON.
         // Corrected URL based on main urls.py include
-        const url = new URL(window.location.origin + '/catalogo/api/');
+        const url = new URL(window.location.origin + '/floresvalentin_app/catalogo/api/'); // Added prefix
         url.searchParams.append('page', page);
         if (searchTerm) url.searchParams.append('search', searchTerm);
         if (selectedCategory) url.searchParams.append('category', selectedCategory);
@@ -183,8 +183,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // }
 
         // **Opción 2: Fetch detalles desde una API de Django**
-        // Corregido: Eliminar el prefijo /floresvalentin_app/ ya que las URLs de la app se incluyen en la raíz
-        const url = `/producto/${productId}/api/`; // URL de API para detalles
+        // Corrected URL based on main urls.py include
+        const url = `/floresvalentin_app/producto/${productId}/api/`; // URL de API para detalles - Added prefix
         try {
             const response = await fetch(url);
             // Mejorar manejo de errores: verificar si la respuesta es 404 específicamente
@@ -240,7 +240,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const addToCart = async (productId, buttonElement) => {
         // **IMPORTANTE**: Debes crear una URL en Django (ej. 'floresvalentin_app:agregar_al_carrito')
         // que apunte a una vista que maneje POST.
-        const url = `/carrito/agregar/${productId}/`; // Ajusta la URL - REMOVED /floresvalentin_app prefix
+        // Corrected URL based on main urls.py include
+        const url = `/floresvalentin_app/carrito/agregar/${productId}/`; // Ajusta la URL - Added prefix
         buttonElement.disabled = true; // Deshabilitar botón temporalmente
         buttonElement.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>'; // Feedback visual
 

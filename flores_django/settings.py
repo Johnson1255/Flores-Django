@@ -152,3 +152,34 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/login/' # URL where users are redirected for login
+
+# Basic Logging Configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'level': 'DEBUG', # Show DEBUG level messages and above
+            'formatter': 'simple',
+        },
+    },
+    'formatters': {
+        'simple': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'root': { # Configure the root logger
+        'handlers': ['console'],
+        'level': 'DEBUG', # Set the root logger level to DEBUG
+    },
+    # Optionally, configure specific loggers like Django's internal ones if needed
+    # 'loggers': {
+    #     'django': {
+    #         'handlers': ['console'],
+    #         'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'), # Keep Django logs at INFO by default
+    #         'propagate': False,
+    #     },
+    # }
+}

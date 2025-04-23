@@ -214,7 +214,9 @@ def cart_add(request, product_id):
     is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
 
     cart = get_or_create_cart(request)
+    logger.debug(f"cart_add: User {request.user.username} attempting to add product {product_id}") # Added log
     if not cart:
+        logger.warning(f"cart_add: Cart not found or user not logged in for user {request.user.username}") # Added log
         message = "Debes iniciar sesión para añadir productos al carrito."
         if is_ajax:
             return JsonResponse({'success': False, 'error': message, 'login_required': True}, status=401) # Unauthorized
@@ -223,24 +225,35 @@ def cart_add(request, product_id):
             return redirect('login') # Redirect non-AJAX requests
 
     try: # Added try block
+        logger.debug(f"cart_add: Fetching product {product_id}") # Added log
         product = get_object_or_404(Product, id=product_id)
+        logger.debug(f"cart_add: Product '{product.name}' found.") # Added log
         # For AJAX, quantity might come from JSON body, but JS currently doesn't send one. Default to 1.
         # quantity = int(request.POST.get('quantity', 1)) # Keep for non-AJAX if needed
         quantity = 1 # Default for current AJAX implementation
         product_id_str = str(product.id)
 
+        logger.debug(f"cart_add: Cart items before update for user {request.user.username}: {cart.items}") # Added log
+
         # Update JSONField
         if product_id_str in cart.items:
-            cart.items[product_id_str]['quantity'] = cart.items[product_id_str].get('quantity', 0) + quantity
+            current_quantity = cart.items[product_id_str].get('quantity', 0)
+            cart.items[product_id_str]['quantity'] = current_quantity + quantity
+            logger.debug(f"cart_add: Updated quantity for product {product_id_str} to {cart.items[product_id_str]['quantity']}") # Added log
         else:
             cart.items[product_id_str] = {
                 'quantity': quantity,
                 'price': float(product.price) # Store price at time of adding
             }
+            logger.debug(f"cart_add: Added new product {product_id_str} with quantity {quantity}") # Added log
+
+        logger.debug(f"cart_add: Cart items after update, before save: {cart.items}") # Added log
         cart.save()
+        logger.debug(f"cart_add: Cart saved successfully for user {request.user.username}") # Added log
 
         # Calculate current total items in cart for the counter
         cart_count = sum(item.get('quantity', 0) for item in cart.items.values())
+        logger.debug(f"cart_add: Calculated cart count: {cart_count}") # Added log
         success_message = f'{product.name} añadido al carrito'
 
         if is_ajax:

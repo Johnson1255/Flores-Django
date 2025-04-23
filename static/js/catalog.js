@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const addToCart = async (productId, buttonElement) => {
         // **IMPORTANTE**: Debes crear una URL en Django (ej. 'floresvalentin_app:agregar_al_carrito')
         // que apunte a una vista que maneje POST.
-        const url = `/floresvalentin_app/carrito/agregar/${productId}/`; // Ajusta la URL
+        const url = `/carrito/agregar/${productId}/`; // Ajusta la URL - REMOVED /floresvalentin_app prefix
         buttonElement.disabled = true; // Deshabilitar botón temporalmente
         buttonElement.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>'; // Feedback visual
 

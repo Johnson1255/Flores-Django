@@ -276,12 +276,12 @@ def cart_add(request, product_id):
 
 
 # Needs refactoring to use ShoppingCart.items JSONField
-def cart_update(request, item_id): # Changed parameter to item_id (which is product_id here)
+def cart_update(request, product_id): # *** FIX: Changed parameter to product_id ***
     cart = get_or_create_cart(request)
     if not cart:
         return redirect('login')
 
-    product_id_str = str(item_id) # item_id is the product UUID string
+    product_id_str = str(product_id) # *** FIX: Use product_id directly ***
     try: # Added try block
         quantity = int(request.POST.get('quantity', 0))
 
@@ -299,19 +299,19 @@ def cart_update(request, item_id): # Changed parameter to item_id (which is prod
     except ValueError:
         messages.error(request, 'Cantidad inválida.')
     except Exception as e:
-        logger.error(f"Error in cart_update view for item {item_id}: {e}", exc_info=True)
+        logger.error(f"Error in cart_update view for product {product_id}: {e}", exc_info=True) # *** FIX: Log product_id ***
         messages.error(request, 'Error al actualizar el carrito.')
 
 
     return redirect('floresvalentin_app:ver_carrito')
 
 # Needs refactoring to use ShoppingCart.items JSONField
-def cart_remove(request, item_id): # Changed parameter to item_id
+def cart_remove(request, product_id): # *** FIX: Changed parameter to product_id ***
     cart = get_or_create_cart(request)
     if not cart:
         return redirect('login')
 
-    product_id_str = str(item_id) # item_id is the product UUID string
+    product_id_str = str(product_id) # *** FIX: Use product_id directly ***
 
     try: # Added try block
         if product_id_str in cart.items:
@@ -321,7 +321,7 @@ def cart_remove(request, item_id): # Changed parameter to item_id
         else:
             messages.error(request, 'Producto no encontrado en el carrito.')
     except Exception as e:
-        logger.error(f"Error in cart_remove view for item {item_id}: {e}", exc_info=True)
+        logger.error(f"Error in cart_remove view for product {product_id}: {e}", exc_info=True) # *** FIX: Log product_id ***
         messages.error(request, 'Error al eliminar el producto del carrito.')
 
     return redirect('floresvalentin_app:ver_carrito')

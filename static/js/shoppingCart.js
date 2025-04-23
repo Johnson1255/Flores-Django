@@ -63,39 +63,63 @@ class CarritoCompras {
             const cartItem = target.closest('.cart-item');
             if (!cartItem) return;
 
-            const productId = cartItem.dataset.productId;
+            const itemId = cartItem.dataset.itemId; // *** FIX: Use data-item-id ***
             const actionButton = target.closest('button'); // Encuentra el botón clickeado
 
-            if (!actionButton) return;
+            if (!actionButton || !itemId) return; // Ensure we have an item ID
 
-            if (actionButton.classList.contains('quantity-btn')) {
-                const action = actionButton.dataset.action; //'increase' o 'decrease'
-                 const quantityInput = cartItem.querySelector('input[type="number"]');
-                 let currentQuantity = parseInt(quantityInput.value);
-                 let newQuantity = currentQuantity;
+            // --- Logic for Quantity Buttons ---
+            if (actionButton.classList.contains('quantity-decrease') || actionButton.classList.contains('quantity-increase')) {
+                const quantityInput = cartItem.querySelector('input[type="number"].quantity-input');
+                if (!quantityInput) return;
 
-                 if (action === 'increase') {
-                     newQuantity++;
-                 } else if (action === 'decrease') {
-                     newQuantity = Math.max(1, currentQuantity - 1); // No bajar de 1
-                 }
+                let currentQuantity = parseInt(quantityInput.value);
+                let newQuantity = currentQuantity;
 
-                 if (newQuantity !== currentQuantity) {
-                    await this.actualizarCantidad(productId, newQuantity, cartItem);
-                 }
+                if (actionButton.classList.contains('quantity-increase')) {
+                    newQuantity++;
+                } else if (actionButton.classList.contains('quantity-decrease')) {
+                    newQuantity = Math.max(1, currentQuantity - 1); // No bajar de 1
+                }
 
+                if (newQuantity !== currentQuantity) {
+                    // Update the input visually immediately for responsiveness
+                    quantityInput.value = newQuantity;
+                    // Find the hidden submit button within the same form and click it
+                    const updateForm = actionButton.closest('.update-cart-form');
+                    const submitButton = updateForm?.querySelector('.update-submit-btn');
+                    submitButton?.click(); // Trigger the form submission
+                    // Note: We are now using the form submission defined in HTML,
+                    // so the `actualizarCantidad` AJAX function below might not be used
+                    // unless called from elsewhere. Consider removing it if unused.
+                }
+            // --- Logic for Remove Button ---
             } else if (actionButton.classList.contains('remove-item')) {
-                e.preventDefault();
-                 if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
-                    await this.eliminarProducto(productId, cartItem);
-                 }
+                // The remove button is already type="submit" in its own form.
+                // We can let the form submit naturally.
+                // If we want confirmation, we can prevent default and then submit the form.
+                if (!confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+                    e.preventDefault(); // Prevent submission only if user cancels
+                }
+                // If confirmed, the form submission proceeds as defined in the HTML.
+                // The `eliminarProducto` AJAX function below might not be used
+                // unless called from elsewhere. Consider removing it if unused.
             }
         });
     }
 
-    // Llama a la vista Django para actualizar cantidad
-    async actualizarCantidad(productId, quantity, cartItemElement) {
-        const url = `/floresvalentin_app/carrito/actualizar/${productId}/`; // URL Django
+    // Llama a la vista Django para actualizar cantidad (MAYBE UNUSED if form submission is used)
+    async actualizarCantidad(itemId, quantity, cartItemElement) { // *** FIX: Use itemId ***
+        // *** FIX: Construct URL based on the form action or a data attribute if needed ***
+        // This assumes the URL pattern is like /carrito/actualizar/<item_id>/
+        // Let's get the URL from the form action attribute for robustness
+        const updateForm = cartItemElement?.querySelector('.update-cart-form');
+        const url = updateForm?.action;
+        if (!url) {
+            console.error("Could not find update form action URL for item:", itemId);
+            this.showToast('Error: No se pudo encontrar la URL para actualizar.', 'error');
+            return;
+        }
         this.showLoadingFeedback(cartItemElement);
 
         try {
@@ -144,10 +168,21 @@ class CarritoCompras {
         }
     }
 
-    // Llama a la vista Django para eliminar producto
-    async eliminarProducto(productId, cartItemElement) {
-        const url = `/floresvalentin_app/carrito/eliminar/${productId}/`; // URL Django
-        this.showLoadingFeedback(cartItemElement);
+    // Llama a la vista Django para eliminar producto (MAYBE UNUSED if form submission is used)
+    async eliminarProducto(itemId, cartItemElement) { // *** FIX: Use itemId ***
+        // *** FIX: Construct URL based on the form action or a data attribute if needed ***
+        // This assumes the URL pattern is like /carrito/eliminar/<item_id>/
+        // Let's get the URL from the form action attribute for robustness
+        const removeForm = cartItemElement?.querySelector('.remove-cart-form');
+        const url = removeForm?.action;
+         if (!url) {
+            console.error("Could not find remove form action URL for item:", itemId);
+            this.showToast('Error: No se pudo encontrar la URL para eliminar.', 'error');
+            return;
+        }
+        // No need for loading feedback here if the form submits and reloads the page,
+        // but keep it if we switch back to full AJAX later.
+        // this.showLoadingFeedback(cartItemElement);
 
         try {
             const response = await fetch(url, {

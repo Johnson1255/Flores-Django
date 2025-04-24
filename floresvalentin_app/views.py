@@ -906,9 +906,9 @@ def manage_products_view(request):
 
 @login_required
 def check_admin_status_api(request):
-    """Checks if the current user has admin privileges."""
-    profile = getattr(request.user, 'profile', None)
-    is_admin = profile and profile.role == 'admin'
+    """Checks if the current user has admin privileges using the standard is_staff flag."""
+    # A user created with createsuperuser will have is_staff=True
+    is_admin = request.user.is_staff
     return JsonResponse({'is_admin': is_admin})
 
 

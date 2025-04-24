@@ -12,9 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // URLs (assuming Django's reverse mechanism isn't directly available in JS)
     // It's often better to pass these via data attributes in the HTML if they might change
-    const checkAdminUrl = '/api/check-admin/';
-    const manageProductsApiUrl = '/api/manage-products/'; // Base URL for GET/POST
-    const manageProductsApiDetailUrl = (id) => `/api/manage-products/${id}/`; // URL for DELETE
+    const checkAdminUrl = '/floresvalentin_app/api/check-admin/';
+    const manageProductsApiUrl = '/floresvalentin_app/api/manage-products/'; // Base URL for GET/POST
+    const manageProductsApiDetailUrl = (id) => `/floresvalentin_app/api/manage-products/${id}/`; // URL for DELETE
 
     // Function to get CSRF token (needed for POST/DELETE requests)
     function getCookie(name) {

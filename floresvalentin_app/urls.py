@@ -39,4 +39,10 @@ urlpatterns = [
     path('contact-submit/', views.contact_view, name='contact_submit'), # Changed URL and view name
     path('galeria/', views.gallery, name='gallery'), # Assuming gallery is part of index
     path('ubicacion/', views.location, name='location'), # Assuming location is also part of index or needs its own template
+
+    # --- Product Management URLs ---
+    path('manage-products/', views.manage_products_view, name='manage_products'),
+    path('api/check-admin/', views.check_admin_status_api, name='check_admin_status_api'),
+    path('api/manage-products/', views.manage_products_api, name='manage_products_api'), # For listing (GET) and creating (POST)
+    path('api/manage-products/<uuid:product_id>/', views.manage_products_api, name='manage_products_api_detail'), # For deleting (DELETE)
 ]

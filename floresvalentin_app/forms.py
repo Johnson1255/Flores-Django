@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 # Import the new ContactMessage model
 import json # Import json for handling the JSONField
-from .models import SpecialOrder, Profile, ContactMessage
+from .models import SpecialOrder, Profile, ContactMessage, Product # Import Product model
 
 class SpecialOrderForm(forms.ModelForm):
     # Define fields for product types - these are not directly in the model
@@ -138,6 +138,46 @@ class ProfileForm(forms.ModelForm):
             'address': _("Dirección de Entrega"),
             'postal_code': _("Código Postal"),
             'newsletter': _("Deseo recibir ofertas y novedades por correo electrónico"),
+        }
+
+# --- Product Management Form ---
+class ProductForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        # Include fields needed for creation/editing via the frontend management tool
+        fields = ['name', 'category', 'description', 'price', 'stock', 'available'] # Exclude 'image' for now
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'category': forms.Select(attrs={'class': 'form-select'}),
+            'description': forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+            'price': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
+            'stock': forms.NumberInput(attrs={'class': 'form-control'}),
+            'available': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+        labels = {
+            'name': _("Nombre del Producto"),
+            'category': _("Categoría"),
+            'description': _("Descripción"),
+            'price': _("Precio (COP)"),
+            'stock': _("Cantidad en Stock"),
+            'available': _("Disponible para la venta"),
+        }
+        # Add help text or error messages if needed
+        error_messages = {
+            'name': {
+                'required': _("El nombre del producto es obligatorio."),
+            },
+            'category': {
+                'required': _("Debe seleccionar una categoría."),
+            },
+             'price': {
+                'required': _("El precio es obligatorio."),
+                'invalid': _("Ingrese un número válido para el precio."),
+            },
+             'stock': {
+                'required': _("El stock es obligatorio."),
+                 'invalid': _("Ingrese un número entero válido para el stock."),
+            },
         }
 
 

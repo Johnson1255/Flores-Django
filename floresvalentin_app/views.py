@@ -5,7 +5,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponseBadRequest # *** ADD: HttpResponseBadRequest ***
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.forms import AuthenticationForm # Restore AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.mixins import UserPassesTestMixin # Import for admin check
+from django.views.decorators.http import require_POST, require_http_methods # For restricting HTTP methods
 # from django.contrib.auth.views import LoginView
 from django.contrib import messages
 from django.urls import reverse_lazy, reverse
@@ -14,9 +16,9 @@ from django.template.loader import render_to_string # Added for rendering partia
 from django.db.models import Q # Added for search
 
 # Corrected model imports
-from .models import Product, Category, Order, OrderItem, SpecialOrder, ShoppingCart, Profile, ContactMessage # Added ContactMessage
+from .models import Product, Category, Order, OrderItem, SpecialOrder, ShoppingCart, Profile, ContactMessage
 # Import the correct form
-from .forms import SpecialOrderForm, ContactMessageForm, ProfileForm, CheckoutForm, CustomUserCreationForm # Changed ContactForm to ContactMessageForm
+from .forms import SpecialOrderForm, ContactMessageForm, ProfileForm, CheckoutForm, CustomUserCreationForm, ProductForm # Added ProductForm
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -878,3 +880,120 @@ def register_view(request): # Renamed from register
         return render(request, 'registration/register.html', context) # Render register.html
 
 # Logout view will use Django's built-in view configured in urls.py
+
+
+# --- Product Management Views (Admin Frontend) ---
+
+# Helper decorator for admin check
+def admin_required(view_func):
+    def _wrapped_view(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return JsonResponse({'error': 'Authentication required'}, status=401)
+        # Check if profile exists and role is admin
+        profile = getattr(request.user, 'profile', None)
+        if not profile or profile.role != 'admin':
+            return JsonResponse({'error': 'Admin privileges required'}, status=403)
+        return view_func(request, *args, **kwargs)
+    return _wrapped_view
+
+@login_required
+def manage_products_view(request):
+    """Renders the product management page."""
+    # Basic permission check (must be logged in)
+    # More granular checks (is_admin) will happen in API calls / JS
+    categories = Category.objects.all()
+    return render(request, 'floresvalentin_app/manage_products.html', {'categories': categories})
+
+@login_required
+def check_admin_status_api(request):
+    """Checks if the current user has admin privileges."""
+    profile = getattr(request.user, 'profile', None)
+    is_admin = profile and profile.role == 'admin'
+    return JsonResponse({'is_admin': is_admin})
+
+
+@login_required
+@require_http_methods(["GET", "POST", "DELETE"]) # Allow GET, POST, DELETE
+def manage_products_api(request, product_id=None):
+    """
+    API endpoint for managing products.
+    GET /api/manage-products/ -> List all products
+    POST /api/manage-products/ -> Create a new product (Admin only)
+    DELETE /api/manage-products/<uuid:product_id>/ -> Delete a product (Admin only)
+    """
+    profile = getattr(request.user, 'profile', None)
+    is_admin = profile and profile.role == 'admin'
+
+    # --- LIST Products (GET) ---
+    if request.method == 'GET':
+        try:
+            products = Product.objects.select_related('category').order_by('name').all()
+            data = [{
+                'id': str(p.id),
+                'name': p.name,
+                'category': {'id': p.category.id, 'name': p.category.name} if p.category else None,
+                'price': str(p.price), # Send as string for consistency
+                'stock': p.stock,
+                'available': p.available,
+                'description': p.description, # Include description
+                'image_url': p.image.url if p.image else None # Include image url
+            } for p in products]
+            return JsonResponse({'products': data})
+        except Exception as e:
+            logger.error(f"Error listing products in manage_products_api: {e}", exc_info=True)
+            return JsonResponse({'error': 'Failed to retrieve products'}, status=500)
+
+    # --- CREATE Product (POST) ---
+    elif request.method == 'POST':
+        if not is_admin:
+            return JsonResponse({'error': 'Admin privileges required to create products'}, status=403)
+
+        try:
+            # Assuming JSON data is sent
+            data = json.loads(request.body)
+            form = ProductForm(data) # Use ProductForm for validation
+
+            if form.is_valid():
+                product = form.save()
+                # Return the created product data
+                product_data = {
+                    'id': str(product.id),
+                    'name': product.name,
+                    'category': {'id': product.category.id, 'name': product.category.name} if product.category else None,
+                    'price': str(product.price),
+                    'stock': product.stock,
+                    'available': product.available,
+                    'description': product.description,
+                    'image_url': product.image.url if product.image else None
+                }
+                return JsonResponse({'product': product_data, 'message': 'Producto creado exitosamente'}, status=201)
+            else:
+                # Return validation errors
+                return JsonResponse({'errors': form.errors}, status=400)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+        except Exception as e:
+            logger.error(f"Error creating product in manage_products_api: {e}", exc_info=True)
+            return JsonResponse({'error': 'Failed to create product'}, status=500)
+
+    # --- DELETE Product (DELETE) ---
+    elif request.method == 'DELETE':
+        if not is_admin:
+            return JsonResponse({'error': 'Admin privileges required to delete products'}, status=403)
+
+        if not product_id:
+             return JsonResponse({'error': 'Product ID is required for deletion'}, status=400)
+
+        try:
+            product = get_object_or_404(Product, id=product_id)
+            product_name = product.name # Get name before deleting
+            product.delete()
+            return JsonResponse({'message': f'Producto "{product_name}" eliminado exitosamente'})
+        except Product.DoesNotExist:
+             return JsonResponse({'error': 'Product not found'}, status=404)
+        except Exception as e:
+            logger.error(f"Error deleting product {product_id} in manage_products_api: {e}", exc_info=True)
+            return JsonResponse({'error': 'Failed to delete product'}, status=500)
+
+    # Should not happen due to @require_http_methods
+    return JsonResponse({'error': 'Method not allowed'}, status=405)

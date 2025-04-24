@@ -188,6 +188,14 @@
                         {# Asumiendo que tenemos una vista/URL para el perfil del usuario #}
                         <a class="nav-link" href="{% url 'floresvalentin_app:profile' %}">{% trans "Mi Cuenta" %}</a>
                     </li>
+                    {# --- Admin Link --- #}
+                    {% if user.is_superuser %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'floresvalentin_app:manage_products' %}">
+                            <i class="fas fa-cogs"></i> {% trans "Gestionar Productos" %}
+                        </a>
+                    </li>
+                    {% endif %}
                     {% endif %}
                 </ul>
             </div>

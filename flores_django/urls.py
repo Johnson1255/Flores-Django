@@ -21,17 +21,16 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-# Import views from the app (keep for register view)
-from floresvalentin_app import views as app_views
-# Import built-in LoginView and LogoutView
 # Import views from the app
 from floresvalentin_app import views as app_views
-# Import built-in LogoutView (LoginView not needed here anymore)
+# Import built-in LogoutView
 from django.contrib.auth.views import LogoutView
 # Import include for i18n urls
 from django.urls import path, include
 
 urlpatterns = [
+    # Map the root URL ('') to the app's index view
+    path('', app_views.index, name='home'), # Added this line
     path('admin/', admin.site.urls),
     path('i18n/', include('django.conf.urls.i18n')), # Add this line for language switching
 

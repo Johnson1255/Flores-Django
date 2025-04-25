@@ -56,7 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
     applyViewMode(); // Aplicar al cargar
 
     // Función para obtener datos (productos y paginación) desde Django vía AJAX
-    const fetchProducts = async (page = 1) => {
+    // *** MODIFIED: Added optional categoryOverride parameter ***
+    const fetchProducts = async (page = 1, categoryOverride = null) => {
         if (!flowersContainer) return;
 
         flowersContainer.innerHTML = `
@@ -69,7 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
         resultsCount.textContent = 'Cargando...';
 
         const searchTerm = searchInput?.value || '';
-        const selectedCategory = categoryFilter?.value || '';
+        // *** MODIFIED: Use categoryOverride if provided, otherwise use dropdown value ***
+        const selectedCategory = categoryOverride !== null ? categoryOverride : (categoryFilter?.value || '');
         const sortOption = sortBy?.value || 'name-asc';
 
         // Construir URL con parámetros de consulta
@@ -329,12 +331,23 @@ document.addEventListener('DOMContentLoaded', () => {
     });
      // Event listener para tabs (si existen)
      categoryTabsContainer?.addEventListener('click', (e) => {
-         if (e.target.tagName === 'BUTTON' && e.target.classList.contains('nav-link')) {
-             categoryTabsContainer.querySelectorAll('button.nav-link').forEach(btn => btn.classList.remove('active'));
+         // *** FIXED: Check for A tag instead of BUTTON ***
+         if (e.target.tagName === 'A' && e.target.classList.contains('nav-link')) {
+             e.preventDefault(); // Prevent default link behavior
+
+             // *** FIXED: Select A tags ***
+             categoryTabsContainer.querySelectorAll('a.nav-link').forEach(link => link.classList.remove('active'));
              e.target.classList.add('active');
+
              const categoryValue = e.target.dataset.category;
-             if (categoryFilter) categoryFilter.value = categoryValue; // Sincronizar dropdown
-             fetchProducts(1);
+
+             // Sincronizar dropdown (optional, but good for consistency)
+             if (categoryFilter) {
+                 categoryFilter.value = categoryValue;
+             }
+
+             // *** MODIFIED: Pass categoryValue directly to fetchProducts ***
+             fetchProducts(1, categoryValue);
          }
      });
 
@@ -344,11 +357,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (categoryFilter) categoryFilter.value = '';
         if (sortBy) sortBy.value = 'name-asc';
          // Resetear tabs (si existen)
-         categoryTabsContainer?.querySelectorAll('button.nav-link').forEach(btn => {
-             btn.classList.remove('active');
-             if (btn.dataset.category === '') btn.classList.add('active');
+         // *** FIXED: Select A tags ***
+         categoryTabsContainer?.querySelectorAll('a.nav-link').forEach(link => {
+             link.classList.remove('active');
+             // Activate the "Todas" tab
+             if (link.dataset.category === '') {
+                 link.classList.add('active');
+             }
          });
-        fetchProducts(1);
+        fetchProducts(1); // Fetch all products
     });
 
     viewGridBtn?.addEventListener('click', () => {

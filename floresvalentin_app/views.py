@@ -918,11 +918,12 @@ def manage_products_api(request, product_id=None):
     """
     API endpoint for managing products.
     GET /api/manage-products/ -> List all products
-    POST /api/manage-products/ -> Create a new product (Admin only)
-    DELETE /api/manage-products/<uuid:product_id>/ -> Delete a product (Admin only)
+    POST /api/manage-products/ -> Create a new product (Staff/Admin only)
+    DELETE /api/manage-products/<uuid:product_id>/ -> Delete a product (Staff/Admin only)
     """
-    profile = getattr(request.user, 'profile', None)
-    is_admin = profile and profile.role == 'admin'
+    # Use Django's standard is_staff check for admin privileges
+    # Superusers automatically have is_staff = True
+    is_admin = request.user.is_staff
 
     # --- LIST Products (GET) ---
     if request.method == 'GET':

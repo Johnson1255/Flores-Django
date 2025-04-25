@@ -29,6 +29,53 @@
     .no-admin-status { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; }
     .error-message { color: #dc3545; font-size: 0.9em; margin-top: 5px; }
     #result, #manageResult { margin-top: 20px; padding: 10px; border: 1px solid #ccc; min-height: 50px; background-color: #f8f9fa; }
+
+    /* Modal Styles */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1000; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+    .modal-content {
+        background-color: #fefefe;
+        margin: 10% auto; /* 10% from the top and centered */
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%; /* Could be more or less, depending on screen size */
+        max-width: 600px; /* Maximum width */
+        border-radius: 5px;
+    }
+    .modal-header, .modal-footer {
+        padding: 10px 15px;
+        border-bottom: 1px solid #eee;
+    }
+    .modal-footer {
+        border-top: 1px solid #eee;
+        border-bottom: none;
+        text-align: right;
+    }
+    .modal-header h2 {
+        margin: 0;
+    }
+    .close-btn {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .close-btn:hover,
+    .close-btn:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
 </style>
 {% endblock %}
 
@@ -59,7 +106,7 @@
                     <th>{% trans "Precio" %}</th>
                     <th>{% trans "Stock" %}</th>
                     <th>{% trans "Disponible" %}</th>
-                    <th>{% trans "Acciones" %}</th>
+                    <th style="width: 150px;">{% trans "Acciones" %}</th> {# Wider column for buttons #}
                 </tr>
             </thead>
             <tbody>
@@ -124,9 +171,92 @@
     </div>
 
 </div> {# End container #}
+
+{# --- Edit Product Modal --- #}
+<div id="editProductModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close-btn" onclick="closeEditModal()">&times;</span>
+            <h2>{% trans "Editar Producto" %}</h2>
+        </div>
+        <form id="editProductForm">
+            {% csrf_token %} {# Include CSRF token if needed by backend for PUT, though often not required for APIs #}
+            <input type="hidden" id="editProductId" name="product_id"> {# Hidden field for ID #}
+
+            <div class="form-group">
+                <label for="editProductName">{% trans "Nombre" %}:</label>
+                <input type="text" id="editProductName" name="name" required>
+                <div id="edit-error-name" class="error-message"></div>
+            </div>
+            <div class="form-group">
+                <label for="editProductCategory">{% trans "Categoría" %}:</label>
+                <select id="editProductCategory" name="category" required>
+                    <option value="">{% trans "Seleccione una categoría" %}...</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+                 <div id="edit-error-category" class="error-message"></div>
+            </div>
+            <div class="form-group">
+                <label for="editProductDescription">{% trans "Descripción" %}:</label>
+                <textarea id="editProductDescription" name="description"></textarea>
+                 <div id="edit-error-description" class="error-message"></div>
+            </div>
+            <div class="form-group">
+                <label for="editProductPrice">{% trans "Precio" %} (COP):</label>
+                <input type="number" id="editProductPrice" name="price" step="0.01" required min="0">
+                 <div id="edit-error-price" class="error-message"></div>
+            </div>
+            <div class="form-group">
+                <label for="editProductStock">{% trans "Stock" %}:</label>
+                <input type="number" id="editProductStock" name="stock" required min="0">
+                 <div id="edit-error-stock" class="error-message"></div>
+            </div>
+            <div class="form-group">
+                <label for="editProductAvailable">
+                    <input type="checkbox" id="editProductAvailable" name="available">
+                    {% trans "Disponible para la venta" %}
+                </label>
+                 <div id="edit-error-available" class="error-message"></div>
+            </div>
+            {# Image editing might require separate handling #}
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeEditModal()">{% trans "Cancelar" %}</button>
+                <button type="submit" id="saveEditBtn" class="btn">{% trans "Guardar Cambios" %}</button>
+            </div>
+        </form>
+         <div id="editResult" style="margin-top: 15px;"></div> {# Area for edit status messages #}
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
-{# Link to the new JavaScript file we will create #}
+{# Link to the JavaScript file #}
 <script src="{% static 'js/manage_products.js' %}"></script>
+<script>
+    // Simple functions to open/close modal (can be integrated into manage_products.js later)
+    const editModal = document.getElementById('editProductModal');
+    function openEditModal() {
+        editModal.style.display = 'block';
+    }
+    function closeEditModal() {
+        editModal.style.display = 'none';
+        // Clear previous errors/results
+        document.getElementById('editResult').innerHTML = '';
+        clearEditFormErrors();
+    }
+    // Close modal if user clicks outside of it
+    window.onclick = function(event) {
+        if (event.target == editModal) {
+            closeEditModal();
+        }
+    }
+
+    function clearEditFormErrors() {
+        const errorDivs = editModal.querySelectorAll('.error-message');
+        errorDivs.forEach(div => div.textContent = '');
+    }
+</script>
 {% endblock %}

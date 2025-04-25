@@ -913,12 +913,14 @@ def check_admin_status_api(request):
 
 
 @login_required
-@require_http_methods(["GET", "POST", "DELETE"]) # Allow GET, POST, DELETE
+# Allow GET, POST, PUT, DELETE
+@require_http_methods(["GET", "POST", "PUT", "DELETE"])
 def manage_products_api(request, product_id=None):
     """
     API endpoint for managing products.
     GET /api/manage-products/ -> List all products
     POST /api/manage-products/ -> Create a new product (Staff/Admin only)
+    PUT /api/manage-products/<uuid:product_id>/ -> Update a product (Staff/Admin only)
     DELETE /api/manage-products/<uuid:product_id>/ -> Delete a product (Staff/Admin only)
     """
     # Use Django's standard is_staff check for admin privileges
@@ -977,9 +979,49 @@ def manage_products_api(request, product_id=None):
             logger.error(f"Error creating product in manage_products_api: {e}", exc_info=True)
             return JsonResponse({'error': 'Failed to create product'}, status=500)
 
+    # --- UPDATE Product (PUT) ---
+    elif request.method == 'PUT':
+        if not is_admin:
+            return JsonResponse({'error': 'Admin privileges required to update products'}, status=403)
+
+        if not product_id:
+            return JsonResponse({'error': 'Product ID is required for update'}, status=400)
+
+        try:
+            product = get_object_or_404(Product, id=product_id)
+            data = json.loads(request.body)
+            # Pass instance=product to update the existing object
+            form = ProductForm(data, instance=product)
+
+            if form.is_valid():
+                updated_product = form.save()
+                # Return the updated product data
+                product_data = {
+                    'id': str(updated_product.id),
+                    'name': updated_product.name,
+                    'category': {'id': updated_product.category.id, 'name': updated_product.category.name} if updated_product.category else None,
+                    'price': str(updated_product.price),
+                    'stock': updated_product.stock,
+                    'available': updated_product.available,
+                    'description': updated_product.description,
+                    'image_url': updated_product.image.url if updated_product.image else None
+                }
+                return JsonResponse({'product': product_data, 'message': 'Producto actualizado exitosamente'})
+            else:
+                # Return validation errors
+                return JsonResponse({'errors': form.errors}, status=400)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+        except Product.DoesNotExist:
+            return JsonResponse({'error': 'Product not found'}, status=404)
+        except Exception as e:
+            logger.error(f"Error updating product {product_id} in manage_products_api: {e}", exc_info=True)
+            return JsonResponse({'error': 'Failed to update product'}, status=500)
+
     # --- DELETE Product (DELETE) ---
     elif request.method == 'DELETE':
         if not is_admin:
+            # This check remains important for DELETE as well
             return JsonResponse({'error': 'Admin privileges required to delete products'}, status=403)
 
         if not product_id:

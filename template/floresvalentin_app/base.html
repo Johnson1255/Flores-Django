@@ -38,7 +38,6 @@
             name: '{{ user.get_full_name|default:user.username }}',
             email: '{{ user.email }}',
             
-            // Add custom user traits if available
             {% if logrocket_user_data %}
             {% for key, value in logrocket_user_data.items %}
             {{ key }}: '{{ value }}',

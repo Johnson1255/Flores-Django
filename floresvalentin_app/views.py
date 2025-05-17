@@ -896,7 +896,7 @@ def admin_required(view_func):
         return view_func(request, *args, **kwargs)
     return _wrapped_view
 
-@login_required
+@admin_required
 def manage_products_view(request):
     """Renders the product management page."""
     # Basic permission check (must be logged in)
@@ -904,7 +904,7 @@ def manage_products_view(request):
     categories = Category.objects.all()
     return render(request, 'floresvalentin_app/manage_products.html', {'categories': categories})
 
-@login_required
+@admin_required
 def check_admin_status_api(request):
     """Checks if the current user has admin privileges using the standard is_staff flag."""
     # A user created with createsuperuser will have is_staff=True

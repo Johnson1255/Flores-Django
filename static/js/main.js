@@ -38,3 +38,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Puedes añadir aquí otras funciones globales de UI si es necesario,
 // pero evita lógica de datos o autenticación.
+
+// Error tracking
+window.addEventListener('error', (event) => {
+    console.error('Caught error:', event.error);
+    // LogRocket automatically captures these, but you can add custom metadata
+    if (window.LogRocket) {
+        LogRocket.captureException(event.error, {
+            tags: {
+                location: window.location.pathname,
+                component: 'global'
+            }
+        });
+    }
+});
+
+// Track custom events if needed
+function trackUserAction(action, metadata = {}) {
+    if (window.LogRocket) {
+        LogRocket.track(action, metadata);
+    }
+}

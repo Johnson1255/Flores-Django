@@ -68,6 +68,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'floresvalentin_app.context_processors.logrocket_context',
                 # Custom context processors
                 'floresvalentin_app.context_processors.cart_context', # Added cart context
             ],

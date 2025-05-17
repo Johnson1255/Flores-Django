@@ -17,3 +17,13 @@ def cart_context(request):
     return {
         'cart_item_count': cart_item_count,
     }
+
+def logrocket_context(request):
+    user_data = {}
+    if request.user.is_authenticated:
+        user_data = {
+            'user_id': request.user.id,
+            'username': request.user.username,
+            'is_staff': request.user.is_staff,
+        }
+    return {'logrocket_user_data': user_data}

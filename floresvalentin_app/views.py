@@ -3,7 +3,7 @@ import json # *** ADD: Import json for parsing request body ***
 import logging
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponseBadRequest # *** ADD: HttpResponseBadRequest ***
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import UserPassesTestMixin # Import for admin check
@@ -896,7 +896,7 @@ def admin_required(view_func):
         return view_func(request, *args, **kwargs)
     return _wrapped_view
 
-@admin_required
+@login_required
 def manage_products_view(request):
     """Renders the product management page."""
     # Basic permission check (must be logged in)
@@ -904,7 +904,7 @@ def manage_products_view(request):
     categories = Category.objects.all()
     return render(request, 'floresvalentin_app/manage_products.html', {'categories': categories})
 
-@admin_required
+@login_required
 def check_admin_status_api(request):
     """Checks if the current user has admin privileges using the standard is_staff flag."""
     # A user created with createsuperuser will have is_staff=True
@@ -913,6 +913,7 @@ def check_admin_status_api(request):
 
 
 @login_required
+@permission_required('floresvalentin_app.change_product', login_url='login', raise_exception=True)
 # Allow GET, POST, PUT, DELETE
 @require_http_methods(["GET", "POST", "PUT", "DELETE"])
 def manage_products_api(request, product_id=None):

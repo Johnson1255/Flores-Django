@@ -103,7 +103,6 @@ def create_or_update_user_profile(sender, instance, created, **kwargs):
         instance.is_staff = True
     else:
         instance.is_staff = False
-    instance.save()
 
 
 # Modelo de Órdenes

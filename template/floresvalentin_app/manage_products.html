@@ -159,11 +159,11 @@
                 </label>
                  <div id="error-available" class="error-message"></div>
             </div>
-            {# Add Image field if needed - requires different handling (FormData) #}
-            {# <div class="form-group">
-                <label for="productImage">Imagen:</label>
-                <input type="file" id="productImage" name="image" accept="image/*">
-            </div> #}
+            <div class="form-group">
+                <label for="productImageUrl">{% trans "URL de Imagen" %}:</label>
+                <input type="url" id="productImageUrl" name="image_url" placeholder="https://example.com/image.jpg">
+                <div id="error-image_url" class="error-message"></div>
+            </div>
 
             <button type="submit" id="insertBtn" class="btn" disabled>{% trans "Insertar Producto" %}</button>
         </form>

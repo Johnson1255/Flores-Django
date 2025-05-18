@@ -74,7 +74,7 @@ class FloresDjangoAutomation:
             
         else:  # Chrome/Chromium
             options = webdriver.ChromeOptions()
-            # More aggressive options for Arch Linux
+            # More aggressive options for Arch Linux + slower machines
             options.add_argument("--no-sandbox")
             options.add_argument("--disable-dev-shm-usage")
             options.add_argument("--disable-gpu")
@@ -83,6 +83,9 @@ class FloresDjangoAutomation:
             options.add_argument("--disable-software-rasterizer")
             options.add_argument("--disable-web-security")
             options.add_argument("--allow-running-insecure-content")
+            options.add_argument("--disable-features=VizDisplayCompositor")
+            options.add_argument("--memory-pressure-off")
+            options.add_argument("--max_old_space_size=4096")
             # Uncomment for headless mode
             # options.add_argument("--headless")
             
@@ -98,8 +101,10 @@ class FloresDjangoAutomation:
                 service = Service(ChromeDriverManager().install())
                 self.driver = webdriver.Chrome(service=service, options=options)
         
-        self.wait = WebDriverWait(self.driver, 10)
-        self.driver.maximize_window()
+        # Increased wait time for slower machines
+        self.wait = WebDriverWait(self.driver, 20)
+        # Don't maximize window on slower machines to save resources
+        # self.driver.maximize_window()
         
     def login(self):
         """Login to the application"""
@@ -125,14 +130,37 @@ class FloresDjangoAutomation:
         print("Login successful!")
         
     def navigate_to_product_management(self):
-        """Navigate to product management page"""
+        """Navigate to product management page and wait for loading"""
         print("Navigating to product management...")
-        self.driver.get(f"{self.base_url}/manage-products/")
+        self.driver.get(f"{self.base_url}/floresvalentin_app/manage-products/")
         
-        # Wait for page to load
-        self.wait.until(
-            EC.presence_of_element_located((By.TAG_NAME, "form"))
-        )
+        # Wait for splash/loading to complete
+        print("Waiting for page to load...")
+        time.sleep(3)
+        
+        # Wait for the insert tab form to be present
+        try:
+            # Wait for tabs to load
+            self.wait.until(
+                EC.presence_of_element_located((By.CLASS_NAME, "tab"))
+            )
+            
+            # Click on insert tab to make sure form is visible
+            insert_tab = self.driver.find_element(By.CSS_SELECTOR, "[data-tab='insert']")
+            insert_tab.click()
+            time.sleep(1)
+            
+            # Wait for the form to be present
+            self.wait.until(
+                EC.presence_of_element_located((By.ID, "insertProductForm"))
+            )
+            print("Product management page loaded successfully!")
+            
+        except Exception as e:
+            print(f"Error waiting for page: {e}")
+            # Take screenshot for debugging
+            self.driver.save_screenshot("page_load_error.png")
+            raise
         
     def download_image(self, image_url, filename):
         """Download image from URL and save locally"""
@@ -158,63 +186,63 @@ class FloresDjangoAutomation:
         """Create a new product with given data"""
         print(f"Creating product: {product_data['name']}")
         
-        # Fill product form
-        name_field = self.driver.find_element(By.NAME, "name")
+        # Make sure we're on the insert tab
+        insert_tab = self.driver.find_element(By.CSS_SELECTOR, "[data-tab='insert']")
+        insert_tab.click()
+        time.sleep(1)
+        
+        # Fill product form using the actual field IDs from the template
+        name_field = self.wait.until(EC.presence_of_element_located((By.ID, "productName")))
         name_field.clear()
         name_field.send_keys(product_data["name"])
         
-        description_field = self.driver.find_element(By.NAME, "description")
+        # Category dropdown
+        category_select = self.driver.find_element(By.ID, "productCategory")
+        category_select.send_keys(product_data.get("category", ""))
+        
+        # Description
+        description_field = self.driver.find_element(By.ID, "productDescription")
         description_field.clear()
         description_field.send_keys(product_data["description"])
         
-        price_field = self.driver.find_element(By.NAME, "price")
+        # Price
+        price_field = self.driver.find_element(By.ID, "productPrice")
         price_field.clear()
         price_field.send_keys(str(product_data["price"]))
         
-        # Handle automatic image fetching
+        # Stock
+        stock_field = self.driver.find_element(By.ID, "productStock")
+        stock_field.clear()
+        stock_field.send_keys(str(product_data.get("stock", 0)))
+        
+        # Available checkbox
+        available_checkbox = self.driver.find_element(By.ID, "productAvailable")
+        if product_data.get("available", True) != available_checkbox.is_selected():
+            available_checkbox.click()
+        
+        # Handle automatic image fetching (this part might need adjustment based on your backend)
         if product_data.get("auto_image"):
-            print(f"Fetching image for: {product_data['name']}")
-            image_url = self.dynapictures_api.search_image(product_data["name"])
-            if image_url:
-                image_path = self.download_image(
-                    image_url, 
-                    f"{product_data['name'].replace(' ', '_').lower()}.jpg"
-                )
-                if image_path:
-                    image_field = self.driver.find_element(By.NAME, "image")
-                    image_field.send_keys(image_path)
-                    print("Image uploaded successfully!")
-        elif product_data.get("image_path"):
-            image_field = self.driver.find_element(By.NAME, "image")
-            image_field.send_keys(os.path.abspath(product_data["image_path"]))
+            print(f"Note: Auto-image feature needs backend integration for: {product_data['name']}")
         
-        # Handle category selection (adjust selector based on your form)
-        if product_data.get("category"):
-            try:
-                # Try dropdown first
-                category_select = self.driver.find_element(By.NAME, "category")
-                category_select.send_keys(product_data["category"])
-            except:
-                # Try text input
-                category_field = self.driver.find_element(By.NAME, "category")
-                category_field.clear()
-                category_field.send_keys(product_data["category"])
-        
-        # Handle stock quantity if available
-        if product_data.get("stock"):
-            try:
-                stock_field = self.driver.find_element(By.NAME, "stock")
-                stock_field.clear()
-                stock_field.send_keys(str(product_data["stock"]))
-            except:
-                pass  # Field might not exist
+        # Wait for form validation to enable submit button
+        submit_button = self.wait.until(
+            EC.element_to_be_clickable((By.ID, "insertBtn"))
+        )
         
         # Submit form
-        submit_button = self.driver.find_element(By.CSS_SELECTOR, "button[type='submit'], input[type='submit']")
         submit_button.click()
         
-        # Wait for form submission
+        # Wait for response/result
         time.sleep(3)
+        
+        # Check for success/error messages
+        result_div = self.driver.find_element(By.ID, "result")
+        result_text = result_div.text
+        print(f"Result: {result_text}")
+        
+        if "error" in result_text.lower() or "error" in result_div.get_attribute("class"):
+            raise Exception(f"Failed to create product: {result_text}")
+        
         print("Product created successfully!")
         
     def cleanup_temp_files(self):
@@ -268,25 +296,17 @@ if __name__ == "__main__":
             "name": "Red Rose Bouquet",
             "description": "Beautiful red roses perfect for special occasions",
             "price": 45.99,
-            "category": "Bouquets",
+            "category": "1",  # Use category ID instead of name
             "stock": 10,
-            "auto_image": True  # Will fetch image automatically
+            "available": True
         },
         {
-            "name": "White Lily Arrangement",
+            "name": "White Lily Arrangement", 
             "description": "Elegant white lilies in a ceramic vase",
             "price": 62.50,
-            "category": "Arrangements",
+            "category": "2",  # Adjust based on your categories
             "stock": 5,
-            "auto_image": True
-        },
-        {
-            "name": "Sunflower Field Bundle",
-            "description": "Bright sunflowers to brighten any day",
-            "price": 38.75,
-            "category": "Seasonal",
-            "stock": 8,
-            "auto_image": True
+            "available": True
         }
     ]
     

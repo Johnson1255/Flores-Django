@@ -906,10 +906,10 @@ def manage_products_view(request):
 
 @login_required
 def check_admin_status_api(request):
-    """Checks if the current user has admin privileges using the standard is_staff flag."""
-    # A user created with createsuperuser will have is_staff=True
-    is_admin = request.user.is_staff
-    return JsonResponse({'is_admin': is_admin})
+    """Checks if the current user has admin privileges by checking for product change permission."""
+    # Check if the user has the permission to change products
+    has_permission = request.user.has_perm('floresvalentin_app.change_product')
+    return JsonResponse({'is_admin': has_permission}) # Return has_permission as is_admin for frontend compatibility
 
 
 @login_required
@@ -949,9 +949,6 @@ def manage_products_api(request, product_id=None):
 
     # --- CREATE Product (POST) ---
     elif request.method == 'POST':
-        if not is_admin:
-            return JsonResponse({'error': 'Admin privileges required to create products'}, status=403)
-
         try:
             # Assuming JSON data is sent
             data = json.loads(request.body)
@@ -982,9 +979,6 @@ def manage_products_api(request, product_id=None):
 
     # --- UPDATE Product (PUT) ---
     elif request.method == 'PUT':
-        if not is_admin:
-            return JsonResponse({'error': 'Admin privileges required to update products'}, status=403)
-
         if not product_id:
             return JsonResponse({'error': 'Product ID is required for update'}, status=400)
 
@@ -1021,10 +1015,6 @@ def manage_products_api(request, product_id=None):
 
     # --- DELETE Product (DELETE) ---
     elif request.method == 'DELETE':
-        if not is_admin:
-            # This check remains important for DELETE as well
-            return JsonResponse({'error': 'Admin privileges required to delete products'}, status=403)
-
         if not product_id:
              return JsonResponse({'error': 'Product ID is required for deletion'}, status=400)
 

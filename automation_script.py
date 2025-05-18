@@ -4,6 +4,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.firefox import GeckoDriverManager
+from selenium.webdriver.firefox.service import Service as FirefoxService
 import time
 import os
 import requests
@@ -55,16 +57,47 @@ class FloresDjangoAutomation:
         self.driver = None
         self.wait = None
     
-    def setup_driver(self):
-        """Initialize Chrome driver with options"""
-        options = webdriver.ChromeOptions()
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
-        # Uncomment for headless mode
-        # options.add_argument("--headless")
+    def setup_driver(self, browser="firefox"):
+        """Initialize browser driver with options (firefox or chrome)"""
+        print(f"Setting up {browser} driver...")
         
-        service = Service(ChromeDriverManager().install())
-        self.driver = webdriver.Chrome(service=service, options=options)
+        if browser.lower() == "firefox":
+            options = webdriver.FirefoxOptions()
+            # Firefox options for better compatibility
+            options.add_argument("--no-sandbox")
+            options.add_argument("--disable-dev-shm-usage")
+            # Uncomment for headless mode
+            # options.add_argument("--headless")
+            
+            service = FirefoxService(GeckoDriverManager().install())
+            self.driver = webdriver.Firefox(service=service, options=options)
+            
+        else:  # Chrome/Chromium
+            options = webdriver.ChromeOptions()
+            # More aggressive options for Arch Linux
+            options.add_argument("--no-sandbox")
+            options.add_argument("--disable-dev-shm-usage")
+            options.add_argument("--disable-gpu")
+            options.add_argument("--remote-debugging-port=9222")
+            options.add_argument("--disable-extensions")
+            options.add_argument("--disable-software-rasterizer")
+            options.add_argument("--disable-web-security")
+            options.add_argument("--allow-running-insecure-content")
+            # Uncomment for headless mode
+            # options.add_argument("--headless")
+            
+            # Try both chromium and chrome paths
+            try:
+                # Check if google-chrome is available
+                service = Service(ChromeDriverManager().install())
+                self.driver = webdriver.Chrome(service=service, options=options)
+            except Exception as e:
+                print(f"Chrome failed: {e}")
+                print("Trying with chromium binary...")
+                options.binary_location = "/usr/bin/chromium"
+                service = Service(ChromeDriverManager().install())
+                self.driver = webdriver.Chrome(service=service, options=options)
+        
         self.wait = WebDriverWait(self.driver, 10)
         self.driver.maximize_window()
         
@@ -198,8 +231,13 @@ class FloresDjangoAutomation:
             if not self.username or not self.password:
                 raise ValueError("Admin credentials not found in environment variables")
             
-            # Setup driver
-            self.setup_driver()
+            # Setup driver (try Firefox first, then Chrome)
+            try:
+                self.setup_driver("firefox")
+            except Exception as firefox_error:
+                print(f"Firefox failed: {firefox_error}")
+                print("Trying Chrome...")
+                self.setup_driver("chrome")
             
             # Login
             self.login()
@@ -215,7 +253,8 @@ class FloresDjangoAutomation:
                 
         except Exception as e:
             print(f"Error during automation: {e}")
-            self.driver.save_screenshot("error_screenshot.png")
+            if self.driver:
+                self.driver.save_screenshot("error_screenshot.png")
         finally:
             if self.driver:
                 self.driver.quit()

@@ -182,13 +182,44 @@ class FloresDjangoAutomation:
             print(f"Error downloading image: {e}")
         return None
         
+    def safe_click(self, element, description="element"):
+        """Safely click an element with scrolling and fallback"""
+        try:
+            # Scroll into view
+            self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", element)
+            time.sleep(0.5)
+            # Try regular click
+            element.click()
+        except Exception as e:
+            print(f"Regular click failed for {description}, trying JS click: {e}")
+            # Fallback to JavaScript click
+            self.driver.execute_script("arguments[0].click();", element)
+    
+    def safe_input(self, element, text, description="field"):
+        """Safely input text with scrolling"""
+        try:
+            # Scroll into view
+            self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", element)
+            time.sleep(0.3)
+            element.clear()
+            element.send_keys(text)
+        except Exception as e:
+            print(f"Warning: Could not set {description}: {e}")
+    
     def create_product(self, product_data):
         """Create a new product with given data"""
         print(f"Creating product: {product_data['name']}")
         
         # Make sure we're on the insert tab
         insert_tab = self.driver.find_element(By.CSS_SELECTOR, "[data-tab='insert']")
-        insert_tab.click()
+        # Scroll tab into view first
+        self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", insert_tab)
+        time.sleep(0.5)
+        try:
+            insert_tab.click()
+        except Exception as e:
+            # Try JavaScript click if regular click fails
+            self.driver.execute_script("arguments[0].click();", insert_tab)
         time.sleep(1)
         
         # Fill product form using the actual field IDs from the template
@@ -220,17 +251,52 @@ class FloresDjangoAutomation:
         if product_data.get("available", True) != available_checkbox.is_selected():
             available_checkbox.click()
         
-        # Handle automatic image fetching (this part might need adjustment based on your backend)
-        if product_data.get("auto_image"):
-            print(f"Note: Auto-image feature needs backend integration for: {product_data['name']}")
+        # Handle image URL if provided
+        if product_data.get("image_url"):
+            try:
+                image_url_field = self.driver.find_element(By.ID, "productImageUrl")
+                # Scroll into view first
+                self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", image_url_field)
+                time.sleep(0.5)
+                image_url_field.clear()
+                image_url_field.send_keys(product_data["image_url"])
+                print(f"Image URL set: {product_data['image_url']}")
+            except Exception as e:
+                print(f"Warning: Could not set image URL: {e}")
+        
+        # Auto-generate image URL using DynaPictures API if enabled
+        elif product_data.get("auto_image", False):
+            try:
+                # Extract flower type from product name for API search
+                flower_query = product_data["name"].lower()
+                image_url = self.dynapictures_api.search_image(flower_query)
+                
+                if image_url:
+                    image_url_field = self.driver.find_element(By.ID, "productImageUrl")
+                    image_url_field.clear()
+                    image_url_field.send_keys(image_url)
+                    print(f"Auto-generated image URL: {image_url}")
+                else:
+                    print("Could not auto-generate image URL")
+            except Exception as e:
+                print(f"Warning: Auto-image generation failed: {e}")
         
         # Wait for form validation to enable submit button
         submit_button = self.wait.until(
             EC.element_to_be_clickable((By.ID, "insertBtn"))
         )
         
+        # Scroll button into view before clicking
+        self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", submit_button)
+        time.sleep(1)  # Wait for scroll to complete
+        
         # Submit form
-        submit_button.click()
+        try:
+            submit_button.click()
+        except Exception as e:
+            # If regular click fails, try JavaScript click
+            print(f"Regular click failed, trying JS click: {e}")
+            self.driver.execute_script("arguments[0].click();", submit_button)
         
         # Wait for response/result
         time.sleep(3)
@@ -290,23 +356,25 @@ class FloresDjangoAutomation:
 
 # Example usage
 if __name__ == "__main__":
-    # Sample product data
+    # Sample product data with image URLs
     products_to_create = [
         {
             "name": "Red Rose Bouquet",
             "description": "Beautiful red roses perfect for special occasions",
             "price": 45.99,
-            "category": "1",  # Use category ID instead of name
+            "category": "Rosas",
             "stock": 10,
-            "available": True
+            "available": True,
+            "image_url": "https://images.unsplash.com/photo-1518870180780-e41835bb38cf?w=500"
         },
         {
             "name": "White Lily Arrangement", 
             "description": "Elegant white lilies in a ceramic vase",
             "price": 62.50,
-            "category": "2",  # Adjust based on your categories
+            "category": "Lirios",
             "stock": 5,
-            "available": True
+            "available": True,
+            "image_url": "https://images.unsplash.com/photo-1509932942196-6bc29de5bfa5?w=500"
         }
     ]
     

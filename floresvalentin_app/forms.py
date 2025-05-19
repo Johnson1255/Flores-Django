@@ -2,6 +2,7 @@ from django import forms
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from .models import Comment
 # Import gettext_lazy for translations in forms/models
 from django.utils.translation import gettext_lazy as _
 # Import the new ContactMessage model
@@ -243,3 +244,19 @@ class CustomUserCreationForm(UserCreationForm):
 class MinimalLoginForm(forms.Form):
     username = forms.CharField(max_length=150, required=True)
     password = forms.CharField(widget=forms.PasswordInput, required=True)
+
+#Formulario de comentarios
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={
+                'rows': 4, 
+                'placeholder': 'Escribe tu comentario aquí...',
+                'class': 'form-control'
+            }),
+        }
+        labels = {
+            'content': 'Comentario'
+        }

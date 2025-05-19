@@ -14,6 +14,8 @@ from django.urls import reverse_lazy, reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger # Added for pagination
 from django.template.loader import render_to_string # Added for rendering partials
 from django.db.models import Q # Added for search
+from .forms import CommentForm #Para los comentarios
+from .models import Comment, Product #Para los comentarios
 
 # Corrected model imports
 from .models import Product, Category, Order, OrderItem, SpecialOrder, ShoppingCart, Profile, ContactMessage
@@ -1031,3 +1033,40 @@ def manage_products_api(request, product_id=None):
 
     # Should not happen due to @require_http_methods
     return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+def product_detail(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    comments = product.comments.all()
+    comment_form = CommentForm()
+    
+    context = {
+        'product': product,
+        'comments': comments,
+        'comment_form': comment_form,
+    }
+    return render(request, 'floresvalentin_app/product_detail.html', context)
+
+@login_required
+def add_comment(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    
+    if request.method == 'POST':
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            # Verificar comentarios duplicados
+            existing_comment = Comment.objects.filter(
+                user=request.user,
+                product=product,
+                content=form.cleaned_data['content']
+            ).exists()
+            
+            if existing_comment:
+                messages.error(request, 'Ya has publicado este comentario exacto.')
+            else:
+                comment = form.save(commit=False)
+                comment.user = request.user
+                comment.product = product
+                comment.save()
+                messages.success(request, '¡Tu comentario ha sido añadido exitosamente!')
+                
+    return redirect('floresvalentin_app:product_detail', product_id=product_id)

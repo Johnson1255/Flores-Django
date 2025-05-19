@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _ # Import gettext_lazy
+from django.contrib.auth.models import User
 
 # Modelo para Categorías
 class Category(models.Model):
@@ -222,3 +223,16 @@ class ContactMessage(models.Model):
         ordering = ['-submitted_at'] # Show newest messages first
         verbose_name = "Mensaje de Contacto"
         verbose_name_plural = "Mensajes de Contacto"
+
+# Modelo para comment
+class Comment(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        
+    def __str__(self):
+        return f'Comentario de {self.user.username} en {self.product.name}'

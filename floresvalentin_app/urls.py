@@ -45,4 +45,7 @@ urlpatterns = [
     path('api/check-admin/', views.check_admin_status_api, name='check_admin_status_api'),
     path('api/manage-products/', views.manage_products_api, name='manage_products_api'), # For listing (GET) and creating (POST)
     path('api/manage-products/<uuid:product_id>/', views.manage_products_api, name='manage_products_api_detail'), # For deleting (DELETE)
+
+    # Comentarios
+    path('producto/<uuid:product_id>/comentario/', views.add_comment, name='add_comment'),
 ]

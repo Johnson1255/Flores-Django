@@ -1,0 +1,77 @@
+{% extends 'floresvalentin_app/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Imagen del producto -->
+        <div class="col-md-6">
+            <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'images/default-flower.jpg' %}{% endif %}" 
+                 alt="{{ product.name }}" 
+                 class="img-fluid rounded">
+        </div>
+        
+        <!-- Detalles del producto -->
+        <div class="col-md-6">
+            <h1>{{ product.name }}</h1>
+            <p class="text-muted">
+                {% if product.category %}
+                    <span class="badge bg-secondary">{{ product.category.name }}</span>
+                {% endif %}
+            </p>
+            <h2 class="text-primary">${{ product.price|floatformat:0 }}</h2>
+            <p class="mt-3">{{ product.description }}</p>
+            
+            {% if product.available %}
+                <p class="text-success">
+                    <i class="fas fa-check-circle"></i> Producto disponible
+                    {% if product.stock > 0 %}
+                        ({{ product.stock }} unidades en stock)
+                    {% endif %}
+                </p>
+                <form action="{% url 'floresvalentin_app:agregar_al_carrito' product.id %}" method="post" class="mt-4">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-cart-plus"></i> Añadir al carrito
+                    </button>
+                </form>
+            {% else %}
+                <p class="text-danger">
+                    <i class="fas fa-times-circle"></i> Producto no disponible
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Separador -->
+    <hr class="my-5">
+
+    <!-- Sección de comentarios existente -->
+    <div class="comments-section mt-5">
+        <h3>Comentarios</h3>
+          {% if user.is_authenticated %}
+            <form method="post" action="{% url 'floresvalentin_app:add_comment' product.id %}" class="mb-4">
+        {% csrf_token %}
+        {{ comment_form.as_p }}
+        <button type="submit" class="btn btn-primary">Enviar Comentario</button>
+    </form>
+          {% else %}
+              <p>Por favor <a href="{% url 'login' %}">inicia sesión</a> para dejar un comentario.</p>
+          {% endif %}
+
+          {% if comments %}
+              {% for comment in comments %}
+                  <div class="comment border-bottom py-3">
+                      <div class="d-flex justify-content-between">
+                          <strong>{{ comment.user.username }}</strong>
+                          <small class="text-muted">{{ comment.created_at|date:"d/m/Y" }}</small>
+                      </div>
+                      <p class="mt-2">{{ comment.content }}</p>
+                  </div>
+              {% endfor %}
+          {% else %}
+              <p>No hay comentarios todavía.</p>
+          {% endif %}
+      </div>
+</div>
+{% endblock %}

@@ -247,6 +247,140 @@ class MinimalLoginForm(forms.Form):
     username = forms.CharField(max_length=150, required=True)
     password = forms.CharField(widget=forms.PasswordInput, required=True)
 
+# Formulario para edición de perfil combinado (User + Profile)
+class UserProfileForm(forms.Form):
+    first_name = forms.CharField(
+        max_length=30, 
+        required=True, 
+        label=_("Nombre"),
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': _('Tu nombre')})
+    )
+    last_name = forms.CharField(
+        max_length=150, 
+        required=True, 
+        label=_("Apellidos"),
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': _('Tus apellidos')})
+    )
+    email = forms.EmailField(
+        required=True, 
+        label=_("Correo Electrónico"),
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': _('tu@correo.com')})
+    )
+    username = forms.CharField(
+        max_length=150, 
+        required=True, 
+        label=_("Nombre de Usuario"),
+        widget=forms.TextInput(attrs={'class': 'form-control', 'readonly': 'readonly'})
+    )
+    
+    # Campos del perfil
+    phone = forms.CharField(
+        max_length=20, 
+        required=False, 
+        label=_("Teléfono"),
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': _('Tu número de teléfono')})
+    )
+    country = forms.CharField(
+        max_length=50, 
+        required=False, 
+        label=_("País"),
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    city = forms.CharField(
+        max_length=50, 
+        required=False, 
+        label=_("Ciudad"),
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    neighborhood = forms.CharField(
+        max_length=100, 
+        required=False, 
+        label=_("Barrio"),
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    address = forms.CharField(
+        max_length=255, 
+        required=False, 
+        label=_("Dirección de Entrega"),
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    postal_code = forms.CharField(
+        max_length=20, 
+        required=False, 
+        label=_("Código Postal"),
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    
+    OCCASION_CHOICES = [
+        ('cumpleanos', _('Cumpleaños')),
+        ('aniversarios', _('Aniversarios')),
+        ('bodas', _('Bodas')),
+        ('condolencias', _('Condolencias')),
+    ]
+    preferences = forms.MultipleChoiceField(
+        choices=OCCASION_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+        label=_("Ocasiones de interés (opcional)")
+    )
+    newsletter = forms.BooleanField(
+        required=False,
+        label=_("Deseo recibir ofertas y novedades por correo electrónico"),
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+    
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        
+        # Si estamos editando un usuario existente, hacer el username de solo lectura
+        if self.user and self.user.pk:
+            self.fields['username'].widget.attrs['readonly'] = True
+            
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email:
+            # Verificar que el email no exista para otro usuario
+            if User.objects.filter(email=email).exclude(pk=self.user.pk).exists():
+                raise forms.ValidationError(_("Este correo electrónico ya está registrado."))
+        return email
+    
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        # Si el campo es de solo lectura, devolvemos el valor del usuario actual
+        if self.user and self.user.pk:
+            return self.user.username
+        
+        # Si estamos permitiendo cambiar el username, verificamos que no exista
+        if User.objects.filter(username=username).exclude(pk=self.user.pk if self.user else None).exists():
+            raise forms.ValidationError(_("Este nombre de usuario ya está en uso."))
+        return username
+    
+    def save(self):
+        """Guarda los datos en los modelos User y Profile."""
+        if not self.user:
+            return None
+        
+        # Actualizamos el modelo User
+        self.user.first_name = self.cleaned_data['first_name']
+        self.user.last_name = self.cleaned_data['last_name']
+        self.user.email = self.cleaned_data['email']
+        self.user.save()
+        
+        # Actualizamos o creamos el Profile
+        profile, created = Profile.objects.get_or_create(user=self.user)
+        profile.phone = self.cleaned_data['phone']
+        profile.country = self.cleaned_data['country']
+        profile.city = self.cleaned_data['city']
+        profile.neighborhood = self.cleaned_data['neighborhood']
+        profile.address = self.cleaned_data['address']
+        profile.postal_code = self.cleaned_data['postal_code']
+        profile.preferences = self.cleaned_data['preferences']
+        profile.newsletter = self.cleaned_data['newsletter']
+        profile.save()
+        
+        return self.user
+
 #Formulario de comentarios
 class CommentForm(forms.ModelForm):
     class Meta:

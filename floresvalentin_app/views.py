@@ -20,7 +20,7 @@ from .models import Comment, Product #Para los comentarios
 # Corrected model imports
 from .models import Product, Category, Order, OrderItem, SpecialOrder, ShoppingCart, Profile, ContactMessage
 # Import the correct form
-from .forms import SpecialOrderForm, ContactMessageForm, ProfileForm, CheckoutForm, CustomUserCreationForm, ProductForm # Added ProductForm
+from .forms import SpecialOrderForm, ContactMessageForm, ProfileForm, CheckoutForm, CustomUserCreationForm, ProductForm, UserProfileForm # Added UserProfileForm
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
@@ -732,21 +732,35 @@ def profile(request):
 def profile_edit(request):
     # Ensure profile exists, create if not (should be handled by signal, but good practice)
     profile, created = Profile.objects.get_or_create(user=request.user)
+    
     if request.method == 'POST':
-        # We need to handle User form and Profile form separately if editing both
-        # Assuming ProfileForm only edits Profile fields for now
-        form = ProfileForm(request.POST, instance=profile) # Use profile instance
+        # Usamos el formulario combinado que maneja User y Profile
+        form = UserProfileForm(request.POST, user=request.user)
         if form.is_valid():
-            try: # Added try block
+            try:
                 form.save()
                 messages.success(request, 'Perfil actualizado correctamente')
                 return redirect('floresvalentin_app:profile')
             except Exception as e:
-                 logger.error(f"Error updating profile for user {request.user.id}: {e}", exc_info=True)
-                 messages.error(request, 'Ocurrió un error al actualizar tu perfil.')
-        # No else needed, just re-render below if form invalid or error occurred
+                logger.error(f"Error updating profile for user {request.user.id}: {e}", exc_info=True)
+                messages.error(request, 'Ocurrió un error al actualizar tu perfil.')
     else:
-        form = ProfileForm(instance=profile) # Use profile instance
+        # Crear instancia del formulario y poblarlo con datos actuales
+        initial_data = {
+            'username': request.user.username,
+            'first_name': request.user.first_name,
+            'last_name': request.user.last_name,
+            'email': request.user.email,
+            'phone': profile.phone,
+            'country': profile.country,
+            'city': profile.city,
+            'neighborhood': profile.neighborhood,
+            'address': profile.address,
+            'postal_code': profile.postal_code,
+            'preferences': profile.preferences,
+            'newsletter': profile.newsletter
+        }
+        form = UserProfileForm(initial=initial_data, user=request.user)
 
     return render(request, 'floresvalentin_app/profile_edit.html', {'form': form})
 

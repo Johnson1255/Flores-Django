@@ -1,0 +1,137 @@
+{% extends "floresvalentin_app/base.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "Mis Pedidos" %} - Flores Valentín{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">{% trans "Mi Cuenta" %}</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'floresvalentin_app:profile' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-user me-2"></i>{% trans "Perfil" %}
+                    </a>
+                    <a href="{% url 'floresvalentin_app:my_orders' %}" class="list-group-item list-group-item-action active">
+                        <i class="fas fa-box me-2"></i>{% trans "Mis Pedidos" %}
+                    </a>
+                    <a href="{% url 'floresvalentin_app:ver_carrito' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-shopping-cart me-2"></i>{% trans "Carrito" %}
+                    </a>
+                    <a href="{% url 'logout' %}" class="list-group-item list-group-item-action text-danger">
+                        <i class="fas fa-sign-out-alt me-2"></i>{% trans "Cerrar Sesión" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">{% trans "Mis Pedidos" %}</h4>
+                </div>
+                <div class="card-body">
+                    {% if orders %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>{% trans "Número" %}</th>
+                                        <th>{% trans "Fecha" %}</th>
+                                        <th>{% trans "Estado" %}</th>
+                                        <th>{% trans "Total" %}</th>
+                                        <th>{% trans "Acciones" %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in orders %}
+                                    <tr>
+                                        <td>{{ order.id|truncatechars:8 }}</td>
+                                        <td>{{ order.created_at|date:"d/m/Y" }}</td>
+                                        <td>
+                                            {% if order.status == 'pending' %}
+                                                <span class="badge bg-warning text-dark">{{ order.get_status_display }}</span>
+                                            {% elif order.status == 'processing' %}
+                                                <span class="badge bg-info">{{ order.get_status_display }}</span>
+                                            {% elif order.status == 'shipped' %}
+                                                <span class="badge bg-primary">{{ order.get_status_display }}</span>
+                                            {% elif order.status == 'delivered' %}
+                                                <span class="badge bg-success">{{ order.get_status_display }}</span>
+                                            {% elif order.status == 'cancelled' %}
+                                                <span class="badge bg-danger">{{ order.get_status_display }}</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">{{ order.get_status_display }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>${{ order.total_amount|floatformat:2 }}</td>
+                                        <td>
+                                            <a href="{% url 'floresvalentin_app:order_detail' order_id=order.id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i> {% trans "Ver" %}
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>{% trans "No tienes pedidos realizados todavía." %}
+                        </div>
+                        <div class="text-center mt-4">
+                            <a href="{% url 'floresvalentin_app:catalogo' %}" class="btn btn-primary">
+                                <i class="fas fa-shopping-bag me-2"></i>{% trans "Explorar Productos" %}
+                            </a>
+                        </div>
+                        
+                        {% if orders.has_other_pages %}
+                        <nav aria-label="{% trans 'Paginación de pedidos' %}" class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                {% if orders.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ orders.previous_page_number }}" aria-label="Anterior">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link" aria-hidden="true">&laquo;</span>
+                                </li>
+                                {% endif %}
+
+                                {% for i in orders.paginator.page_range %}
+                                    {% if orders.number == i %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ i }} <span class="sr-only">({% trans "actual" %})</span></span>
+                                    </li>
+                                    {% else %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                                    </li>
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% if orders.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ orders.next_page_number }}" aria-label="Siguiente">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link" aria-hidden="true">&raquo;</span>
+                                </li>
+                                {% endif %}
+                            </ul>
+                        </nav>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

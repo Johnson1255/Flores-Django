@@ -1,0 +1,238 @@
+{% extends "floresvalentin_app/base.html" %}
+{% load static i18n %}
+{% load math_filters %}
+
+{% block title %}{% trans "Detalle de Pedido" %} - Flores Valentín{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">{% trans "Mi Cuenta" %}</h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'floresvalentin_app:profile' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-user me-2"></i>{% trans "Perfil" %}
+                    </a>
+                    <a href="{% url 'floresvalentin_app:my_orders' %}" class="list-group-item list-group-item-action active">
+                        <i class="fas fa-box me-2"></i>{% trans "Mis Pedidos" %}
+                    </a>
+                    <a href="{% url 'floresvalentin_app:ver_carrito' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-shopping-cart me-2"></i>{% trans "Carrito" %}
+                    </a>
+                    <a href="{% url 'logout' %}" class="list-group-item list-group-item-action text-danger">
+                        <i class="fas fa-sign-out-alt me-2"></i>{% trans "Cerrar Sesión" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">{% trans "Detalle de Pedido" %}</h4>
+                    <a href="{% url 'floresvalentin_app:my_orders' %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>{% trans "Volver" %}
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5>{% trans "Información del Pedido" %}</h5>
+                            <p><strong>{% trans "Número de Pedido" %}:</strong> {{ order.id }}</p>
+                            <p><strong>{% trans "Fecha" %}:</strong> {{ order.created_at|date:"d/m/Y H:i" }}</p>
+                            <p>
+                                <strong>{% trans "Estado" %}:</strong>
+                                {% if order.status == 'pending' %}
+                                    <span class="badge bg-warning text-dark">{{ order.get_status_display }}</span>
+                                {% elif order.status == 'processing' %}
+                                    <span class="badge bg-info">{{ order.get_status_display }}</span>
+                                {% elif order.status == 'shipped' %}
+                                    <span class="badge bg-primary">{{ order.get_status_display }}</span>
+                                {% elif order.status == 'delivered' %}
+                                    <span class="badge bg-success">{{ order.get_status_display }}</span>
+                                {% elif order.status == 'cancelled' %}
+                                    <span class="badge bg-danger">{{ order.get_status_display }}</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">{{ order.get_status_display }}</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>{% trans "Información de Entrega" %}</h5>
+                            <p><strong>{% trans "Nombre" %}:</strong> {{ order.user.first_name }} {{ order.user.last_name }}</p>
+                            <p><strong>{% trans "Email" %}:</strong> {{ order.user.email }}</p>
+                            {% if order.user.profile %}
+                                <p><strong>{% trans "Dirección" %}:</strong> {{ order.user.profile.address }}</p>
+                                <p><strong>{% trans "Ciudad" %}:</strong> {{ order.user.profile.city }}</p>
+                                <p><strong>{% trans "Teléfono" %}:</strong> {{ order.user.profile.phone|default:"-" }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <h5>{% trans "Productos" %}</h5>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>{% trans "Producto" %}</th>
+                                    <th>{% trans "Precio Unitario" %}</th>
+                                    <th class="text-center">{% trans "Cantidad" %}</th>
+                                    <th class="text-end">{% trans "Subtotal" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order.items.all %}
+                                <tr>
+                                    <td>
+                                        {% if item.product %}
+                                            {{ item.product.name }}
+                                        {% else %}
+                                            {% trans "Producto no disponible" %}
+                                        {% endif %}
+                                    </td>
+                                    <td>${{ item.price|floatformat:2 }}</td>
+                                    <td class="text-center">{{ item.quantity }}</td>
+                                    <td class="text-end">${{ item.price|mul:item.quantity|floatformat:2 }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center">{% trans "No hay productos en este pedido." %}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>{% trans "Subtotal" %}:</strong></td>
+                                    {% with subtotal=order.total_amount|div:1.19 %}
+                                    <td class="text-end">${{ subtotal|floatformat:2 }}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>{% trans "IVA (19%)" %}:</strong></td>
+                                    <td class="text-end">${{ order.total_amount|sub:subtotal|floatformat:2 }}</td>
+                                </tr>
+                                {% endwith %}
+                                <tr>
+                                    <td colspan="3" class="text-end"><strong>{% trans "Total" %}:</strong></td>
+                                    <td class="text-end">${{ order.total_amount|floatformat:2 }}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            {% if order.status == 'pending' or order.status == 'processing' %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">{% trans "Seguimiento del Pedido" %}</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between position-relative">
+                        <div class="step active text-center">
+                            <div class="step-icon">
+                                <i class="fas fa-receipt"></i>
+                            </div>
+                            <div class="step-label">{% trans "Pedido Recibido" %}</div>
+                        </div>
+                        <div class="step {% if order.status != 'pending' %}active{% endif %} text-center">
+                            <div class="step-icon">
+                                <i class="fas fa-box-open"></i>
+                            </div>
+                            <div class="step-label">{% trans "En Preparación" %}</div>
+                        </div>
+                        <div class="step {% if order.status == 'shipped' or order.status == 'delivered' %}active{% endif %} text-center">
+                            <div class="step-icon">
+                                <i class="fas fa-truck"></i>
+                            </div>
+                            <div class="step-label">{% trans "Enviado" %}</div>
+                        </div>
+                        <div class="step {% if order.status == 'delivered' %}active{% endif %} text-center">
+                            <div class="step-icon">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="step-label">{% trans "Entregado" %}</div>
+                        </div>
+                        
+                        <!-- Linea de progreso -->
+                        <div class="progress-line"></div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if order.status == 'cancelled' %}
+            <div class="alert alert-danger">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                {% trans "Este pedido ha sido cancelado." %}
+            </div>
+            {% endif %}
+            
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{% url 'floresvalentin_app:my_orders' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>{% trans "Volver a Mis Pedidos" %}
+                </a>
+                <a href="{% url 'floresvalentin_app:catalogo' %}" class="btn btn-primary">
+                    <i class="fas fa-shopping-bag me-2"></i>{% trans "Continuar Comprando" %}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<style>
+    .step {
+        width: 20%;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .step-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: #f8f9fa;
+        border: 2px solid #dee2e6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 10px;
+        font-size: 20px;
+        color: #6c757d;
+    }
+    
+    .step.active .step-icon {
+        background-color: #198754;
+        border-color: #198754;
+        color: white;
+    }
+    
+    .progress-line {
+        position: absolute;
+        top: 25px;
+        left: 10%;
+        width: 80%;
+        height: 2px;
+        background-color: #dee2e6;
+        z-index: 0;
+    }
+    
+    .step-label {
+        font-size: 14px;
+        margin-top: 5px;
+    }
+</style>
+
+<script>
+    // Para realizar cálculos matemáticos en las plantillas Django
+    // (ya que el template filter 'mul' y 'div' y 'sub' no existen por defecto)
+    // Crea los filtros usando JavaScript
+    document.addEventListener('DOMContentLoaded', function() {
+        // Si es necesario, implementa cálculos aquí
+    });
+</script>
+{% endblock %} 

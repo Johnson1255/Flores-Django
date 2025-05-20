@@ -796,7 +796,21 @@ def profile_edit(request):
 
 @login_required
 def my_orders(request):
-    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    orders_list = Order.objects.filter(user=request.user).order_by('-created_at')
+    
+    # Paginación
+    paginator = Paginator(orders_list, 10)  # Mostrar 10 pedidos por página
+    page = request.GET.get('page', 1)
+    
+    try:
+        orders = paginator.page(page)
+    except PageNotAnInteger:
+        # Si la página no es un entero, mostrar la primera página
+        orders = paginator.page(1)
+    except EmptyPage:
+        # Si la página está fuera de rango, mostrar la última página
+        orders = paginator.page(paginator.num_pages)
+    
     return render(request, 'floresvalentin_app/my_orders.html', {'orders': orders})
 
 @login_required

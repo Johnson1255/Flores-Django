@@ -38,25 +38,67 @@
                     {% endwith %}
                 </div>
             </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4>{% trans "Pedidos Recientes" %}</h4>
+                </div>
+                <div class="card-body">
+                    {% with recent_orders=user.order_set.all|slice:":3" %}
+                        {% if recent_orders %}
+                            <div class="list-group">
+                                {% for order in recent_orders %}
+                                    <a href="{% url 'floresvalentin_app:order_detail' order_id=order.id %}" class="list-group-item list-group-item-action">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">{% trans "Pedido" %} #{{ order.id|truncatechars:8 }}</h6>
+                                            <small>{{ order.created_at|date:"d/m/Y" }}</small>
+                                        </div>
+                                        <p class="mb-1">${{ order.total_amount|floatformat:2 }}</p>
+                                        {% if order.status == 'pending' %}
+                                            <span class="badge bg-warning text-dark">{{ order.get_status_display }}</span>
+                                        {% elif order.status == 'processing' %}
+                                            <span class="badge bg-info">{{ order.get_status_display }}</span>
+                                        {% elif order.status == 'shipped' %}
+                                            <span class="badge bg-primary">{{ order.get_status_display }}</span>
+                                        {% elif order.status == 'delivered' %}
+                                            <span class="badge bg-success">{{ order.get_status_display }}</span>
+                                        {% elif order.status == 'cancelled' %}
+                                            <span class="badge bg-danger">{{ order.get_status_display }}</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ order.get_status_display }}</span>
+                                        {% endif %}
+                                    </a>
+                                {% endfor %}
+                            </div>
+                            <div class="mt-3 text-center">
+                                <a href="{% url 'floresvalentin_app:my_orders' %}" class="btn btn-sm btn-outline-primary">{% trans "Ver todos mis pedidos" %}</a>
+                            </div>
+                        {% else %}
+                            <p class="text-muted">{% trans "No has realizado ningún pedido aún." %}</p>
+                            <a href="{% url 'floresvalentin_app:catalogo' %}" class="btn btn-primary btn-sm">{% trans "Explorar productos" %}</a>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
         </div>
 
         <div class="col-md-4">
             <div class="card">
                 <div class="card-header">
-                    <h4>{% trans "Actions" %}</h4>
+                    <h4>{% trans "Acciones" %}</h4>
                 </div>
                 <div class="list-group list-group-flush">
                     <a href="{% url 'floresvalentin_app:profile_edit' %}" class="list-group-item list-group-item-action">
-                        <i class="fas fa-user-edit me-2"></i>{% trans "Edit Profile" %}
+                        <i class="fas fa-user-edit me-2"></i>{% trans "Editar Perfil" %}
                     </a>
                     <a href="{% url 'floresvalentin_app:my_orders' %}" class="list-group-item list-group-item-action">
-                        <i class="fas fa-history me-2"></i>{% trans "My Orders" %}
+                        <i class="fas fa-history me-2"></i>{% trans "Mis Pedidos" %}
                     </a>
                     <a href="{% url 'password_change' %}" class="list-group-item list-group-item-action">
-                        <i class="fas fa-key me-2"></i>{% trans "Change Password" %}
+                        <i class="fas fa-key me-2"></i>{% trans "Cambiar Contraseña" %}
                     </a>
                     <a href="{% url 'logout' %}" class="list-group-item list-group-item-action text-danger">
-                        <i class="fas fa-sign-out-alt me-2"></i>{% trans "Logout" %}
+                        <i class="fas fa-sign-out-alt me-2"></i>{% trans "Cerrar Sesión" %}
                     </a>
                 </div>
             </div>

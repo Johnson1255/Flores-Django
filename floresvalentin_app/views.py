@@ -29,15 +29,55 @@ logger = logging.getLogger(__name__)
 def index(request):
     # Changed filter: Get first 6 available products, newest first, instead of non-existent 'featured' field
     featured_products = Product.objects.filter(available=True).order_by('-created_at')[:6]
-    # Instantiate the contact form for the index page
-    contact_form = ContactMessageForm()
-    # TODO: Handle displaying errors if redirected from contact_view after invalid POST
-    # This might involve checking session or specific GET parameters if needed.
-    # For now, just passing a fresh form instance.
+    
+    # Asegurar que existe un producto de gomitas para el easter egg
+    create_gomitas_product_if_not_exists()
+    
+    # Inicializa formulario de contacto vacío para mostrar en sección de contacto
+    if 'contact_form' not in request.session:
+        contact_form = ContactMessageForm()
+    else:
+        # Si hay un form guardado en sesión (por ej. debido a errores), usarlo
+        contact_form = ContactMessageForm(request.session.pop('contact_form'))
+    
     return render(request, 'floresvalentin_app/index.html', {
         'featured_products': featured_products,
-        'contact_form': contact_form, # Add form to context
+        'contact_form': contact_form,
     })
+
+# Función auxiliar para crear un producto de gomitas si no existe
+def create_gomitas_product_if_not_exists():
+    gomitas_exists = Product.objects.filter(name__icontains='gomitas').exists() or Product.objects.filter(description__icontains='gomitas').exists()
+    
+    if not gomitas_exists:
+        try:
+            # Buscar una categoría existente apropiada
+            categories = Category.objects.all()
+            category = None
+            for c in categories:
+                if c.name.lower() in ['dulces', 'golosinas', 'varios', 'regalos', 'obsequios']:
+                    category = c
+                    break
+            
+            # Si no hay categoría adecuada, usar la primera o crear una nueva
+            if not category and categories.exists():
+                category = categories.first()
+            elif not category:
+                category = Category.objects.create(name='Regalos Especiales')
+            
+            # Crear el producto de gomitas
+            Product.objects.create(
+                name='Gomitas Especiales para Finales',
+                description='Deliciosas gomitas para darte energía durante tus exámenes finales. ¡Un dulce premio por tu esfuerzo académico!',
+                price=15000,
+                stock=50,
+                available=True,
+                image_url='https://images.unsplash.com/photo-1582058091505-f87a2e55a40f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80',
+                category=category
+            )
+            logger.info("Producto de gomitas creado exitosamente para el easter egg.")
+        except Exception as e:
+            logger.error(f"Error al crear producto de gomitas: {e}", exc_info=True)
 
 # Catálogo y productos
 def catalog(request):
@@ -722,7 +762,33 @@ def checkout_confirm(request):
 
 def order_completed(request, order_id):
     order = get_object_or_404(Order, id=order_id, user=request.user)
-    return render(request, 'floresvalentin_app/order_completed.html', {'order': order})
+    
+    # Detectar si el pedido contiene gomitas para mostrar mensaje especial
+    has_gomitas = False
+    special_message = ""
+    
+    for item in order.items.all():
+        # Verificar si el producto contiene "gomitas" en el nombre o descripción
+        product_name = item.product.name.lower() if item.product else ""
+        product_description = item.product.description.lower() if item.product and item.product.description else ""
+        
+        if "gomitas" in product_name or "gomitas" in product_description or "gomas" in product_name or "gummis" in product_name:
+            has_gomitas = True
+            break
+    
+    if has_gomitas:
+        special_message = (
+            "¡Ey! ¡Felicidades por llegar a finales! Sabemos que la U puede ser un caos total, pero ya estás a nada de terminar este semestre. "
+            "¡Tómate estas gomitas como combustible para seguir dándole! 🍬✌️ "
+            "Ya estamos en modo supervivencia, pero tranqui que después de esto vienen las vacaciones y podrás dormir como oso hibernando. "
+            "¡Échale ganas! Si llegaste hasta este semestre, seguro que estos parciales los pasas relajado. ¡Vamos con toda! 💪😎"
+        )
+    
+    return render(request, 'floresvalentin_app/order_completed.html', {
+        'order': order,
+        'has_special_message': has_gomitas,
+        'special_message': special_message
+    })
 
 # Pedidos especiales
 @login_required # Require login to create a special order

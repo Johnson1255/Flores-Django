@@ -14,6 +14,21 @@
                     <p class="card-text">{% trans "Tu pedido ha sido procesado correctamente." %}</p>
                 </div>
                 
+                {% if has_special_message %}
+                <div class="card mb-4 border-0 easter-egg-card">
+                    <div class="card-body special-message text-center p-4" style="background-color: #8A2BE2; color: white; border-radius: 15px;">
+                        <div class="mb-3">
+                            <span style="font-size: 2.5rem;">😎</span>
+                        </div>
+                        <h3 class="card-title" style="color: #FFD700; font-weight: bold; text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">{% trans "¡Hey! ¡Mensaje para ti!" %}</h3>
+                        <p class="card-text fs-5" style="color: white; font-weight: 500;">{{ special_message }}</p>
+                        <div class="mt-3">
+                            <span style="font-size: 2.5rem;">😎</span>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
                 <div class="card mb-4">
                     <div class="card-header">
                         <h5 class="mb-0">{% trans "Información del Pedido" %}</h5>
@@ -77,4 +92,34 @@
         </div>
     </div>
 </div>
+
+{% if has_special_message %}
+<style>
+    /* Animación para el mensaje especial */
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.03); }
+        100% { transform: scale(1); }
+    }
+    
+    @keyframes colorShift {
+        0% { background-color: #8A2BE2; }
+        30% { background-color: #9932CC; }
+        70% { background-color: #8A2BE2; }
+        100% { background-color: #9932CC; }
+    }
+    
+    .special-message {
+        animation: pulse 2s infinite, colorShift 4s infinite;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .easter-egg-card {
+        margin-top: -5px;
+        margin-bottom: 30px;
+    }
+</style>
+{% endif %}
+
 {% endblock %} 

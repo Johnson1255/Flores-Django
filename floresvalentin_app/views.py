@@ -128,17 +128,38 @@ def catalog_api(request):
 
 def product_detail(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    comments = product.comments.all()
+    comments = product.comments.all().order_by('-created_at')  # Ordenados por fecha más reciente
     comment_form = CommentForm()
     
-    # Calcular el promedio de valoraciones
-    average_rating = comments.aggregate(Avg('rating')).get('rating__avg', 0)
+    # Calcular el promedio de valoraciones de manera más precisa
+    ratings = list(comments.values_list('rating', flat=True))
+    total_ratings = len(ratings)
+    
+    if total_ratings > 0:
+        # Cálculo manual del promedio para mayor control
+        sum_ratings = sum(ratings)
+        average_rating = sum_ratings / total_ratings
+    else:
+        average_rating = 0
+    
+    # Depuración - registrar información sobre las valoraciones
+    logger.debug(f"Producto: {product.name}, ID: {product.id}")
+    logger.debug(f"Total de comentarios: {total_ratings}")
+    logger.debug(f"Valoraciones individuales: {ratings}")
+    logger.debug(f"Suma de valoraciones: {sum(ratings) if ratings else 0}")
+    logger.debug(f"Promedio calculado: {average_rating}")
     
     context = {
         'product': product,
         'comments': comments,
         'comment_form': comment_form,
         'average_rating': average_rating,
+        'ratings_debug': {
+            'individual_ratings': ratings,
+            'total_comments': total_ratings,
+            'sum_ratings': sum(ratings) if ratings else 0, 
+            'manual_avg': average_rating
+        }
     }
     return render(request, 'floresvalentin_app/product_detail.html', context)
 

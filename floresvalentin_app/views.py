@@ -147,7 +147,7 @@ def product_detail_api(request, product_id):
             'stock': product.stock,
             # Safely access category name
             'category': product.category.name if product.category else None,
-            'image_url': product.image.url if product.image else None,
+            'image_url': product.image_url,
         }
 
         return JsonResponse(product_data)
@@ -942,7 +942,7 @@ def manage_products_api(request, product_id=None):
                 'stock': p.stock,
                 'available': p.available,
                 'description': p.description, # Include description
-                'image_url': p.image.url if p.image else None # Include image url
+                'image_url': p.image_url # Include image url
             } for p in products]
             return JsonResponse({'products': data})
         except Exception as e:
@@ -967,7 +967,7 @@ def manage_products_api(request, product_id=None):
                     'stock': product.stock,
                     'available': product.available,
                     'description': product.description,
-                    'image_url': product.image.url if product.image else None
+                    'image_url': product.image_url
                 }
                 return JsonResponse({'product': product_data, 'message': 'Producto creado exitosamente'}, status=201)
             else:
@@ -1001,7 +1001,7 @@ def manage_products_api(request, product_id=None):
                     'stock': updated_product.stock,
                     'available': updated_product.available,
                     'description': updated_product.description,
-                    'image_url': updated_product.image.url if updated_product.image else None
+                    'image_url': updated_product.image_url
                 }
                 return JsonResponse({'product': product_data, 'message': 'Producto actualizado exitosamente'})
             else:

@@ -146,7 +146,7 @@ class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
         # Include fields needed for creation/editing via the frontend management tool
-        fields = ['name', 'category', 'description', 'price', 'stock', 'available'] # Exclude 'image' for now
+        fields = ['name', 'category', 'description', 'price', 'stock', 'available', 'image_url']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'category': forms.Select(attrs={'class': 'form-select'}),
@@ -154,6 +154,7 @@ class ProductForm(forms.ModelForm):
             'price': forms.NumberInput(attrs={'class': 'form-control', 'step': '0.01'}),
             'stock': forms.NumberInput(attrs={'class': 'form-control'}),
             'available': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'image_url': forms.URLInput(attrs={'class': 'form-control'}),
         }
         labels = {
             'name': _("Nombre del Producto"),
@@ -162,6 +163,7 @@ class ProductForm(forms.ModelForm):
             'price': _("Precio (COP)"),
             'stock': _("Cantidad en Stock"),
             'available': _("Disponible para la venta"),
+            'image_url': _("URL de Imagen"),
         }
         # Add help text or error messages if needed
         error_messages = {

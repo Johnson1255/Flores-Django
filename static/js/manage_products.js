@@ -186,6 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
             price: formData.get('price'),
             stock: formData.get('stock'),
             available: formData.get('available') === 'on',
+            image_url: formData.get('image_url'),
         };
 
         try {
@@ -247,6 +248,12 @@ document.addEventListener('DOMContentLoaded', () => {
         editProductPriceInput.value = product.price;
         editProductStockInput.value = product.stock;
         editProductAvailableCheckbox.checked = product.available;
+        
+        // Set image URL if it exists
+        const imageUrlInput = document.getElementById('editProductImageUrl');
+        if (imageUrlInput) {
+            imageUrlInput.value = product.image_url || '';
+        }
 
         openEditModal();
     }
@@ -267,6 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
             price: editProductPriceInput.value,
             stock: editProductStockInput.value,
             available: editProductAvailableCheckbox.checked,
+            image_url: document.getElementById('editProductImageUrl')?.value || '',
         };
 
         try {

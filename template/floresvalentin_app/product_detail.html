@@ -6,7 +6,7 @@
     <div class="row">
         <!-- Imagen del producto -->
         <div class="col-md-6">
-            <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'images/default-flower.jpg' %}{% endif %}" 
+            <img src="{% if product.image_url %}{{ product.image_url }}{% else %}{% static 'images/default-flower.jpg' %}{% endif %}" 
                  alt="{{ product.name }}" 
                  class="img-fluid rounded">
         </div>

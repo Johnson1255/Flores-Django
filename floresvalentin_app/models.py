@@ -39,8 +39,8 @@ class Product(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True) # blank=True significa que no es requerido en formularios
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    # Usamos ImageField para mejor manejo de archivos en Django
-    image = models.ImageField(upload_to='products/', blank=True, null=True) # null=True permite valor NULL en DB
+    # Usamos URLField para almacenar la URL de la imagen
+    image_url = models.URLField(blank=True, null=True, help_text="URL de la imagen del producto")
     stock = models.PositiveIntegerField(default=0) # PositiveIntegerField asegura >= 0
     available = models.BooleanField(default=True) # Campo útil para marcar si se muestra o no
     created_at = models.DateTimeField(auto_now_add=True) # Se establece al crear

@@ -220,7 +220,11 @@
                 </label>
                  <div id="edit-error-available" class="error-message"></div>
             </div>
-            {# Image editing might require separate handling #}
+            <div class="form-group">
+                <label for="editProductImageUrl">{% trans "URL de Imagen" %}:</label>
+                <input type="url" id="editProductImageUrl" name="image_url" placeholder="https://example.com/image.jpg">
+                <div id="edit-error-image_url" class="error-message"></div>
+            </div>
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="closeEditModal()">{% trans "Cancelar" %}</button>

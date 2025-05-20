@@ -1,0 +1,80 @@
+{% extends "floresvalentin_app/base.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "Pedido Completado" %} - Flores Valentín{% endblock %}
+
+{% block content %}
+<div class="container mt-5 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm p-4">
+                <div class="text-center mb-4">
+                    <i class="fas fa-check-circle text-success" style="font-size: 4rem;"></i>
+                    <h2 class="card-title mt-3">{% trans "¡Gracias por tu Pedido!" %}</h2>
+                    <p class="card-text">{% trans "Tu pedido ha sido procesado correctamente." %}</p>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">{% trans "Información del Pedido" %}</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>{% trans "Número de Pedido" %}:</strong> {{ order.id }}</p>
+                        <p><strong>{% trans "Fecha" %}:</strong> {{ order.created_at|date:"d/m/Y H:i" }}</p>
+                        <p><strong>{% trans "Estado" %}:</strong> 
+                            <span class="badge bg-primary">{{ order.get_status_display }}</span>
+                        </p>
+                        <p><strong>{% trans "Total" %}:</strong> ${{ order.total_amount|floatformat:2 }}</p>
+                    </div>
+                </div>
+                
+                {% if order.items.all %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">{% trans "Productos" %}</h5>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        {% for item in order.items.all %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">{{ item.product.name }}</h6>
+                                <small class="text-muted">{% trans "Cantidad" %}: {{ item.quantity }}</small>
+                            </div>
+                            <span>${{ item.price|floatformat:2 }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">{% trans "¿Qué sucede ahora?" %}</h5>
+                    </div>
+                    <div class="card-body">
+                        <ol class="mb-0">
+                            <li class="mb-2">{% trans "Recibirás un correo electrónico con la confirmación de tu pedido." %}</li>
+                            <li class="mb-2">{% trans "Nos pondremos en contacto contigo para coordinar la entrega." %}</li>
+                            <li class="mb-2">{% trans "Puedes ver el estado de tu pedido en tu perfil, en la sección 'Mis Pedidos'." %}</li>
+                        </ol>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="text-center mt-3">
+                    <p class="card-text">{% trans "¿Quieres seguir comprando?" %}</p>
+                    <div class="d-grid gap-2 d-md-flex justify-content-center">
+                        <a href="{% url 'floresvalentin_app:index' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-home me-2"></i>{% trans "Volver al Inicio" %}
+                        </a>
+                        <a href="{% url 'floresvalentin_app:catalogo' %}" class="btn btn-primary">
+                            <i class="fas fa-shopping-bag me-2"></i>{% trans "Ver Catálogo" %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -8,6 +8,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const insertBtn = document.getElementById('insertBtn');
     const tabs = document.querySelectorAll('.tab');
     const tabContents = document.querySelectorAll('.tab-content');
+    // Search Elements
+    const productSearchInput = document.getElementById('productSearchInput');
+    const productSearchBtn = document.getElementById('productSearchBtn');
+    const resetSearchBtn = document.getElementById('resetSearchBtn');
     // Edit Modal Elements
     const editModal = document.getElementById('editProductModal');
     const editForm = document.getElementById('editProductForm');
@@ -24,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- State ---
     let isAdmin = false; // Store admin status globally in this script
     let currentProducts = []; // Store fetched products to easily find data for editing
+    let allProducts = []; // Store all products for filtering
 
     // --- URLs ---
     const checkAdminUrl = '/floresvalentin_app/api/check-admin/';
@@ -53,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await loadProducts();
         setupTabs();
         setupFormListeners(); // Setup listeners for both forms
+        setupSearchFunctionality(); // Setup product search
         updateAdminUIElements(); // Enable/disable elements based on admin status
         setupModalCloseHandlers(); // Setup modal close handlers
     }
@@ -79,6 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
         manageResultDiv.innerHTML = '<p>Cargando productos...</p>';
         productListTbody.innerHTML = '<tr><td colspan="7">Cargando...</td></tr>';
         currentProducts = []; // Reset current products
+        allProducts = []; // Reset all products
 
         try {
             const response = await fetch(manageProductsApiUrl);
@@ -86,9 +93,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
 
             if (data.products && data.products.length > 0) {
-                currentProducts = data.products; // Store fetched products
+                allProducts = data.products; // Store all fetched products
+                currentProducts = [...allProducts]; // Create a copy for current display
                 displayProducts(currentProducts);
                 manageResultDiv.innerHTML = `<p>Se cargaron ${currentProducts.length} productos.</p>`;
+                // Clear search input on reload
+                if (productSearchInput) productSearchInput.value = '';
             } else {
                 productListTbody.innerHTML = '<tr><td colspan="7">No se encontraron productos.</td></tr>';
                 manageResultDiv.innerHTML = '<p>No hay productos para mostrar.</p>';
@@ -169,6 +179,65 @@ document.addEventListener('DOMContentLoaded', () => {
         if (editForm) editForm.addEventListener('submit', handleEditSubmit);
     }
 
+    // --- Search Functionality ---
+    function setupSearchFunctionality() {
+        if (productSearchBtn) {
+            productSearchBtn.addEventListener('click', () => {
+                searchProducts(productSearchInput.value.trim());
+            });
+        }
+
+        if (productSearchInput) {
+            productSearchInput.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    searchProducts(productSearchInput.value.trim());
+                }
+            });
+        }
+
+        if (resetSearchBtn) {
+            resetSearchBtn.addEventListener('click', () => {
+                productSearchInput.value = '';
+                resetSearch();
+            });
+        }
+    }
+
+    function searchProducts(searchTerm) {
+        if (!searchTerm) {
+            resetSearch();
+            return;
+        }
+
+        searchTerm = searchTerm.toLowerCase();
+        
+        const filteredProducts = allProducts.filter(product => {
+            const productId = product.id.toLowerCase();
+            const productName = product.name.toLowerCase();
+            const categoryName = product.category ? product.category.name.toLowerCase() : '';
+            
+            return productId.includes(searchTerm) || 
+                  productName.includes(searchTerm) || 
+                  categoryName.includes(searchTerm);
+        });
+
+        currentProducts = filteredProducts;
+        
+        if (filteredProducts.length > 0) {
+            displayProducts(filteredProducts);
+            manageResultDiv.innerHTML = `<p>Se encontraron ${filteredProducts.length} productos con "${searchTerm}".</p>`;
+        } else {
+            productListTbody.innerHTML = '<tr><td colspan="7">No se encontraron productos con los criterios de búsqueda.</td></tr>';
+            manageResultDiv.innerHTML = `<p>No se encontraron productos que coincidan con "${searchTerm}".</p>`;
+        }
+    }
+
+    function resetSearch() {
+        currentProducts = [...allProducts];
+        displayProducts(currentProducts);
+        manageResultDiv.innerHTML = `<p>Se muestran todos los productos (${currentProducts.length}).</p>`;
+    }
+
     // -- Insert Product --
     async function handleInsertProduct(event) {
         event.preventDefault();
@@ -201,6 +270,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 insertResultDiv.innerHTML = `<p class="text-success">${responseData.message || 'Producto insertado correctamente.'}</p>`;
                 insertForm.reset();
                 await loadProducts(); // Refresh list
+                if (productSearchInput && productSearchInput.value) {
+                    productSearchInput.value = ''; // Reset search input after new product is added
+                }
             } else if (response.status === 400 && responseData.errors) {
                 displayInsertFormErrors(responseData.errors);
                 insertResultDiv.innerHTML = '<p class="text-danger">Error de validación. Por favor revise los campos.</p>';
@@ -288,19 +360,58 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok) {
                 editResultDiv.innerHTML = `<p class="text-success">${responseData.message || 'Producto actualizado correctamente.'}</p>`;
 
-                // Update local data store
-                const index = currentProducts.findIndex(p => p.id === productId);
-                if (index !== -1) {
-                    currentProducts[index] = responseData.product; // Update with data returned from API
+                // Update both data stores
+                const indexCurrent = currentProducts.findIndex(p => p.id === productId);
+                if (indexCurrent !== -1) {
+                    currentProducts[indexCurrent] = responseData.product;
+                }
+                
+                const indexAll = allProducts.findIndex(p => p.id === productId);
+                if (indexAll !== -1) {
+                    allProducts[indexAll] = responseData.product;
                 }
 
-                // Update the specific row in the table
-                const row = productListTbody.querySelector(`tr[data-product-id="${productId}"]`);
-                if (row) {
-                    updateProductRow(row, responseData.product);
+                // If there's an active search, we need to check if edited product still matches search criteria
+                if (productSearchInput && productSearchInput.value.trim()) {
+                    const searchTerm = productSearchInput.value.trim().toLowerCase();
+                    const updatedProduct = responseData.product;
+                    const productName = updatedProduct.name.toLowerCase();
+                    const categoryName = updatedProduct.category ? updatedProduct.category.name.toLowerCase() : '';
+                    
+                    // Check if product still matches search criteria
+                    if (productId.toLowerCase().includes(searchTerm) || 
+                        productName.includes(searchTerm) || 
+                        categoryName.includes(searchTerm)) {
+                        // Product still matches - update the row
+                        const row = productListTbody.querySelector(`tr[data-product-id="${productId}"]`);
+                        if (row) {
+                            updateProductRow(row, updatedProduct);
+                        } else {
+                            // If row not found, rerun search to refresh display
+                            searchProducts(productSearchInput.value.trim());
+                        }
+                    } else {
+                        // Product no longer matches search - remove it from view and update currentProducts
+                        currentProducts = currentProducts.filter(p => p.id !== productId);
+                        const row = productListTbody.querySelector(`tr[data-product-id="${productId}"]`);
+                        if (row) {
+                            row.remove();
+                        }
+                        if (productListTbody.rows.length === 0) {
+                            productListTbody.innerHTML = '<tr><td colspan="7">No se encontraron productos con los criterios de búsqueda.</td></tr>';
+                        }
+                        // Update message to reflect removal from search results
+                        manageResultDiv.innerHTML = `<p>Producto actualizado. Ya no coincide con la búsqueda "${productSearchInput.value.trim()}" y ha sido removido de los resultados.</p>`;
+                    }
                 } else {
-                    // If row not found, reload the whole table (less ideal)
-                    await loadProducts();
+                    // No active search - just update the row
+                    const row = productListTbody.querySelector(`tr[data-product-id="${productId}"]`);
+                    if (row) {
+                        updateProductRow(row, responseData.product);
+                    } else {
+                        // If row not found, reload the whole table (less ideal)
+                        await loadProducts();
+                    }
                 }
 
                 setTimeout(closeEditModal, 1000); // Close modal after a short delay
@@ -358,12 +469,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (response.ok) {
                     manageResultDiv.innerHTML = `<p class="text-success">${responseData.message || 'Producto eliminado.'}</p>`;
-                    // Remove from local store
-                    currentProducts = currentProducts.filter(p => p.id !== productId);
-                    // Remove row from table
-                    button.closest('tr').remove();
-                    if (productListTbody.rows.length === 0) {
-                         productListTbody.innerHTML = '<tr><td colspan="7">No se encontraron productos.</td></tr>';
+                    
+                    // Update the global allProducts array to remove the deleted product
+                    allProducts = allProducts.filter(p => p.id !== productId);
+                    
+                    // If there's an active search, update the filtered list and refresh display
+                    if (productSearchInput && productSearchInput.value.trim()) {
+                        searchProducts(productSearchInput.value.trim());
+                    } else {
+                        // Remove from local store
+                        currentProducts = currentProducts.filter(p => p.id !== productId);
+                        // Remove row from table
+                        button.closest('tr').remove();
+                        if (productListTbody.rows.length === 0) {
+                            productListTbody.innerHTML = '<tr><td colspan="7">No se encontraron productos.</td></tr>';
+                        }
                     }
                 } else {
                      throw new Error(responseData.error || `HTTP error! status: ${response.status}`);

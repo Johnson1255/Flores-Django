@@ -30,6 +30,20 @@
     .error-message { color: #dc3545; font-size: 0.9em; margin-top: 5px; }
     #result, #manageResult { margin-top: 20px; padding: 10px; border: 1px solid #ccc; min-height: 50px; background-color: #f8f9fa; }
 
+    /* Search Bar Styles */
+    .search-container {
+        margin-bottom: 20px;
+    }
+    .search-container .input-group {
+        display: flex;
+    }
+    .search-container .input-group-append {
+        display: flex;
+    }
+    .search-container .btn {
+        margin-left: 5px;
+    }
+    
     /* Modal Styles */
     .modal {
         display: none; /* Hidden by default */
@@ -96,6 +110,22 @@
     {# Tab Content: Manage Products #}
     <div id="manageTab" class="tab-content active">
         <h2>{% trans "Gestionar Productos Existentes" %}</h2>
+        
+        <!-- Barra de búsqueda de productos -->
+        <div class="search-container mb-3">
+            <div class="input-group">
+                <input type="text" id="productSearchInput" class="form-control" placeholder="{% trans 'Buscar por ID, nombre o categoría' %}">
+                <div class="input-group-append">
+                    <button id="productSearchBtn" class="btn btn-outline-secondary" type="button">
+                        <i class="fas fa-search"></i> {% trans "Buscar" %}
+                    </button>
+                    <button id="resetSearchBtn" class="btn btn-outline-danger" type="button">
+                        <i class="fas fa-times"></i> {% trans "Limpiar" %}
+                    </button>
+                </div>
+            </div>
+        </div>
+        
         <div id="manageResult"><p>{% trans "Cargando productos..." %}</p></div>
         <table id="productList">
             <thead>

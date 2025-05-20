@@ -13,7 +13,7 @@ from django.contrib import messages
 from django.urls import reverse_lazy, reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger # Added for pagination
 from django.template.loader import render_to_string # Added for rendering partials
-from django.db.models import Q # Added for search
+from django.db.models import Q, Avg # Added for search and average
 from .forms import CommentForm #Para los comentarios
 from .models import Comment, Product #Para los comentarios
 
@@ -128,12 +128,19 @@ def catalog_api(request):
 
 def product_detail(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    related_products = Product.objects.filter(category=product.category).exclude(id=product_id)[:4]
-
-    return render(request, 'floresvalentin_app/product_detail.html', {
+    comments = product.comments.all()
+    comment_form = CommentForm()
+    
+    # Calcular el promedio de valoraciones
+    average_rating = comments.aggregate(Avg('rating')).get('rating__avg', 0)
+    
+    context = {
         'product': product,
-        'related_products': related_products
-    })
+        'comments': comments,
+        'comment_form': comment_form,
+        'average_rating': average_rating,
+    }
+    return render(request, 'floresvalentin_app/product_detail.html', context)
 
 def product_detail_api(request, product_id):
     try: # Added try block
@@ -1034,18 +1041,6 @@ def manage_products_api(request, product_id=None):
     # Should not happen due to @require_http_methods
     return JsonResponse({'error': 'Method not allowed'}, status=405)
 
-def product_detail(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    comments = product.comments.all()
-    comment_form = CommentForm()
-    
-    context = {
-        'product': product,
-        'comments': comments,
-        'comment_form': comment_form,
-    }
-    return render(request, 'floresvalentin_app/product_detail.html', context)
-
 @login_required
 def add_comment(request, product_id):
     product = get_object_or_404(Product, id=product_id)
@@ -1066,6 +1061,14 @@ def add_comment(request, product_id):
                 comment = form.save(commit=False)
                 comment.user = request.user
                 comment.product = product
+                
+                # Obtener y guardar la valoración
+                rating = request.POST.get('rating')
+                if rating and rating.isdigit() and 1 <= int(rating) <= 5:
+                    comment.rating = int(rating)
+                else:
+                    comment.rating = 5  # Valor por defecto
+                
                 comment.save()
                 messages.success(request, '¡Tu comentario ha sido añadido exitosamente!')
                 

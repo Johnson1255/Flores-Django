@@ -53,12 +53,18 @@
                 <h3 class="mb-0"><i class="fas fa-comments text-primary me-2"></i>Opiniones de Clientes</h3>
                 {% if comments %}
                 <div class="ratings">
-                    <i class="fas fa-star text-warning"></i>
-                    <i class="fas fa-star text-warning"></i>
-                    <i class="fas fa-star text-warning"></i>
-                    <i class="fas fa-star text-warning"></i>
-                    <i class="fas fa-star-half-alt text-warning"></i>
-                    <span class="ms-2 fw-bold">{{ comments|length }} opiniones</span>
+                    {% with avg_rating=average_rating|default:0 %}
+                        {% for i in '12345' %}
+                            {% if forloop.counter <= avg_rating|floatformat:0 %}
+                                <i class="fas fa-star text-warning"></i>
+                            {% elif forloop.counter <= avg_rating|add:0.5|floatformat:0 %}
+                                <i class="fas fa-star-half-alt text-warning"></i>
+                            {% else %}
+                                <i class="far fa-star text-warning"></i>
+                            {% endif %}
+                        {% endfor %}
+                        <span class="ms-2 fw-bold">{{ comments|length }} opiniones</span>
+                    {% endwith %}
                 </div>
                 {% endif %}
             </div>
@@ -73,6 +79,29 @@
                                 <h5>Compartir tu experiencia</h5>
                                 <form method="post" action="{% url 'floresvalentin_app:add_comment' product.id %}" class="review-form">
                                     {% csrf_token %}
+                                    
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Tu valoración:</label>
+                                        <div class="star-rating">
+                                            <div class="rating-selection d-flex">
+                                                <input type="radio" id="star1" name="rating" value="1" class="visually-hidden" required/>
+                                                <label for="star1" class="star-label fs-3" title="1 estrella"><i class="far fa-star"></i></label>
+                                                
+                                                <input type="radio" id="star2" name="rating" value="2" class="visually-hidden"/>
+                                                <label for="star2" class="star-label fs-3" title="2 estrellas"><i class="far fa-star"></i></label>
+                                                
+                                                <input type="radio" id="star3" name="rating" value="3" class="visually-hidden"/>
+                                                <label for="star3" class="star-label fs-3" title="3 estrellas"><i class="far fa-star"></i></label>
+                                                
+                                                <input type="radio" id="star4" name="rating" value="4" class="visually-hidden"/>
+                                                <label for="star4" class="star-label fs-3" title="4 estrellas"><i class="far fa-star"></i></label>
+                                                
+                                                <input type="radio" id="star5" name="rating" value="5" class="visually-hidden"/>
+                                                <label for="star5" class="star-label fs-3" title="5 estrellas"><i class="far fa-star"></i></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
                                     <div class="mb-3">
                                         {{ comment_form.as_p }}
                                     </div>
@@ -111,11 +140,15 @@
                                             </div>
                                         </div>
                                         <div class="review-rating mb-2">
-                                            <i class="fas fa-star text-warning"></i>
-                                            <i class="fas fa-star text-warning"></i>
-                                            <i class="fas fa-star text-warning"></i>
-                                            <i class="fas fa-star text-warning"></i>
-                                            <i class="fas fa-star text-warning"></i>
+                                            {% with rating=comment.rating|default:5 %}
+                                                {% for i in '12345' %}
+                                                    {% if forloop.counter <= rating %}
+                                                        <i class="fas fa-star text-warning"></i>
+                                                    {% else %}
+                                                        <i class="far fa-star text-warning"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endwith %}
                                         </div>
                                         <p class="review-text">{{ comment.content }}</p>
                                         {% if comment.user == user %}
@@ -142,4 +175,111 @@
         </div>
     </div>
 </div>
+
+{% block extra_css %}
+<style>
+    /* Estilos para el selector de estrellas */
+    .star-rating .rating-selection {
+        display: flex;
+    }
+    
+    .star-label {
+        color: #ccc;
+        cursor: pointer;
+        padding: 0 0.1em;
+    }
+    
+    /* Nueva lógica para selección de izquierda a derecha */
+    .star-label:hover i,
+    .star-label:hover i ~ .rating-selection i,
+    input[type="radio"]:checked + .star-label i,
+    input[type="radio"]:checked + .star-label ~ label i {
+        color: #FFD700;
+        content: "\f005";
+        font-weight: 900;
+    }
+    
+    .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Script para manejar la selección de estrellas
+        const starLabels = document.querySelectorAll('.star-label');
+        const starInputs = document.querySelectorAll('.star-rating input[type="radio"]');
+        
+        starLabels.forEach(label => {
+            label.addEventListener('click', function() {
+                // Actualizar todas las estrellas cuando se hace clic
+                const starId = this.getAttribute('for');
+                const selectedInput = document.getElementById(starId);
+                const ratingValue = selectedInput.value;
+                
+                // Cambiar los iconos a estrellas sólidas o huecas según la selección
+                starLabels.forEach(lbl => {
+                    const lblFor = lbl.getAttribute('for');
+                    const starValue = document.getElementById(lblFor).value;
+                    
+                    if (starValue <= ratingValue) {
+                        lbl.querySelector('i').className = 'fas fa-star text-warning';
+                    } else {
+                        lbl.querySelector('i').className = 'far fa-star';
+                    }
+                });
+            });
+            
+            // Agregar efecto hover
+            label.addEventListener('mouseenter', function() {
+                const starId = this.getAttribute('for');
+                const hoverValue = document.getElementById(starId).value;
+                
+                starLabels.forEach(lbl => {
+                    const lblFor = lbl.getAttribute('for');
+                    const starValue = document.getElementById(lblFor).value;
+                    
+                    if (starValue <= hoverValue) {
+                        lbl.querySelector('i').className = 'fas fa-star text-warning';
+                    }
+                });
+            });
+            
+            // Restaurar estado al quitar el hover
+            label.addEventListener('mouseleave', function() {
+                const selectedInput = document.querySelector('.star-rating input[type="radio"]:checked');
+                const selectedValue = selectedInput ? selectedInput.value : 0;
+                
+                starLabels.forEach(lbl => {
+                    const lblFor = lbl.getAttribute('for');
+                    const starValue = document.getElementById(lblFor).value;
+                    
+                    if (selectedValue && starValue <= selectedValue) {
+                        lbl.querySelector('i').className = 'fas fa-star text-warning';
+                    } else {
+                        lbl.querySelector('i').className = 'far fa-star';
+                    }
+                });
+            });
+        });
+        
+        // Asegurar que al cargar la página, si hay una valoración seleccionada, se muestren las estrellas
+        const selectedInput = document.querySelector('.star-rating input[type="radio"]:checked');
+        if (selectedInput) {
+            const event = new Event('click');
+            document.querySelector(`label[for="${selectedInput.id}"]`).dispatchEvent(event);
+        }
+    });
+</script>
+{% endblock %}
+
 {% endblock %}

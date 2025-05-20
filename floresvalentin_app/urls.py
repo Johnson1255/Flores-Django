@@ -48,4 +48,6 @@ urlpatterns = [
 
     # Comentarios
     path('producto/<uuid:product_id>/comentario/', views.add_comment, name='add_comment'),
+    path('comentario/<int:comment_id>/editar/', views.edit_comment, name='edit_comment'),
+    path('comentario/<int:comment_id>/eliminar/', views.delete_comment, name='delete_comment'),
 ]

@@ -1094,3 +1094,56 @@ def add_comment(request, product_id):
                 messages.success(request, '¡Tu comentario ha sido añadido exitosamente!')
                 
     return redirect('floresvalentin_app:product_detail', product_id=product_id)
+
+@login_required
+def edit_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    
+    # Verificar que el usuario sea el autor del comentario
+    if comment.user != request.user:
+        messages.error(request, 'No tienes permiso para editar este comentario.')
+        return redirect('floresvalentin_app:product_detail', product_id=comment.product.id)
+    
+    if request.method == 'POST':
+        form = CommentForm(request.POST, instance=comment)
+        if form.is_valid():
+            # Actualizar el contenido
+            edited_comment = form.save(commit=False)
+            
+            # Obtener y actualizar la valoración
+            rating = request.POST.get('rating')
+            if rating and rating.isdigit() and 1 <= int(rating) <= 5:
+                edited_comment.rating = int(rating)
+            
+            # Marcar como editado (aunque esto también se hace en el método save del modelo)
+            edited_comment.is_edited = True
+            
+            edited_comment.save()
+            messages.success(request, 'Tu comentario ha sido actualizado exitosamente.')
+            return redirect('floresvalentin_app:product_detail', product_id=comment.product.id)
+    else:
+        form = CommentForm(instance=comment)
+    
+    context = {
+        'form': form,
+        'comment': comment,
+        'product': comment.product
+    }
+    return render(request, 'floresvalentin_app/edit_comment.html', context)
+
+@login_required
+def delete_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    
+    # Verificar que el usuario sea el autor del comentario
+    if comment.user != request.user:
+        messages.error(request, 'No tienes permiso para eliminar este comentario.')
+        return redirect('floresvalentin_app:product_detail', product_id=comment.product.id)
+    
+    product_id = comment.product.id
+    
+    if request.method == 'POST':
+        comment.delete()
+        messages.success(request, 'Tu comentario ha sido eliminado exitosamente.')
+    
+    return redirect('floresvalentin_app:product_detail', product_id=product_id)

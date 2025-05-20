@@ -226,6 +226,11 @@
                                                     <i class="far fa-calendar-alt me-1"></i>
                                                     {{ comment.created_at|date:"d/m/Y" }}
                                                 </span>
+                                                {% if comment.is_edited %}
+                                                <span class="badge bg-light text-muted ms-1" title="Editado el {{ comment.updated_at|date:'d/m/Y H:i' }}">
+                                                    <i class="fas fa-pen-alt me-1"></i>Editado
+                                                </span>
+                                                {% endif %}
                                             </div>
                                         </div>
                                         <div class="review-rating mb-2">
@@ -242,9 +247,15 @@
                                         <p class="review-text">{{ comment.content }}</p>
                                         {% if comment.user == user %}
                                             <div class="d-flex justify-content-end">
-                                                <button class="btn btn-sm btn-outline-secondary">
+                                                <a href="{% url 'floresvalentin_app:edit_comment' comment.id %}" class="btn btn-sm btn-outline-secondary me-2">
                                                     <i class="fas fa-edit me-1"></i>Editar
-                                                </button>
+                                                </a>
+                                                <form method="post" action="{% url 'floresvalentin_app:delete_comment' comment.id %}" class="d-inline" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este comentario?');">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                        <i class="fas fa-trash me-1"></i>Eliminar
+                                                    </button>
+                                                </form>
                                             </div>
                                         {% endif %}
                                     </div>

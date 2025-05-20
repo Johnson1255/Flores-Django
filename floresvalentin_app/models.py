@@ -231,9 +231,18 @@ class Comment(models.Model):
     content = models.TextField()
     rating = models.IntegerField(choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')], default=5)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)  # Se actualiza cada vez que el modelo se guarda
+    is_edited = models.BooleanField(default=False)  # Indica si el comentario ha sido editado
     
     class Meta:
         ordering = ['-created_at']
         
     def __str__(self):
         return f'Comentario de {self.user.username} en {self.product.name}'
+        
+    def save(self, *args, **kwargs):
+        # Si el comentario ya existe (tiene ID) y no es una creación nueva
+        if self.pk is not None:
+            # Marcar como editado solo si no es la primera vez que se guarda
+            self.is_edited = True
+        super().save(*args, **kwargs)

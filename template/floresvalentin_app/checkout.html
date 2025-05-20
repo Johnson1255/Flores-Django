@@ -16,23 +16,47 @@
             background-color: #f8f9fa;
             padding: 1.5rem;
             border-radius: 0.25rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
         }
         .order-summary h4 {
             margin-bottom: 1rem;
             border-bottom: 1px solid #dee2e6;
             padding-bottom: 0.5rem;
+            color: #495057;
         }
         .summary-item {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+        .products-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+            padding-right: 0.5rem;
+        }
+        .product-item {
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #e9ecef;
+        }
+        .product-item:last-child {
+            border-bottom: none;
+        }
+        .product-name {
+            font-weight: 500;
+        }
+        .product-price {
+            font-weight: 500;
+            color: #495057;
         }
         .summary-total {
             font-weight: bold;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             margin-top: 1rem;
             padding-top: 1rem;
             border-top: 1px solid #dee2e6;
+            color: #212529;
         }
     </style>
 {% endblock %}
@@ -77,38 +101,70 @@
             <div class="col-md-5 checkout-section">
                 <div class="order-summary">
                     <h4>{% trans "Resumen del Pedido" %}</h4>
-                    {# You might want to list items here if needed #}
-                    {# Example:
-                    {% for item in cart_items %}
-                        <div class="summary-item">
-                            <span>{{ item.product.name }} x {{ item.quantity }}</span>
-                            <span>${{ item.total_price|floatformat:2 }}</span>
+                    
+                    {% if cart_items %}
+                        <div class="products-list mb-3">
+                            {% for item in cart_items %}
+                                <div class="product-item">
+                                    <div class="summary-item">
+                                        <span class="product-name">{{ item.product.name }}</span>
+                                        <span class="product-price">${{ item.price|floatformat:2 }}</span>
+                                    </div>
+                                    <div class="summary-item">
+                                        <span class="text-muted">{% trans "Cantidad" %}: {{ item.quantity }}</span>
+                                        <span class="text-muted">{% trans "Subtotal" %}: ${{ item.total_price|floatformat:2 }}</span>
+                                    </div>
+                                </div>
+                            {% endfor %}
                         </div>
-                    {% endfor %}
-                    <hr>
-                    #}
-                    <div class="summary-item">
-                        <span>{% trans "Subtotal" %}:</span>
-                        <span>${{ cart_subtotal|floatformat:2 }}</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>{% trans "Impuestos" %} (19%):</span> {# Adjust tax rate if needed #}
-                        <span>${{ cart_tax|floatformat:2 }}</span>
-                    </div>
-                    <div class="summary-item summary-total">
-                        <span>{% trans "Total" %}:</span>
-                        <span>${{ cart_total|floatformat:2 }}</span>
+                        <hr>
+                    {% else %}
+                        <div class="alert alert-warning mb-3">
+                            {% trans "No hay productos en el carrito." %}
+                            <a href="{% url 'floresvalentin_app:catalogo' %}" class="alert-link">{% trans "Ir al catálogo" %}</a>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="mt-3">
+                        <div class="summary-item">
+                            <span>{% trans "Subtotal" %}:</span>
+                            <span class="fw-bold">${{ cart_subtotal|floatformat:2 }}</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>{% trans "Impuestos" %} (19%):</span>
+                            <span class="fw-bold">${{ cart_tax|floatformat:2 }}</span>
+                        </div>
+                        <div class="summary-item summary-total">
+                            <span>{% trans "Total a pagar" %}:</span>
+                            <span>${{ cart_total|floatformat:2 }}</span>
+                        </div>
                     </div>
 
-                    {# Payment Method Section (Placeholder) #}
-                    <div class="mt-4">
-                        <h5>{% trans "Método de Pago" %}</h5>
-                        <p class="text-muted">{% trans "Actualmente solo aceptamos pago contra entrega o transferencia. Nos pondremos en contacto para coordinar." %}</p>
-                        {# Add payment options here later if integrating a gateway #}
+                    {# Payment Method Section #}
+                    <div class="mt-4 p-3 bg-white rounded shadow-sm">
+                        <h5 class="mb-3">{% trans "Método de Pago" %}</h5>
+                        
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="payment_method" id="payment_contra_entrega" value="contra_entrega" checked>
+                            <label class="form-check-label" for="payment_contra_entrega">
+                                {% trans "Pago contra entrega" %}
+                            </label>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="payment_method" id="payment_transferencia" value="transferencia">
+                            <label class="form-check-label" for="payment_transferencia">
+                                {% trans "Transferencia bancaria" %}
+                            </label>
+                        </div>
+                        
+                        <p class="text-muted small">{% trans "Nos pondremos en contacto para coordinar los detalles del pago." %}</p>
                     </div>
 
                     <div class="d-grid gap-2 mt-4">
-                        <button type="submit" class="btn btn-primary btn-lg">{% trans "Confirmar y Realizar Pedido" %}</button>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-shopping-cart me-2"></i>{% trans "Confirmar y Realizar Pedido" %}
+                        </button>
                     </div>
                 </div>
             </div>

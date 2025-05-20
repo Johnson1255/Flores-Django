@@ -537,7 +537,15 @@ def checkout(request):
              if product:
                  quantity = item_data.get('quantity', 0)
                  price = item_data.get('price', float(product.price))
-                 cart_subtotal += quantity * price
+                 total_price = quantity * price
+                 cart_subtotal += total_price
+                 # Añadir datos de producto al contexto
+                 cart_items_context.append({
+                    'product': product,
+                    'quantity': quantity,
+                    'price': price,
+                    'total_price': total_price
+                 })
 
     cart_tax = cart_subtotal * 0.19 # Example tax
     cart_total = cart_subtotal + cart_tax
@@ -562,6 +570,7 @@ def checkout(request):
     return render(request, 'floresvalentin_app/checkout.html', {
         'cart': cart,
         'form': form,
+        'cart_items': cart_items_context,
         'cart_subtotal': cart_subtotal,
         'cart_tax': cart_tax,
         'cart_total': cart_total,
@@ -640,6 +649,7 @@ def checkout_confirm(request):
                 # Re-rendering with the original form might be the simplest approach
                 # Need to recalculate totals again for the template
                 cart_subtotal = 0
+                cart_items_context = []
                 if cart and cart.items:
                     product_ids = cart.items.keys()
                     products = Product.objects.filter(id__in=product_ids)
@@ -649,12 +659,21 @@ def checkout_confirm(request):
                          if product:
                              quantity = item_data.get('quantity', 0)
                              price = item_data.get('price', float(product.price))
-                             cart_subtotal += quantity * price
+                             total_price = quantity * price
+                             cart_subtotal += total_price
+                             # Añadir datos de producto al contexto
+                             cart_items_context.append({
+                                'product': product,
+                                'quantity': quantity,
+                                'price': price,
+                                'total_price': total_price
+                             })
                 cart_tax = cart_subtotal * 0.19
                 cart_total = cart_subtotal + cart_tax
                 return render(request, 'floresvalentin_app/checkout.html', {
                     'cart': cart,
                     'form': form, # Pass the submitted form back
+                    'cart_items': cart_items_context,
                     'cart_subtotal': cart_subtotal,
                     'cart_tax': cart_tax,
                     'cart_total': cart_total,
@@ -665,6 +684,7 @@ def checkout_confirm(request):
              cart = get_or_create_cart(request) # Need cart context again
              # Recalculate totals again for the template
              cart_subtotal = 0
+             cart_items_context = []
              if cart and cart.items:
                  product_ids = cart.items.keys()
                  products = Product.objects.filter(id__in=product_ids)
@@ -674,7 +694,15 @@ def checkout_confirm(request):
                       if product:
                           quantity = item_data.get('quantity', 0)
                           price = item_data.get('price', float(product.price))
-                          cart_subtotal += quantity * price
+                          total_price = quantity * price
+                          cart_subtotal += total_price
+                          # Añadir datos de producto al contexto
+                          cart_items_context.append({
+                             'product': product,
+                             'quantity': quantity,
+                             'price': price,
+                             'total_price': total_price
+                          })
              cart_tax = cart_subtotal * 0.19
              cart_total = cart_subtotal + cart_tax
 
@@ -682,6 +710,7 @@ def checkout_confirm(request):
              return render(request, 'floresvalentin_app/checkout.html', {
                  'cart': cart,
                  'form': form, # Pass invalid form back
+                 'cart_items': cart_items_context,
                  'cart_subtotal': cart_subtotal,
                  'cart_tax': cart_tax,
                  'cart_total': cart_total,

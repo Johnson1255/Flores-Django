@@ -61,17 +61,19 @@ Flores San Valentín es una aplicación web completa desarrollada con Django par
 - **Multidioma**: Implementado con el sistema de traducción de Django
 - **Tema claro/oscuro**: Soporte para modos de visualización alternativos
 
-## 📸 Capturas de Pantalla (TODO)
+## 📸 Capturas de Pantalla
 
 <div align="center">
 <table>
 <tr>
-<td><img src="https://i.imgur.com/z9XxUeS.png" alt="Página Principal" width="400"/></td>
-<td><img src="https://i.imgur.com/qL8WDCh.png" alt="Catálogo de Productos" width="400"/></td>
+<td><img src="https://imgur.com/rPxuqkC.png" alt="Página Principal" width="400"/></td>
+<td><img src="https://imgur.com/f51eSj6.png" alt="Catálogo de Productos" width="400"/></td>
+<td><img src="https://imgur.com/mJByOJp.png" alt="Detalle del Producto" width="400"/></td>
 </tr>
 <tr>
-<td><img src="https://i.imgur.com/fCnImst.png" alt="Detalle de Producto" width="400"/></td>
-<td><img src="https://i.imgur.com/V2AjFLp.png" alt="Carrito de Compras" width="400"/></td>
+<td><img src="https://imgur.com/eNoxx2X.png" alt="Historial de Compras" width="400"/></td>
+<td><img src="https://imgur.com/vS1qDl9.png" alt="Perfil de Usuario" width="400"/></td>
+<td><img src="https://imgur.com/qtEthgl.png" alt="Carrito de Compras" width="400"/></td>
 </tr>
 </table>
 </div>
